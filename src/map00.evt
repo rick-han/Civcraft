@@ -1,0 +1,15 @@
+# stop/walking/stepping,imagefile,x,y,direction(0=LEFT,1=RIGHT,2=UP,3=DOWN),movement speed(1=slow,6=fast),frequency(1=slow,8=fast),logic updater(stay,random,updown,leftright),dialog1+dialog2+dialog3
+stop,Chara2.png,36,19,0,1,1,stay,you know my son...+you should start planning your own game
+walking,Chara2.png,10,14,1,1,1,leftright,ahh a young energic kid+remind me when i am at your age...
+stepping,Chara3.png,26,17,2,5,5,updown,i want to go to a prom!!+i want to go to a prom!!+i want to go to a prom!!
+stepping,Chara4.png,19,22,0,2,6,leftright,back off!!!+i have to guard this GTGE garden!!
+walking,Chara5.png,18,6,3,3,5,random,no nice guy in this city+i feel so lonely...
+stop,Chara4.png,2,1,3,1,1,stay,welcome to the city of nowhere+enjoy your visit!
+stop,Chara4.png,30,16,3,1,1,stay,this city is really dull!+no job in here instead guarding this old man!
+stepping,Chara3.png,5,8,2,4,7,random,playing all day! yipee!!
+stop,none,30,20,0,1,1,stay,wise man is lived here!
+stop,Chara4.png,37,1,1,1,1,stay,i love her...
+stop,Chara5.png,38,1,0,1,1,stay,i love him...+we are going to marry!!
+stop,Chara2.png,9,20,3,1,1,stay,don't disturb us you little brat!
+stop,Chara5.png,9,21,2,1,1,stay,this old bag is killing me!+please take me with you warrior...
+stepping,Chara3.png,29,6,1,6,7,random,wonder if this is an online rpg game!+mmorpg!!
