@@ -28,13 +28,16 @@ public class RPGSprite extends AdvanceSprite {
 					  { 1, 2, 1, 0 },	 // up animation
 					  { 7, 8, 7, 6 } };  // down animation
 
-	int			tileX, tileY;
+	 int			tileX;
+	int tileY;
 
 	RPGGame		owner;
 	Map			map;
 	double		speed;
 
-
+   public int getXX(){
+	   return tileX;
+   }
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
 					 int moveSpeed, int direction) {
 		super(images,(tileX*32)-8,(tileY*32)-32);
@@ -54,7 +57,7 @@ public class RPGSprite extends AdvanceSprite {
 		speed = 0.04*moveSpeed;
 	}
 
-
+	
 	public void update(long elapsedTime) {
 		super.update(elapsedTime);
 
@@ -76,17 +79,61 @@ public class RPGSprite extends AdvanceSprite {
 
 	// the npc is standing and do nothing, time to think what to do next
 	protected void updateLogic(long elapsedTime) { }
+    
+	boolean test(int dir, int horiz, int vert){
+		System.out.print(tileX+" <tx "+tileY+" <ty");
+		if (horiz > tileX && vert > tileY){
+			horiz=1; vert=1;dir=1;}
+		if (horiz < tileX && vert < tileY){
+			horiz=-1; vert=-1;dir=1;}
+		if (horiz > tileX){
+			horiz=1; dir=1;
+		}
+		if (horiz < tileX){
+			horiz=-1; dir=0;}
+		if (vert > tileY){
+			vert=1;
+		}else{vert=-1;}
+	
+		setDirection(dir);
 
+	//if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
+		// tile is not empty!
+		// can't go to this direction
+		//return false;
+	//}
+
+	// unoccupy old location
+		map.layer3[tileX][tileY] = null;
+
+	// set new location
+		tileX += horiz;
+		tileY += vert;
+	// occupy new location
+		map.layer3[tileX][tileY] = this;
+
+
+		setStatus(MOVING);
+
+
+	// next frame
+		setFrame(getFrame() + 1);
+
+		return true;
+	}
 
 	// sprite is walking to tileX+horiz, tileY+vert
 	boolean walkTo(int dir, int horiz, int vert) {
+		
+		
+		
 		setDirection(dir);
 
-		if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
+		//if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
 			// tile is not empty!
 			// can't go to this direction
-			return false;
-		}
+			//return false;
+		//}
 
 		// unoccupy old location
 		map.layer3[tileX][tileY] = null;

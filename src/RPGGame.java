@@ -10,18 +10,21 @@ import java.util.StringTokenizer;
 // GTGE
 import com.golden.gamedev.GameObject;
 import com.golden.gamedev.GameEngine;
+import com.golden.gamedev.engine.BaseInput;
 import com.golden.gamedev.object.Sprite;
 import com.golden.gamedev.object.PlayField;
 import com.golden.gamedev.util.FileUtil;
+import com.golden.gamedev.*;
 
 
 public class RPGGame extends GameObject {
 
  /***************************** GAME STATE **********************************/
-
+	
 	public static final int PLAYING = 0, TALKING = 1;
 	int gameState = PLAYING;
-
+    BaseInput     bsInput;
+    
 
 	PlayField		playfield;
 	Map				map;
@@ -118,17 +121,32 @@ public class RPGGame extends GameObject {
 	}
 
 
+
+	
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
-
-
+        
+		int xx=0, yy=0;
 		switch (gameState) {
 			// playing
 			// moving hero : arrow key
 			// talk to npc : Z
 			case PLAYING:
 				if (hero.getStatus() == RPGSprite.STANDING) {
+					if (click()){
+						int x = getMouseX();
+						int y = getMouseY();
+						hero.test(0,x,y);
+						
+						//if (RPGSprite.tileX < x)
+							
+					}
+							
+						
+					
+				
 					if (keyDown(KeyEvent.VK_LEFT)) {
+					//if (keyDown(click()) {
 						hero.walkTo(RPGSprite.LEFT, -1, 0);
 
 					} else if (keyDown(KeyEvent.VK_RIGHT)) {
