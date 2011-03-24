@@ -14,6 +14,7 @@ import com.golden.gamedev.funbox.*;
 
 
 public class Civcraft extends GameEngine {
+	int d=0;
 
 	public static final int	TITLE = 0, GAME_MODE = 1;
 
