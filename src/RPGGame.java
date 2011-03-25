@@ -67,7 +67,7 @@ ArrayList lista = new ArrayList();
 		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 13, 13, 3, RPGSprite.RIGHT));
 		
 		playfield.add(list.get(0));
-        playfield.add(list.get(1));
+        
 		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
 		LogicUpdater stayStill = new StayStill();
 		LogicUpdater randomMovement = new RandomMovement();
@@ -145,7 +145,8 @@ ArrayList lista = new ArrayList();
 					ys = list.get(0).getYY();
 					if (tileAt.x == xs && tileAt.y == ys){
 						list.get(0).setMov();						
-						list.get(0).setImg(getImages("CharaC.png",3,4));				
+						list.get(0).setImg(getImages("CharaC.png",3,4));
+						playfield.add(list.get(1));
 						break;
 						
 				}}
@@ -163,12 +164,15 @@ ArrayList lista = new ArrayList();
 							xs = list.get(h).getXX();
 							ys = list.get(h).getYY();
 							if (tileAt.x == xs && tileAt.y == ys && list.get(h).getMov()==true){
-							
+								map.setToCenter(list.get(h));
+								
 								funnen=true;
 								list.get(h).dirSet(3);
 								break;
 							}
-						}}}
+							
+						}
+						}}
 					
 					// action key
 					if (keyPressed(KeyEvent.VK_Z)) {
@@ -225,8 +229,7 @@ ArrayList lista = new ArrayList();
 				dialog.update(elapsedTime);
 			break;
 		}
-
-		map.setToCenter(list.get(1));
+		
 	}
 
 	public void render(Graphics2D g) {
