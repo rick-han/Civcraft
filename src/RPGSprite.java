@@ -36,7 +36,7 @@ public class RPGSprite extends AdvanceSprite{
 	RPGGame		owner;
 	Map			map;
 	double		speed;
-
+boolean klickad=false;
   
    public RPGSprite(){
    }
@@ -60,7 +60,19 @@ public class RPGSprite extends AdvanceSprite{
 		speed = 0.04*moveSpeed;
 	}
 
+	public int getXX(){
+		return tileX;
+	}
+	public int getYY(){
+		return tileY;
+	}
+	public void setX(int x){
+		tileX=x;
 	
+	}
+	public void setY(int y){
+		tileY=y;
+	}
 	public void update(long elapsedTime) {
 		super.update(elapsedTime);
 
@@ -225,7 +237,11 @@ public class RPGSprite extends AdvanceSprite{
 			super.render(g);
 		}
 	}
-
+	boolean klickad(){
+		klickad=!klickad;
+		System.out.print(klickad);
+		return klickad;
+	}
 	boolean dirSet(int i) {
 		setDirection(i);
 		return true;

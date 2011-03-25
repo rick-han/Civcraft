@@ -4,8 +4,10 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.StringTokenizer;
+import java.util.*;
 
 // GTGE
 import com.golden.gamedev.GameObject;
@@ -28,15 +30,16 @@ public class RPGGame extends GameObject {
     Point tileAt;
 	PlayField		playfield;
 	Map				map;
-	RPGSprite		hero;
-    int xs=0, ys=0;
+	RPGSprite		hero,hero2;
+    int xs=0, ys=0, xd=0,yd=0;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
+	boolean funnen=false;
 	NPC				talkToNPC;			// the NPC we talk to
 	int				talkToNPCDirection;	// old NPC direction before
-										// we talk to him/her
-
-
+		int h = 0;								// we talk to him/her
+	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
+ArrayList lista = new ArrayList();
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -47,7 +50,7 @@ public class RPGGame extends GameObject {
 	
 
 	
-
+	
 
 	public void initResources() {
 		map = new Map(bsLoader, bsIO);
@@ -59,10 +62,12 @@ public class RPGGame extends GameObject {
 			}
 		} );
 
-		hero = new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.DOWN);
-
-		playfield.add(hero);
-
+		//hero = new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.DOWN);
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.LEFT));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 13, 13, 3, RPGSprite.RIGHT));
+		
+		playfield.add(list.get(0));
+        playfield.add(list.get(1));
 		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
 		LogicUpdater stayStill = new StayStill();
 		LogicUpdater randomMovement = new RandomMovement();
@@ -114,6 +119,7 @@ public class RPGGame extends GameObject {
 					npc.setLoopAnim(true);
 				}
 
+				list.add(npc);
 				playfield.add(npc);
 			}
 		}
@@ -130,36 +136,28 @@ public class RPGGame extends GameObject {
 		switch (gameState) {
 			
 			case PLAYING:
-				if (hero.getStatus() == RPGSprite.STANDING) {
-				 
-					if (click()){
-						int x = getMouseX();
-						int y = getMouseY();					
-						tileAt = map.getTileAt(x, y);
-						xs = hero.tileX;
-						ys = hero.tileY;
-						if (gubbeklickad==true)
-							hero.test(tileAt.x,tileAt.y);
-						    gubbeklickad=false;
-						if (tileAt.x == xs && tileAt.y == ys){
-						    gubbeklickad=true;
-						    hero.dirSet(3);
-							
-						}
-																		
-					}							
-					if (keyDown(KeyEvent.VK_LEFT)) {					
-						hero.walkTo(RPGSprite.LEFT, -1, 0);
-
-					} else if (keyDown(KeyEvent.VK_RIGHT)) {
-						hero.walkTo(RPGSprite.RIGHT, 1, 0);
-
-					} else if (keyDown(KeyEvent.VK_UP)) {
-						hero.walkTo(RPGSprite.UP, 0, -1);
-
-					} else if (keyDown(KeyEvent.VK_DOWN)) {
-						hero.walkTo(RPGSprite.DOWN, 0, 1);
+				if (click()){
+					int x = getMouseX();
+					int y = getMouseY();
+					tileAt = map.getTileAt(x, y);
+					if (funnen){
+						funnen=false;
+						list.get(h).test(tileAt.x,tileAt.y);
+						break;
 					}
+					if (!funnen){
+						for(h = 0; h<list.size();h++){
+							xs = list.get(h).getXX();
+							ys = list.get(h).getYY();
+							if (tileAt.x == xs && tileAt.y == ys){
+							
+								funnen=true;
+								list.get(h).dirSet(3);
+								break;
+							}
+					}}
+					
+				
 
 
 					// action key
@@ -218,7 +216,7 @@ public class RPGGame extends GameObject {
 			break;
 		}
 
-		map.setToCenter(hero);
+		map.setToCenter(list.get(1));
 	}
 
 	public void render(Graphics2D g) {
