@@ -29,9 +29,9 @@ public class RPGGame extends GameObject {
 	PlayField		playfield;
 	Map				map;
 	RPGSprite		hero;
-
+    int xs=0, ys=0;
 	RPGDialog		dialog;
-
+	boolean gubbeklickad=false		;
 	NPC				talkToNPC;			// the NPC we talk to
 	int				talkToNPCDirection;	// old NPC direction before
 										// we talk to him/her
@@ -122,28 +122,31 @@ public class RPGGame extends GameObject {
 							   getImage("DialogBox.png", false),
 							   getImage("DialogArrow.png"));
 	}
-
-
-public void met(int x, int y){
-	hero.walkTo(0, x, y);	
-
-}
 	
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
         
 		int xx=0, yy=0;
 		switch (gameState) {
-			// playing
-			// moving hero : arrow key
-			// talk to npc : Z
+			
 			case PLAYING:
 				if (hero.getStatus() == RPGSprite.STANDING) {
+				 
 					if (click()){
 						int x = getMouseX();
 						int y = getMouseY();					
 						tileAt = map.getTileAt(x, y);
-						hero.test(tileAt.x,tileAt.y);												
+						xs = hero.tileX;
+						ys = hero.tileY;
+						if (gubbeklickad==true)
+							hero.test(tileAt.x,tileAt.y);
+						    gubbeklickad=false;
+						if (tileAt.x == xs && tileAt.y == ys){
+						    gubbeklickad=true;
+						    hero.dirSet(3);
+							
+						}
+																		
 					}							
 					if (keyDown(KeyEvent.VK_LEFT)) {					
 						hero.walkTo(RPGSprite.LEFT, -1, 0);
@@ -217,7 +220,6 @@ public void met(int x, int y){
 
 		map.setToCenter(hero);
 	}
-
 
 	public void render(Graphics2D g) {
 		playfield.render(g);

@@ -85,9 +85,6 @@ public class RPGSprite extends AdvanceSprite{
     
 	boolean test(int horiz, int vert){
 		
-		
-		
-
 		map.layer3[tileX][tileY] = null;
 		int tilX = tileX; int tilY = tileY;
 	  
@@ -227,6 +224,11 @@ public class RPGSprite extends AdvanceSprite{
 		if (getImages() != null) {
 			super.render(g);
 		}
+	}
+
+	boolean dirSet(int i) {
+		setDirection(i);
+		return true;
 	}
 
 }
