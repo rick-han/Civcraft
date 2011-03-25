@@ -13,6 +13,7 @@ import com.golden.gamedev.GameEngine;
 import com.golden.gamedev.engine.BaseInput;
 import com.golden.gamedev.object.Sprite;
 import com.golden.gamedev.object.PlayField;
+import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
 import com.golden.gamedev.util.FileUtil;
 import com.golden.gamedev.*;
 
@@ -24,8 +25,8 @@ public class RPGGame extends GameObject {
 	public static final int PLAYING = 0, TALKING = 1;
 	int gameState = PLAYING;
     BaseInput     bsInput;
-    
-
+    AbstractTileBackground bg;
+Point tileAt;
 	PlayField		playfield;
 	Map				map;
 	RPGSprite		hero;
@@ -40,10 +41,13 @@ public class RPGGame extends GameObject {
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
-
+	
 	public RPGGame(GameEngine parent) {
 		super(parent);
 	}
+	
+
+	
 
 
 	public void initResources() {
@@ -121,7 +125,10 @@ public class RPGGame extends GameObject {
 	}
 
 
+public void met(int x, int y){
+	hero.walkTo(0, x, y);	
 
+}
 	
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
@@ -136,9 +143,11 @@ public class RPGGame extends GameObject {
 					if (click()){
 						int x = getMouseX();
 						int y = getMouseY();
-						hero.test(0,x,y);
 						
-						//if (RPGSprite.tileX < x)
+						
+						tileAt = map.getTileAt(x, y);
+						hero.test(0,tileAt.x,tileAt.y);
+						
 							
 					}
 							

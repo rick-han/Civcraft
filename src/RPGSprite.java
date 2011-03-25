@@ -2,13 +2,15 @@
 
 // JFC
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 // GTGE
+import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
 import com.golden.gamedev.object.sprite.AdvanceSprite;
 
 
-public class RPGSprite extends AdvanceSprite {
+public class RPGSprite extends AdvanceSprite{
 
 
 	// sprite constant direction
@@ -21,7 +23,7 @@ public class RPGSprite extends AdvanceSprite {
 	public static final int STANDING = 0,
 							MOVING = 1;
 
-
+	AbstractTileBackground bg;
 	public static final int[][] movingAnimation =
 		new int[][] { { 10, 11, 10, 9 }, // left animation
 			  		  { 4, 5, 4, 3 },    // right animation
@@ -35,9 +37,10 @@ public class RPGSprite extends AdvanceSprite {
 	Map			map;
 	double		speed;
 
-   public int getXX(){
-	   return tileX;
+  
+   public RPGSprite(){
    }
+   
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
 					 int moveSpeed, int direction) {
 		super(images,(tileX*32)-8,(tileY*32)-32);
@@ -81,35 +84,88 @@ public class RPGSprite extends AdvanceSprite {
 	protected void updateLogic(long elapsedTime) { }
     
 	boolean test(int dir, int horiz, int vert){
-		System.out.print(tileX+" <tx "+tileY+" <ty");
-		if (horiz > tileX && vert > tileY){
-			horiz=1; vert=1;dir=1;}
-		if (horiz < tileX && vert < tileY){
-			horiz=-1; vert=-1;dir=1;}
-		if (horiz > tileX){
-			horiz=1; dir=1;
-		}
-		if (horiz < tileX){
-			horiz=-1; dir=0;}
-		if (vert > tileY){
-			vert=1;
-		}else{vert=-1;}
+		
 	
 		setDirection(dir);
 
-	//if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
-		// tile is not empty!
-		// can't go to this direction
-		//return false;
-	//}
-
-	// unoccupy old location
-		map.layer3[tileX][tileY] = null;
-
+	  map.layer3[tileX][tileY] = null;
+	  int tilX = tileX; int tilY = tileY;
+	  
 	// set new location
-		tileX += horiz;
-		tileY += vert;
-	// occupy new location
+	  if(horiz > tileX && vert > tileY){
+		 
+		  tileX+=1; 
+		  tileY+=1;
+		  if (map.isOccupied(tileX, tileY) == true){
+	    	  return false;
+	      }
+		 
+		  map.layer3[tileX][tileY] = null;
+		 
+		  map.layer3[tileX][tileY] = this;
+		  setStatus(MOVING);
+		  setFrame(getFrame() + 1);
+		  return true;
+	  }
+	  
+	  else if(horiz < tileX && vert < tileY){
+		 
+		  tileX-=1;
+		  tileY-=1;
+		  if (map.isOccupied(tileX, tileY) == true){
+	    	  return false;
+	      }
+		  map.layer3[tileX][tileY] = null;
+		 
+		  map.layer3[tileX][tileY] = this;
+		  setStatus(MOVING);
+		  setFrame(getFrame() + 1);
+		  return true;
+	  }	
+	  else if(horiz < tileX && vert > tileY){
+		
+		  tileX-=1;
+		  tileY+=1;
+		  if (map.isOccupied(tileX, tileY) == true){
+	    	  return false;
+	      }
+		  map.layer3[tileX][tileY] = null;
+		 
+		  map.layer3[tileX][tileY] = this;
+		  setStatus(MOVING);
+		  setFrame(getFrame() + 1);
+		  return true;
+	  }	
+	  else if(horiz > tileX && vert < tileY){
+		  
+		  tileX+=1;
+		  tileY-=1;
+		  if (map.isOccupied(tileX, tileY) == true){
+	    	  return false;
+	      }
+		  map.layer3[tileX][tileY] = null;
+		  map.layer3[tileX][tileY] = this;
+		  setStatus(MOVING);
+		  setFrame(getFrame() + 1);
+		  return true;
+	  }	
+      if(horiz > tileX){
+    	  tileX+=1;
+      }
+      else if(horiz < tileX){
+    	  tileX-=1;
+      }
+      else if(vert > tileY){
+    	  tileY+=1;
+      }
+      else if(vert < tileY){
+    	  tileY-=1;
+      }
+      if (map.isOccupied(tileX, tileY) == true){
+    	  return false;
+      }
+      	map.layer3[tileX][tileY] = null;
+	
 		map.layer3[tileX][tileY] = this;
 
 
@@ -126,24 +182,27 @@ public class RPGSprite extends AdvanceSprite {
 	boolean walkTo(int dir, int horiz, int vert) {
 		
 		
-		
+		//if (tileAt == tileG){}
 		setDirection(dir);
 
-		//if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
+		if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
 			// tile is not empty!
 			// can't go to this direction
-			//return false;
-		//}
+			return false;
+		}
 
 		// unoccupy old location
+		
 		map.layer3[tileX][tileY] = null;
 
 		// set new location
 		tileX += horiz;
 		tileY += vert;
+		
 		// occupy new location
 		map.layer3[tileX][tileY] = this;
-
+		 
+         
 
 		setStatus(MOVING);
 

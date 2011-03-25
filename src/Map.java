@@ -13,15 +13,18 @@ import com.golden.gamedev.engine.*;
 public class Map extends AbstractTileBackground {
 
 	public static final int TILE_WIDTH = 32, TILE_HEIGHT = 32;
-
+	AbstractTileBackground bg;
 	Chipset		chipsetE;
 	Chipset		chipsetF;
 	Chipset[] 	chipset;
-
+	RPGSprite lol = new RPGSprite();
+	Point tileAt;
+	RPGGame te;
+	int k = 0;
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
 	RPGSprite[][] layer3;	// the object/event/npc tiles
-
+    
 	public Map(BaseLoader bsLoader, BaseIO bsIO) {
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
 
@@ -55,7 +58,13 @@ public class Map extends AbstractTileBackground {
 			chipset[i] = new Chipset(chips);
 		}
 	}
-
+	public void test(int x, int y){
+		
+    	tileAt = getTileAt(x, y);   	
+    	
+        te.met(tileAt.x, tileAt.y);
+    	
+    }
 	public void renderTile(Graphics2D g,
 						   int tileX, int tileY,
 						   int x, int y) {
