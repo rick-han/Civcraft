@@ -83,96 +83,100 @@ public class RPGSprite extends AdvanceSprite{
 	// the npc is standing and do nothing, time to think what to do next
 	protected void updateLogic(long elapsedTime) { }
     
-	boolean test(int dir, int horiz, int vert){
+	boolean test(int horiz, int vert){
 		
-	
-		setDirection(dir);
+		
+		
 
-	  map.layer3[tileX][tileY] = null;
-	  int tilX = tileX; int tilY = tileY;
+		map.layer3[tileX][tileY] = null;
+		int tilX = tileX; int tilY = tileY;
 	  
 	// set new location
-	  if(horiz > tileX && vert > tileY){
+		if(horiz > tileX && vert > tileY){
+			setDirection(1);
+			tileX+=1; 
+			tileY+=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				return false;
+			}
 		 
-		  tileX+=1; 
-		  tileY+=1;
-		  if (map.isOccupied(tileX, tileY) == true){
-	    	  return false;
-	      }
+			map.layer3[tileX][tileY] = null;
 		 
-		  map.layer3[tileX][tileY] = null;
-		 
-		  map.layer3[tileX][tileY] = this;
-		  setStatus(MOVING);
-		  setFrame(getFrame() + 1);
-		  return true;
-	  }
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
+		}
 	  
-	  else if(horiz < tileX && vert < tileY){
+		else if(horiz < tileX && vert < tileY){
+			setDirection(0);
+			tileX-=1;
+			tileY-=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
 		 
-		  tileX-=1;
-		  tileY-=1;
-		  if (map.isOccupied(tileX, tileY) == true){
-	    	  return false;
-	      }
-		  map.layer3[tileX][tileY] = null;
-		 
-		  map.layer3[tileX][tileY] = this;
-		  setStatus(MOVING);
-		  setFrame(getFrame() + 1);
-		  return true;
-	  }	
-	  else if(horiz < tileX && vert > tileY){
-		
-		  tileX-=1;
-		  tileY+=1;
-		  if (map.isOccupied(tileX, tileY) == true){
-	    	  return false;
-	      }
-		  map.layer3[tileX][tileY] = null;
-		 
-		  map.layer3[tileX][tileY] = this;
-		  setStatus(MOVING);
-		  setFrame(getFrame() + 1);
-		  return true;
-	  }	
-	  else if(horiz > tileX && vert < tileY){
-		  
-		  tileX+=1;
-		  tileY-=1;
-		  if (map.isOccupied(tileX, tileY) == true){
-	    	  return false;
-	      }
-		  map.layer3[tileX][tileY] = null;
-		  map.layer3[tileX][tileY] = this;
-		  setStatus(MOVING);
-		  setFrame(getFrame() + 1);
-		  return true;
-	  }	
-      if(horiz > tileX){
-    	  tileX+=1;
-      }
-      else if(horiz < tileX){
-    	  tileX-=1;
-      }
-      else if(vert > tileY){
-    	  tileY+=1;
-      }
-      else if(vert < tileY){
-    	  tileY-=1;
-      }
-      if (map.isOccupied(tileX, tileY) == true){
-    	  return false;
-      }
-      	map.layer3[tileX][tileY] = null;
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
+		}	
+		else if(horiz < tileX && vert > tileY){
+			setDirection(0);
+			tileX-=1;
+			tileY+=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				return false;
+			}
+			  map.layer3[tileX][tileY] = null;
+			  
+			  map.layer3[tileX][tileY] = this;
+			  setStatus(MOVING);
+			  setFrame(getFrame() + 1);
+			  return true;
+		}	
+		else if(horiz > tileX && vert < tileY){
+			setDirection(1);
+			tileX+=1;
+			tileY-=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
+		}	
+		if(horiz > tileX){
+			setDirection(1);
+			tileX+=1;
+		}
+		else if(horiz < tileX){
+			setDirection(0);
+			tileX-=1;
+		}
+		else if(vert > tileY){
+			setDirection(3);
+			tileY+=1;
+		}
+		else if(vert < tileY){
+			setDirection(2);
+			tileY-=1;
+		}
+		if (map.isOccupied(tileX, tileY) == true){
+			return false;
+		}
+		map.layer3[tileX][tileY] = null;
 	
 		map.layer3[tileX][tileY] = this;
-
+      		
 
 		setStatus(MOVING);
 
 
-	// next frame
+      		// next frame
 		setFrame(getFrame() + 1);
 
 		return true;

@@ -1,4 +1,4 @@
-
+	
 
 // JFC
 import java.awt.*;
@@ -25,8 +25,7 @@ public class RPGGame extends GameObject {
 	public static final int PLAYING = 0, TALKING = 1;
 	int gameState = PLAYING;
     BaseInput     bsInput;
-    AbstractTileBackground bg;
-Point tileAt;
+    Point tileAt;
 	PlayField		playfield;
 	Map				map;
 	RPGSprite		hero;
@@ -142,20 +141,11 @@ public void met(int x, int y){
 				if (hero.getStatus() == RPGSprite.STANDING) {
 					if (click()){
 						int x = getMouseX();
-						int y = getMouseY();
-						
-						
+						int y = getMouseY();					
 						tileAt = map.getTileAt(x, y);
-						hero.test(0,tileAt.x,tileAt.y);
-						
-							
-					}
-							
-						
-					
-				
-					if (keyDown(KeyEvent.VK_LEFT)) {
-					//if (keyDown(click()) {
+						hero.test(tileAt.x,tileAt.y);												
+					}							
+					if (keyDown(KeyEvent.VK_LEFT)) {					
 						hero.walkTo(RPGSprite.LEFT, -1, 0);
 
 					} else if (keyDown(KeyEvent.VK_RIGHT)) {
