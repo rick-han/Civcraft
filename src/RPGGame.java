@@ -136,6 +136,19 @@ ArrayList lista = new ArrayList();
 		switch (gameState) {
 			
 			case PLAYING:
+				
+				if (rightClick()){
+					int xd = getMouseX();
+					int yd = getMouseY();
+					tileAt = map.getTileAt(xd, yd);
+					xs = list.get(0).getXX();
+					ys = list.get(0).getYY();
+					if (tileAt.x == xs && tileAt.y == ys){
+						list.get(0).setMov();						
+						list.get(0).setImg(getImages("CharaC.png",3,4));				
+						break;
+						
+				}}
 				if (click()){
 					int x = getMouseX();
 					int y = getMouseY();
@@ -149,17 +162,14 @@ ArrayList lista = new ArrayList();
 						for(h = 0; h<list.size();h++){
 							xs = list.get(h).getXX();
 							ys = list.get(h).getYY();
-							if (tileAt.x == xs && tileAt.y == ys){
+							if (tileAt.x == xs && tileAt.y == ys && list.get(h).getMov()==true){
 							
 								funnen=true;
 								list.get(h).dirSet(3);
 								break;
 							}
-					}}
+						}}}
 					
-				
-
-
 					// action key
 					if (keyPressed(KeyEvent.VK_Z)) {
 						int targetX = hero.tileX,
@@ -197,7 +207,7 @@ ArrayList lista = new ArrayList();
 						parent.nextGameID = Civcraft.TITLE;
 						finish();
 					}
-				}
+		
 			break;
 
 			// talking to npc, end when Z or X or ESC is pressed

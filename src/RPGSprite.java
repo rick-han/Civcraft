@@ -6,12 +6,13 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 // GTGE
+import com.golden.gamedev.object.Sprite;
 import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
 import com.golden.gamedev.object.sprite.AdvanceSprite;
 
 
 public class RPGSprite extends AdvanceSprite{
-
+AdvanceSprite lol;
 
 	// sprite constant direction
 	public static final int LEFT 	= 0;
@@ -37,7 +38,7 @@ public class RPGSprite extends AdvanceSprite{
 	Map			map;
 	double		speed;
 boolean klickad=false;
-  
+  boolean mov=true;
    public RPGSprite(){
    }
    
@@ -59,7 +60,17 @@ boolean klickad=false;
 
 		speed = 0.04*moveSpeed;
 	}
-
+	public void setImg(BufferedImage[] images){
+		//super(images,(tileX*32)-8,(tileY*32)-32);
+		setImages(images);
+		//lol = new AdvanceSprite(images,0,0);
+	}
+	boolean getMov(){
+		return mov;
+	}
+	public void setMov(){
+		mov=false;
+	}
 	public int getXX(){
 		return tileX;
 	}
