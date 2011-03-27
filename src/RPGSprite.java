@@ -37,6 +37,7 @@ AdvanceSprite lol;
 	RPGGame		owner;
 	Map			map;
 	double		speed;
+	private Background2 background;
 boolean klickad=false;
   boolean mov=true;
    public RPGSprite(){
@@ -203,17 +204,17 @@ boolean klickad=false;
 	}
 
 	// sprite is walking to tileX+horiz, tileY+vert
-	boolean walkTo(int dir, int horiz, int vert) {
+	boolean walkTo(int dir, double horiz, double vert) {
 		
 		
 		//if (tileAt == tileG){}
 		setDirection(dir);
 
-		if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
+	//	if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
 			// tile is not empty!
 			// can't go to this direction
-			return false;
-		}
+		//	return false;
+		//}
 
 		// unoccupy old location
 		
@@ -258,4 +259,19 @@ boolean klickad=false;
 		return true;
 	}
 
-}
+	public void setBackground(Background2 backgr) {
+		
+            background = backgr;
+            if (background == null) {
+                    background = Background2.getDefaultBackground();
+            }
+    }
+		
+	}
+
+	
+		
+	
+
+	
+

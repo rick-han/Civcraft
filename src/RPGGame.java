@@ -4,15 +4,14 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.StringTokenizer;
 import java.util.*;
 
 // GTGE
 import com.golden.gamedev.GameObject;
 import com.golden.gamedev.GameEngine;
 import com.golden.gamedev.engine.BaseInput;
+import com.golden.gamedev.gui.TButton;
+import com.golden.gamedev.object.Background;
 import com.golden.gamedev.object.Sprite;
 import com.golden.gamedev.object.PlayField;
 import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
@@ -29,8 +28,9 @@ public class RPGGame extends GameObject {
     BaseInput     bsInput;
     Point tileAt;
 	PlayField		playfield;
-	Map				map;
+	Background2				map2;
 	RPGSprite		hero,hero2;
+	Map map;
     int xs=0, ys=0, xd=0,yd=0;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
@@ -40,21 +40,20 @@ public class RPGGame extends GameObject {
 		int h = 0;								// we talk to him/her
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 ArrayList lista = new ArrayList();
+TButton but;
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
 	
 	public RPGGame(GameEngine parent) {
 		super(parent);
-	}
-	
-
-	
-	
+	}	
 
 	public void initResources() {
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField(map);
+		
+		but = new TButton("hej", 10, 10, 40, 40);
 		playfield.setComparator(new Comparator() {
 			public int compare(Object o1, Object o2) {
 				// sort based on y-order
@@ -67,7 +66,7 @@ ArrayList lista = new ArrayList();
 		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 13, 13, 3, RPGSprite.RIGHT));
 		
 		playfield.add(list.get(0));
-        
+		
 		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
 		LogicUpdater stayStill = new StayStill();
 		LogicUpdater randomMovement = new RandomMovement();
@@ -131,7 +130,9 @@ ArrayList lista = new ArrayList();
 	
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
-        
+		
+		String[] hej = {"h"};
+		
 		int xx=0, yy=0;
 		switch (gameState) {
 			
@@ -157,6 +158,7 @@ ArrayList lista = new ArrayList();
 					if (funnen){
 						funnen=false;
 						list.get(h).test(tileAt.x,tileAt.y);
+						
 						break;
 					}
 					if (!funnen){
@@ -173,10 +175,13 @@ ArrayList lista = new ArrayList();
 							
 						}
 						}}
+					//map.setToCenter(list.get(h));
+				
 					
+						
 					// action key
 					if (keyPressed(KeyEvent.VK_Z)) {
-						int targetX = hero.tileX,
+						    int targetX = hero.tileX,
 							targetY = hero.tileY;
 						switch (hero.getDirection()) {
 							case RPGSprite.LEFT:  targetX = hero.tileX - 1; break;

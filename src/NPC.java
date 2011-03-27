@@ -76,10 +76,10 @@ class RandomMovement implements LogicUpdater {
 		int i = 0;
 		while (!moved) {
 			switch (Utility.getRandom(0, 3)) {
-				case RPGSprite.LEFT: 	moved = spr.walkTo(RPGSprite.LEFT, -1, 0); break;
-				case RPGSprite.RIGHT: 	moved = spr.walkTo(RPGSprite.RIGHT, 1, 0); break;
-				case RPGSprite.UP: 		moved = spr.walkTo(RPGSprite.UP, 0, -1); break;
-				case RPGSprite.DOWN: 	moved = spr.walkTo(RPGSprite.DOWN, 0, 1); break;
+				case RPGSprite.LEFT: 	moved = spr.walkTo(RPGSprite.LEFT, -1.0, 0.0); break;
+				case RPGSprite.RIGHT: 	moved = spr.walkTo(RPGSprite.RIGHT, 1.0, 0.0); break;
+				case RPGSprite.UP: 		moved = spr.walkTo(RPGSprite.UP, 1, -0.00000001); break;
+				case RPGSprite.DOWN: 	moved = spr.walkTo(RPGSprite.DOWN, 1, 0.00000001); break;
 			}
 
 			if (i++ > 10) {
@@ -101,16 +101,16 @@ class CycleUpDown implements LogicUpdater {
 
 		if (spr.getDirection() == RPGSprite.UP) {
 			// if the npc facing up, then moving up until the movement blocked
-			moved = spr.walkTo(RPGSprite.UP, 0, -1);
+			moved = spr.walkTo(RPGSprite.UP, 0, 0);
 			if (!moved) {
 				// can't move up, time to move down
-				spr.walkTo(RPGSprite.DOWN, 0, 1);
+				spr.walkTo(RPGSprite.DOWN, 0, -0);
 			}
 
 		} else {
-			moved = spr.walkTo(RPGSprite.DOWN, 0, 1);
+			moved = spr.walkTo(RPGSprite.DOWN, 0, 0);
 			if (!moved) {
-				spr.walkTo(RPGSprite.UP, 0, -1);
+				spr.walkTo(RPGSprite.UP, 0, -0);
 			}
 		}
 	}

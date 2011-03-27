@@ -5,13 +5,14 @@ import java.awt.image.*;
 import java.awt.event.*;
 
 import com.golden.gamedev.*;
+import com.golden.gamedev.gui.TButton;
 import com.golden.gamedev.object.*;
 import com.golden.gamedev.object.background.*;
 
 
 public class Title extends GameObject {
 
-
+TButton but;
 	GameFont		font;
 
 	BufferedImage	title;
@@ -31,7 +32,7 @@ public class Title extends GameObject {
 	public void initResources() {
 		title = getImage("Title.png", false);
 		arrow = getImage("Arrow.png");
-
+		but = new TButton("hej", 10, 10, 40, 40);
 		font = fontManager.getFont(getImage("BitmapFont.png"));
 	}
 
