@@ -28,7 +28,7 @@ public class RPGGame extends GameObject {
     BaseInput     bsInput;
     Point tileAt;
 	PlayField		playfield;
-	Background2				map2;
+	//Background2				map2;
 	RPGSprite		hero,hero2;
 	Map map;
     int xs=0, ys=0, xd=0,yd=0;
@@ -41,6 +41,7 @@ public class RPGGame extends GameObject {
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 ArrayList lista = new ArrayList();
 TButton but;
+
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -50,6 +51,7 @@ TButton but;
 	}	
 
 	public void initResources() {
+		
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField(map);
 		
@@ -62,7 +64,7 @@ TButton but;
 		} );
 
 		//hero = new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.DOWN);
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.LEFT));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT));
 		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 13, 13, 3, RPGSprite.RIGHT));
 		
 		playfield.add(list.get(0));
@@ -119,7 +121,7 @@ TButton but;
 				}
 
 				list.add(npc);
-				playfield.add(npc);
+				//playfield.add(npc);
 			}
 		}
 
@@ -155,6 +157,7 @@ TButton but;
 					int x = getMouseX();
 					int y = getMouseY();
 					tileAt = map.getTileAt(x, y);
+					
 					if (funnen){
 						funnen=false;
 						list.get(h).test(tileAt.x,tileAt.y);

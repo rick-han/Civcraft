@@ -1,5 +1,3 @@
-
-
 import java.awt.*;
 import java.awt.image.*;
 import java.util.StringTokenizer;
@@ -10,10 +8,10 @@ import com.golden.gamedev.util.*;
 import com.golden.gamedev.engine.*;
 
 
-public class Map extends AbstractTileBackground {
+public class Map extends AbstractTileBackground2 {
 
 	public static final int TILE_WIDTH = 32, TILE_HEIGHT = 32;
-	
+
 	Chipset		chipsetE;
 	Chipset		chipsetF;
 	Chipset chipsetEs;
@@ -24,12 +22,12 @@ public class Map extends AbstractTileBackground {
 	int a=32; int b=32;
 	public Map(BaseLoader bsLoader, BaseIO bsIO) {
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
-		
+
 		//super(0,0, i*a - (a/4 + 1) * i, j*b - b/2);
-		layer1 = new int[40][25];
+		layer1 = new int[20][20];
 		layer2 = new int[40][25];
 		layer3 = new RPGSprite[40][25];		
-		
+
 		String[] lowerTile = FileUtil.fileRead(bsIO.getStream("map00.lwr"));
 		String[] upperTile = FileUtil.fileRead(bsIO.getStream("map00.upr"));
 		for (int j=0;j < layer1[0].length;j++) {
@@ -42,13 +40,13 @@ public class Map extends AbstractTileBackground {
 		}
 
 		// set the actual map size based on the read file
-		setSize(layer1.length, layer1[0].length);
+		setSize(20, 15);
 
 		chipsetE = new Chipset(bsLoader.getImages("ChipSet2.png", 6, 24, false));
 		chipsetF = new Chipset(bsLoader.getImages("ChipSet3.png", 6, 24));
-		
-		
-		
+
+
+
 		chipset = new Chipset[16];
 		BufferedImage[] image = bsLoader.getImages("ChipSet1.png", 4, 4, false);
 		int[] chipnum = new int[] { 0,1,4,5,8,9,11,12,2,3,6,7,10,11,14,15 };
@@ -58,20 +56,21 @@ public class Map extends AbstractTileBackground {
 			chipset[i] = new Chipset(chips);
 		}
 	}
-	
+
 	public void renderTile(Graphics2D g,
 						   int tileX, int tileY,
 						   int x, int y) {
 		// render layer 1
+
+		int tilenum = layer1[10][10];
+		BufferedImage image = chipset[tilenum-chipsetE.image.length].image[2];
 		
-		
-		
-		int tilenum = layer1[tileX][tileY];
 		if (tilenum < chipsetE.image.length) {
-			g.drawImage(chipsetE.image[tilenum], x, y, null);
+			//g.drawImage(chipsetE.image[tilenum], x, y, null);
 			//	g.drawImage(chipsetEs.image2, x, y, null);
+			g.drawImage(image, x, y, null);
 		} else if (tilenum >= chipsetE.image.length) {
-			BufferedImage image = chipset[tilenum-chipsetE.image.length].image[2];
+			
 			g.drawImage(image, x, y, null);
 			//g.drawImage(chipsetEs.image2, x, y, null);
 		}
@@ -79,10 +78,11 @@ public class Map extends AbstractTileBackground {
 		// render layer 2
 		int tilenum2 = layer2[tileX][tileY];
 		if (tilenum2 != -1) {
+			g.drawImage(image, x, y, null);
 			//g.drawImage(chipsetEs.image2, x, y, null);
-			g.drawImage(chipsetF.image[tilenum2], x, y, null);
+			//g.drawImage(chipsetF.image[tilenum2], x, y, null);
 		}
-		
+
 		//int a = 59; //dimensions
 		//int b = 83; //
 		//for(int i=0; i<13; i++) {
@@ -90,12 +90,12 @@ public class Map extends AbstractTileBackground {
 				//if (i%2 == 0){ 
 		//g.drawImage(chipsetE.image[1], i*a - (a/4 + 1) * i, j*b, this);
 		//else
-					
+
 					//g.drawImage(chipsetEs.image2, i*a - (a/4 + 1) * i, j*b - b/2, null);
 			//	}
 			//}
 		//}
-		
+
 		// layer 3 is rendered by sprite group
 	}
 
@@ -131,5 +131,15 @@ BufferedImage image2;
 		}
 
 	}
+
+
+	public boolean isOccupied(double tileX, double tileY) {
+		try {
+		    return (layer2[(int) tileX][(int) tileY] != -1 ||
+					layer3[(int) tileX][(int) tileY] != null);
+		} catch (Exception e) {
+			// out of bounds
+			return true;
+		} }
 
 }

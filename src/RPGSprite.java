@@ -19,7 +19,7 @@ AdvanceSprite lol;
 	public static final int RIGHT 	= 1;
 	public static final int UP 		= 2;
 	public static final int DOWN 	= 3;
-
+	boolean even=true;
 	// sprite constant status
 	public static final int STANDING = 0,
 							MOVING = 1;
@@ -37,7 +37,7 @@ AdvanceSprite lol;
 	RPGGame		owner;
 	Map			map;
 	double		speed;
-	private Background2 background;
+	//private Background2 background;
 boolean klickad=false;
   boolean mov=true;
    public RPGSprite(){
@@ -108,40 +108,47 @@ boolean klickad=false;
 	protected void updateLogic(long elapsedTime) { }
     
 	boolean test(int horiz, int vert){
-		
+		if (horiz % 2 == 0){
+			even=true;
+		}else even=false;
 		map.layer3[tileX][tileY] = null;
 		int tilX = tileX; int tilY = tileY;
 	  
 	// set new location
 		if(horiz > tileX && vert > tileY){
 			setDirection(1);
-			tileX+=1; 
-			tileY+=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				return false;
-			}
+			if (even){
+				tileX+=1; 
+				tileY+=1;
+			
+				if (map.isOccupied(tileX, tileY) == true){
+					return false;
+				}
 		 
-			map.layer3[tileX][tileY] = null;
+				map.layer3[tileX][tileY] = null;
 		 
-			map.layer3[tileX][tileY] = this;
-			setStatus(MOVING);
-			setFrame(getFrame() + 1);
-			return true;
+				map.layer3[tileX][tileY] = this;
+				setStatus(MOVING);
+				setFrame(getFrame() + 1);
+				return true;
+				}
 		}
 	  
 		else if(horiz < tileX && vert < tileY){
 			setDirection(0);
-			tileX-=1;
-			tileY-=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				return false;
-			}
-			map.layer3[tileX][tileY] = null;
+			if (!even){
+				tileX-=1;
+				tileY-=1;
+				if (map.isOccupied(tileX, tileY) == true){
+					return false;
+				}
+				map.layer3[tileX][tileY] = null;
 		 
-			map.layer3[tileX][tileY] = this;
-			setStatus(MOVING);
-			setFrame(getFrame() + 1);
-			return true;
+				map.layer3[tileX][tileY] = this;
+				setStatus(MOVING);
+				setFrame(getFrame() + 1);
+				return true;
+			}
 		}	
 		else if(horiz < tileX && vert > tileY){
 			setDirection(0);
@@ -159,24 +166,29 @@ boolean klickad=false;
 		}	
 		else if(horiz > tileX && vert < tileY){
 			setDirection(1);
-			tileX+=1;
-			tileY-=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				return false;
+			if (!even){
+				tileX+=1;
+				tileY-=1;
+			
+				if (map.isOccupied(tileX, tileY) == true){
+					return false;
+				}
+				map.layer3[tileX][tileY] = null;
+				map.layer3[tileX][tileY] = this;
+				setStatus(MOVING);
+				setFrame(getFrame() + 1);
+				return true;
 			}
-			map.layer3[tileX][tileY] = null;
-			map.layer3[tileX][tileY] = this;
-			setStatus(MOVING);
-			setFrame(getFrame() + 1);
-			return true;
 		}	
 		if(horiz > tileX){
 			setDirection(1);
 			tileX+=1;
+			
 		}
 		else if(horiz < tileX){
 			setDirection(0);
 			tileX-=1;
+			
 		}
 		else if(vert > tileY){
 			setDirection(3);
@@ -186,9 +198,9 @@ boolean klickad=false;
 			setDirection(2);
 			tileY-=1;
 		}
-		if (map.isOccupied(tileX, tileY) == true){
-			return false;
-		}
+		//if (map.isOccupied(tileX, tileY) == true){
+			//return false;
+		//}
 		map.layer3[tileX][tileY] = null;
 	
 		map.layer3[tileX][tileY] = this;
@@ -210,11 +222,11 @@ boolean klickad=false;
 		//if (tileAt == tileG){}
 		setDirection(dir);
 
-	//	if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
+		if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
 			// tile is not empty!
 			// can't go to this direction
-		//	return false;
-		//}
+			return false;
+		}
 
 		// unoccupy old location
 		
@@ -258,16 +270,9 @@ boolean klickad=false;
 		setDirection(i);
 		return true;
 	}
+}
 
-	public void setBackground(Background2 backgr) {
-		
-            background = backgr;
-            if (background == null) {
-                    background = Background2.getDefaultBackground();
-            }
-    }
-		
-	}
+	
 
 	
 		
