@@ -28,7 +28,7 @@ public class RPGDialog {
 	int				y;
 
 
-	public RPGDialog(GameFont font, BufferedImage box, BufferedImage arrow) {
+	public RPGDialog(GameFont font, BufferedImage box) {
 		this.font = font;
 		this.box = box;
 		this.arrow = arrow;
@@ -38,13 +38,16 @@ public class RPGDialog {
 	}
 
 
-	public void setDialog(String[] dialog, boolean bottom) {
-		this.dialog = dialog;
+	
+
+
+	public void setDialog(String[] dialogNP, boolean bottom) {
+		this.dialog = dialogNP;
 
 		endDialog = false;
 		frame = totalFrame = 0;
-		for (int i=0;i < dialog.length;i++) {
-			totalFrame += dialog[i].length();
+		for (int i=0;i < dialogNP.length;i++) {
+			totalFrame += dialogNP[i].length();
 		}
 
 		blink = false;

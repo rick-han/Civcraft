@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.List;
 
 // GTGE
 import com.golden.gamedev.GameObject;
@@ -14,6 +15,7 @@ import com.golden.gamedev.gui.TButton;
 import com.golden.gamedev.object.Background;
 import com.golden.gamedev.object.Sprite;
 import com.golden.gamedev.object.PlayField;
+import com.golden.gamedev.object.SpriteGroup;
 import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
 import com.golden.gamedev.util.FileUtil;
 import com.golden.gamedev.*;
@@ -27,21 +29,19 @@ public class RPGGame extends GameObject {
 	int gameState = PLAYING;
     BaseInput     bsInput;
     Point tileAt;
-	PlayField		playfield;
-	//Background2				map2;
+	PlayField2		playfield;
 	RPGSprite		hero,hero2;
 	Map map;
     int xs=0, ys=0, xd=0,yd=0;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
 	boolean funnen=false;
-	NPC				talkToNPC;			// the NPC we talk to
-	int				talkToNPCDirection;	// old NPC direction before
-		int h = 0;								// we talk to him/her
+	RPGSprite talkToNPC;			// the NPC we talk to
+	int	talkToNPCDirection;	// old NPC direction before
+	int h = 0;								// we talk to him/her
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
-ArrayList lista = new ArrayList();
-TButton but;
-
+	int chance=0;
+	boolean clicked=false;
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -53,9 +53,9 @@ TButton but;
 	public void initResources() {
 		
 		map = new Map(bsLoader, bsIO);
-		playfield = new PlayField(map);
+		playfield = new PlayField2(map);
 		
-		but = new TButton("hej", 10, 10, 40, 40);
+		
 		playfield.setComparator(new Comparator() {
 			public int compare(Object o1, Object o2) {
 				// sort based on y-order
@@ -63,12 +63,14 @@ TButton but;
 			}
 		} );
 
-		//hero = new RPGSprite(this, getImages("Chara1.png",3,4), 10, 10, 3, RPGSprite.DOWN);
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT));
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 13, 13, 3, RPGSprite.RIGHT));
+		
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT, 8, 10, 100, "swordsman"));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 5, 5, 3, RPGSprite.RIGHT, 11,9, 100, "archer"));
 		
 		playfield.add(list.get(0));
+		playfield.add(list.get(1));
 		
+		//Hela NPC delen används ej.
 		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
 		LogicUpdater stayStill = new StayStill();
 		LogicUpdater randomMovement = new RandomMovement();
@@ -124,18 +126,17 @@ TButton but;
 				//playfield.add(npc);
 			}
 		}
-
+		//Här slutar NPC delen ^^
+		
+		
 		dialog = new RPGDialog(fontManager.getFont(getImage("BitmapFont.png")),
-							   getImage("DialogBox.png", false),
-							   getImage("DialogArrow.png"));
+							   getImage("Box.png", false));
+							
 	}
 	
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
 		
-		String[] hej = {"h"};
-		
-		int xx=0, yy=0;
 		switch (gameState) {
 			
 			case PLAYING:
@@ -150,18 +151,49 @@ TButton but;
 						list.get(0).setMov();						
 						list.get(0).setImg(getImages("CharaC.png",3,4));
 						playfield.add(list.get(1));
-						break;
-						
-				}}
+						break;						
+					}
+				}
 				if (click()){
 					int x = getMouseX();
 					int y = getMouseY();
 					tileAt = map.getTileAt(x, y);
 					
 					if (funnen){
-						funnen=false;
-						list.get(h).test(tileAt.x,tileAt.y);
+						funnen=false;					 
+						 int targetX = tileAt.x, targetY = tileAt.y;
 						
+						String dialogNP[] = new String[2];
+						talkToNPC = (RPGSprite) map.getLayer3(targetX, targetY);
+						
+						if(clicked){				
+							   clicked=!clicked;
+							   							   							   
+							   if (talkToNPC!=list.get(h) && talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK()){						   
+								   playfield.remove(talkToNPC);
+								   list.get(h).test(tileAt.x,tileAt.y);
+								   break;
+								   
+							   }
+							   if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() < talkToNPC.getDEF()){						   
+								   playfield.remove(list.get(h));					  
+								   break;						   
+							   }
+							}
+						if (talkToNPC!=null && talkToNPC!=list.get(h)){
+							if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() > list.get(h).getATK())
+								chance=0;
+							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK())
+								chance=100;
+							dialogNP[0]=list.get(h).getTyp().toUpperCase()+" HAS A "+chance+"% CHANCE";
+							dialogNP[1]="AGAINST HES "+talkToNPC.getTyp().toUpperCase();
+						}
+						if (talkToNPC != null && dialogNP != null && talkToNPC!=list.get(h)) {
+							dialog.setDialog(dialogNP,
+								(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
+							     clicked=true;
+								 gameState=TALKING;
+						}else list.get(h).test(tileAt.x,tileAt.y);					
 						break;
 					}
 					if (!funnen){
@@ -177,59 +209,25 @@ TButton but;
 							}
 							
 						}
-						}}
-					//map.setToCenter(list.get(h));
-				
-					
-						
-					// action key
-					if (keyPressed(KeyEvent.VK_Z)) {
-						    int targetX = hero.tileX,
-							targetY = hero.tileY;
-						switch (hero.getDirection()) {
-							case RPGSprite.LEFT:  targetX = hero.tileX - 1; break;
-							case RPGSprite.RIGHT: targetX = hero.tileX + 1; break;
-							case RPGSprite.UP:    targetY = hero.tileY - 1; break;
-							case RPGSprite.DOWN:  targetY = hero.tileY + 1; break;
-						}
-
-						talkToNPC = (NPC) map.getLayer3(targetX, targetY);
-
-						if (talkToNPC != null && talkToNPC.dialog != null) {
-							dialog.setDialog(talkToNPC.dialog,
-								(hero.getScreenY()+hero.getHeight() < 320));
-
-							// make NPC and hero, face to face!
-							// we store the old NPC direction first
-							talkToNPCDirection = talkToNPC.getDirection();
-							switch (hero.getDirection()) {
-								case RPGSprite.LEFT:  talkToNPC.setDirection(RPGSprite.RIGHT); break;
-								case RPGSprite.RIGHT: talkToNPC.setDirection(RPGSprite.LEFT); break;
-								case RPGSprite.UP:    talkToNPC.setDirection(RPGSprite.DOWN); break;
-								case RPGSprite.DOWN:  talkToNPC.setDirection(RPGSprite.UP); break;
-							}
-
-							gameState = TALKING;
-						}
 					}
-
-
-					// quit key
-					if (keyPressed(KeyEvent.VK_ESCAPE)) {
-						parent.nextGameID = Civcraft.TITLE;
-						finish();
-					}
+				}
+											
+				// quit key
+				if (keyPressed(KeyEvent.VK_ESCAPE)) {
+					parent.nextGameID = Civcraft.TITLE;
+					finish();
+				}
 		
-			break;
+				break;
 
-			// talking to npc, end when Z or X or ESC is pressed
+			
 			case TALKING:
 				if (dialog.endDialog) {
 					if (keyPressed(KeyEvent.VK_Z) ||
 						keyPressed(KeyEvent.VK_X) ||
 						keyPressed(KeyEvent.VK_ESCAPE)) {
-						// back to old direction
-						talkToNPC.setDirection(talkToNPCDirection);
+						
+						//talkToNPC.setDirection(talkToNPCDirection);
 						gameState = PLAYING;
 					}
 				}

@@ -13,13 +13,13 @@ public class NPC extends RPGSprite {
 	Timer 			moveTimer;
 	LogicUpdater	logic;
 	String[]		dialog;
-
+    static String typ="npc";
 
 	public NPC(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
 			   int moveSpeed, int direction,
 			   int frequence, LogicUpdater logic,
 			   String[] dialog) {
-		super(owner,images,tileX,tileY,moveSpeed,direction);
+		super(owner,images,tileX,tileY,moveSpeed,direction, frequence, frequence, frequence, typ);
 
 		moveTimer = new Timer((8-frequence)*1500);
 		if (moveTimer.getDelay() == 0) {
