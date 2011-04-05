@@ -175,18 +175,20 @@ AdvanceSprite lol;
 		}	
 		else if(horiz < tileX && vert > tileY){
 			setDirection(0);
-			tileX-=1;
-			tileY+=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				return false;
-			}
-			  map.layer3[tileX][tileY] = null;
+			if(even){
+				tileX-=1;
+				tileY+=1;
+				if (map.isOccupied(tileX, tileY) == true){
+					return false;
+				}
+				map.layer3[tileX][tileY] = null;
 			  
-			  map.layer3[tileX][tileY] = this;
-			  setStatus(MOVING);
-			  setFrame(getFrame() + 1);
-			  return true;
-		}	
+				map.layer3[tileX][tileY] = this;
+				setStatus(MOVING);
+				setFrame(getFrame() + 1);
+				return true;
+			}
+		}
 		else if(horiz > tileX && vert < tileY){
 			setDirection(1);
 			if (!even){

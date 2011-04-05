@@ -42,6 +42,7 @@ public class RPGGame extends GameObject {
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 	int chance=0;
 	boolean clicked=false;
+	int targetX,targetY;
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -64,8 +65,8 @@ public class RPGGame extends GameObject {
 		} );
 
 		
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT, 8, 10, 100, "swordsman"));
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 5, 5, 3, RPGSprite.RIGHT, 11,9, 100, "archer"));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT, 11, 11, 100, "swordsman"));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 5, 5, 3, RPGSprite.RIGHT, 10,10, 100, "archer"));
 		
 		playfield.add(list.get(0));
 		playfield.add(list.get(1));
@@ -122,7 +123,7 @@ public class RPGGame extends GameObject {
 					npc.setLoopAnim(true);
 				}
 
-				list.add(npc);
+				//list.add(npc);
 				//playfield.add(npc);
 			}
 		}
@@ -160,10 +161,14 @@ public class RPGGame extends GameObject {
 					tileAt = map.getTileAt(x, y);
 					
 					if (funnen){
-						funnen=false;					 
-						 int targetX = tileAt.x, targetY = tileAt.y;
+						funnen=false;		
 						
-						String dialogNP[] = new String[2];
+						if (tileAt.x == list.get(h).tileX +1 || tileAt.x == list.get(h).tileX -1 || tileAt.y == list.get(h).tileY +1 || tileAt.y == list.get(h).tileY -1 ){
+							 targetX = tileAt.x; targetY = tileAt.y;
+						
+						}
+						
+						String dialogNP[] = new String[3];
 						talkToNPC = (RPGSprite) map.getLayer3(targetX, targetY);
 						
 						if(clicked){				
@@ -172,21 +177,57 @@ public class RPGGame extends GameObject {
 							   if (talkToNPC!=list.get(h) && talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK()){						   
 								   playfield.remove(talkToNPC);
 								   list.get(h).test(tileAt.x,tileAt.y);
+								   talkToNPC.setX(1000);
+								   talkToNPC.setY(1000);
 								   break;
 								   
 							   }
-							   if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() < talkToNPC.getDEF()){						   
-								   playfield.remove(list.get(h));					  
+							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() < talkToNPC.getDEF()){						   
+								   playfield.remove(list.get(h));
+								   list.get(h).setX(1000);
+								   list.get(h).setY(1000);
 								   break;						   
 							   }
-							}
+							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() == talkToNPC.getDEF()){						   
+								   
+								   list.get(h).setHP(50);
+								   talkToNPC.setHP(50);
+								   break;						   
+							   }
+							   else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && list.get(h).getATK() == talkToNPC.getDEF()){						   
+								   playfield.remove(talkToNPC);
+								   talkToNPC.setX(1000);
+								   talkToNPC.setY(1000);
+								   list.get(h).setHP(50);
+								   
+								   break;						   
+							   }
+							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==50 && list.get(h).getATK() == talkToNPC.getDEF()){						   
+								   playfield.remove(list.get(h));
+								   list.get(h).setX(1000);
+								   list.get(h).setY(1000);
+								   talkToNPC.setHP(50);
+								   
+								   break;						   
+							   }
+						}
+					
 						if (talkToNPC!=null && talkToNPC!=list.get(h)){
 							if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() > list.get(h).getATK())
 								chance=0;
 							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK())
 								chance=100;
-							dialogNP[0]=list.get(h).getTyp().toUpperCase()+" HAS A "+chance+"% CHANCE";
-							dialogNP[1]="AGAINST HES "+talkToNPC.getTyp().toUpperCase();
+							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
+								chance=50;
+							else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
+								chance=100;
+							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==50 && talkToNPC.getDEF() == list.get(h).getATK())
+								chance=0;
+							else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
+								chance=50;
+							dialogNP[0]=list.get(h).getTyp().toUpperCase()+" WITH "+list.get(h).getHP()+" HP";
+							dialogNP[1]="HAS A "+chance+"% CHANCE";
+							dialogNP[2]="AGAINST "+talkToNPC.getTyp().toUpperCase()+" WITH "+talkToNPC.getHP()+ "HP";
 						}
 						if (talkToNPC != null && dialogNP != null && talkToNPC!=list.get(h)) {
 							dialog.setDialog(dialogNP,
