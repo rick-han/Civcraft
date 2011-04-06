@@ -70,8 +70,9 @@ public class RPGGame extends GameObject {
 		
 		playfield.add(list.get(0));
 		playfield.add(list.get(1));
-		
+		Map.reveal(list.get(0).tileX,list.get(0).tileY,2);
 		//Hela NPC delen används ej.
+		/*
 		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
 		LogicUpdater stayStill = new StayStill();
 		LogicUpdater randomMovement = new RandomMovement();
@@ -126,9 +127,10 @@ public class RPGGame extends GameObject {
 				//list.add(npc);
 				//playfield.add(npc);
 			}
+			
 		}
 		//Här slutar NPC delen ^^
-		
+		*/
 		
 		dialog = new RPGDialog(fontManager.getFont(getImage("BitmapFont.png")),
 							   getImage("Box.png", false));
@@ -234,7 +236,8 @@ public class RPGGame extends GameObject {
 								(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
 							     clicked=true;
 								 gameState=TALKING;
-						}else list.get(h).test(tileAt.x,tileAt.y);					
+						}else list.get(h).test(tileAt.x,tileAt.y);
+						Map.reveal(list.get(h).tileX,list.get(h).tileY,2);
 						break;
 					}
 					if (!funnen){

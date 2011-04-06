@@ -14,10 +14,12 @@ public class Map extends AbstractTileBackground2 {
 
 	Chipset		chipsetE;
 	Chipset		chipsetF;
-	Chipset chipsetEs;
+	Chipset 	chipsetEs;
+	Chipset 	csFoW;
 	Chipset[] 	chipset;	
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
+	static int[][]	fogofwar;
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32; int b=32;
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
@@ -26,6 +28,7 @@ public class Map extends AbstractTileBackground2 {
 		layer1 = new int[38][25];
 		layer2 = new int[40][25];
 		layer3 = new RPGSprite[40][25];		
+		fogofwar = new int[40][25];
 
 		String[] lowerTile = FileUtil.fileRead(bsIO.getStream("map00.lwr"));
 		String[] upperTile = FileUtil.fileRead(bsIO.getStream("map00.upr"));
@@ -35,6 +38,7 @@ public class Map extends AbstractTileBackground2 {
 			for (int i=0;i < layer1.length;i++) {
 				layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
 				layer2[i][j] = Integer.parseInt(upperToken.nextToken());
+				fogofwar[i][j] = 1;
 			}
 		}
 
@@ -43,7 +47,7 @@ public class Map extends AbstractTileBackground2 {
 
 		chipsetE = new Chipset(bsLoader.getImages("ChipSet2.png", 6, 24, false));
 		chipsetF = new Chipset(bsLoader.getImages("ChipSet3.png", 6, 24));
-
+		csFoW = new Chipset(bsLoader.getImage("FoW.png"));
 
 
 		chipset = new Chipset[16];
@@ -60,10 +64,13 @@ public class Map extends AbstractTileBackground2 {
 						   int tileX, int tileY,
 						   int x, int y) {
 		// render layer 1
+		g.drawImage(csFoW.image2, x, y, null);
 		
 		int tilenum = layer1[tileX][tileY];
 		//BufferedImage image = chipset[tilenum-chipsetE.image.length].image[2];
 		
+		int tilenum3 = fogofwar[tileX][tileY];
+		if (tilenum3 < 1) {
 		if (tilenum < chipsetE.image.length) {
 			//g.drawImage(chipsetE.image[tilenum], x, y, null);
 			//	g.drawImage(chipsetEs.image2, x, y, null);
@@ -83,7 +90,7 @@ public class Map extends AbstractTileBackground2 {
 			//g.drawImage(chipsetEs.image2, x, y, null);
 			g.drawImage(chipsetF.image[tilenum2], x, y, null);
 		}
-
+		}
 		// layer 3 is rendered by sprite group
 	}
 
@@ -128,4 +135,86 @@ public class Map extends AbstractTileBackground2 {
 			return true;
 		} }
 
-}
+	public static void reveal(int tileX, int tileY, int sightRange){
+		int count = 1;
+		if (tileX < 0) tileX = 0; 
+		if (tileY < 0) tileY = 0;
+		if (tileX >= 0 && tileY >=0)
+			fogofwar[tileX][tileY] = 0;
+		if (tileX%2 == 0){			
+			fogofwar[tileX+1][tileY] = 0; 
+			fogofwar[tileX][tileY+1] = 0;
+			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+			if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
+			if (tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
+			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+			if(count < sightRange){
+				revealRedux(tileX+1, tileY, sightRange, count);
+				revealRedux(tileX, tileY+1, sightRange, count);
+				revealRedux(tileX-1, tileY, sightRange, count);
+				revealRedux(tileX-1, tileY-1, sightRange, count);
+				revealRedux(tileX+1, tileY-1, sightRange, count);
+				revealRedux(tileX, tileY-1, sightRange, count);
+			
+			}
+		}
+		else{
+			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+			if (tileX > 0) fogofwar[tileX-1][tileY+1] = 0;
+			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+			fogofwar[tileX+1][tileY] = 0;
+			fogofwar[tileX+1][tileY+1] = 0;
+			fogofwar[tileX][tileY+1] = 0;
+			if(count < sightRange){
+				revealRedux(tileX-1, tileY, sightRange, count);
+				revealRedux(tileX-1, tileY+1, sightRange, count);
+				revealRedux(tileX, tileY-1, sightRange, count);
+				revealRedux(tileX+1, tileY, sightRange, count);
+				revealRedux(tileX+1, tileY+1, sightRange, count);
+				revealRedux(tileX, tileY+1, sightRange, count);
+				
+			}
+		}
+	}
+	
+private static void revealRedux(int tileX, int tileY, int sightRange, int count){
+	count++;
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileX >= 0 && tileY >=0)
+		fogofwar[tileX][tileY] = 0;
+	if (tileX%2 == 0){			
+		fogofwar[tileX+1][tileY] = 0; 
+		fogofwar[tileX][tileY+1] = 0;
+		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+		if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
+		if (tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
+		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+		if(count < sightRange){
+			revealRedux(tileX+1, tileY, sightRange, count);
+			revealRedux(tileX, tileY+1, sightRange, count);
+			revealRedux(tileX-1, tileY, sightRange, count);
+			revealRedux(tileX-1, tileY-1, sightRange, count);
+			revealRedux(tileX+1, tileY-1, sightRange, count);
+			revealRedux(tileX, tileY-1, sightRange, count);
+		
+		}
+	}
+	else{
+		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+		if (tileX > 0) fogofwar[tileX-1][tileY+1] = 0;
+		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+		fogofwar[tileX+1][tileY] = 0;
+		fogofwar[tileX+1][tileY+1] = 0;
+		fogofwar[tileX][tileY+1] = 0;
+		if(count < sightRange){
+			revealRedux(tileX-1, tileY, sightRange, count);
+			revealRedux(tileX-1, tileY+1, sightRange, count);
+			revealRedux(tileX, tileY-1, sightRange, count);
+			revealRedux(tileX+1, tileY, sightRange, count);
+			revealRedux(tileX+1, tileY+1, sightRange, count);
+			revealRedux(tileX, tileY+1, sightRange, count);
+			
+		}
+	}
+}}	
