@@ -27,7 +27,6 @@ public class RPGGame extends GameObject {
 	
 	public static final int PLAYING = 0, TALKING = 1;
 	int gameState = PLAYING;
-    BaseInput     bsInput;
     Point tileAt;
 	PlayField2		playfield;
 	RPGSprite		hero,hero2;
@@ -43,6 +42,7 @@ public class RPGGame extends GameObject {
 	int chance=0;
 	boolean clicked=false;
 	int targetX,targetY;
+	ActionBar actionBar;
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -52,7 +52,8 @@ public class RPGGame extends GameObject {
 	}	
 
 	public void initResources() {
-		
+		actionBar = new ActionBar(bsInput, getWidth(), getHeight());
+		actionBar.initActionBar();
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField2(map);
 		
@@ -279,7 +280,7 @@ public class RPGGame extends GameObject {
 				dialog.update(elapsedTime);
 			break;
 		}
-		
+		actionBar.getFrameWork().update();
 	}
 
 	public void render(Graphics2D g) {
@@ -288,6 +289,7 @@ public class RPGGame extends GameObject {
 		if (gameState == TALKING) {
 			dialog.render(g);
 		}
+		actionBar.getFrameWork().render(g);
 	}
 
 
