@@ -43,17 +43,19 @@ public class RPGGame extends GameObject {
 	boolean clicked=false;
 	int targetX,targetY;
 	ActionBar actionBar;
+	GameEngine parent;
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
 	
 	public RPGGame(GameEngine parent) {
 		super(parent);
+		this.parent = parent;
 	}	
 
 	public void initResources() {
-		actionBar = new ActionBar(bsInput, getWidth(), getHeight());
-		actionBar.initActionBar();
+		actionBar = new ActionBar(parent);
+		actionBar.initResources();
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField2(map);
 		
@@ -280,7 +282,7 @@ public class RPGGame extends GameObject {
 				dialog.update(elapsedTime);
 			break;
 		}
-		actionBar.getFrameWork().update();
+		actionBar.update(elapsedTime);
 	}
 
 	public void render(Graphics2D g) {
@@ -289,7 +291,7 @@ public class RPGGame extends GameObject {
 		if (gameState == TALKING) {
 			dialog.render(g);
 		}
-		actionBar.getFrameWork().render(g);
+		actionBar.render(g);
 	}
 
 
