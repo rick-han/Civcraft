@@ -44,11 +44,14 @@ AdvanceSprite lol;
 	int def;
 	int hp;
 	String typ;
+	int hit;
+	int move;
+	int range;
 	public RPGSprite(){
 	}
    
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
-					 int moveSpeed, int direction, int atk, int def, int hp, String typ) {
+					 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, String typ) {
 		super(images,(tileX*32)-8,(tileY*32)-32);
 
 		this.owner = owner;
@@ -59,6 +62,9 @@ AdvanceSprite lol;
 		this.atk=atk;
 		this.def=def;
 		this.typ=typ;
+		this.hit=hit;
+		this.range=range;
+		this.move=move;
 		map.layer3[tileX][tileY] = this;	// mark sprite position
 
 		// init status, standing facing direction
@@ -73,6 +79,15 @@ AdvanceSprite lol;
 		
 		setImages(images);
 		
+	}
+	public int getRange(){
+		return range;
+	}
+	public int getMove(){
+		return move;
+	}
+	public int getHit(){
+		return hit;
 	}
 	boolean getMov(){
 		return mov;

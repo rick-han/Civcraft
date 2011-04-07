@@ -35,8 +35,8 @@ public class RPGGame extends GameObject {
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
 	boolean funnen=false;
-	RPGSprite talkToNPC;			// the NPC we talk to
-	int	talkToNPCDirection;	// old NPC direction before
+	RPGSprite fiende;			// the NPC we talk to
+	int	fiendeDirection;	// old NPC direction before
 	int h = 0;								// we talk to him/her
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 	int chance=0;
@@ -44,6 +44,8 @@ public class RPGGame extends GameObject {
 	int targetX,targetY;
 	ActionBar actionBar;
 	GameEngine parent;
+	Random rand = new Random();
+	Random rand2 = new Random();
  /****************************************************************************/
  /******************************* CONSTRUCTOR ********************************/
  /****************************************************************************/
@@ -68,11 +70,12 @@ public class RPGGame extends GameObject {
 		} );
 
 		
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT, 11, 11, 100, "swordsman"));
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 5, 5, 3, RPGSprite.RIGHT, 10,10, 100, "archer"));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 0,0, 3, RPGSprite.LEFT, 1, 1, 10,1,1,1, "Settler"));
+		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 5, 5, 3, RPGSprite.RIGHT, 2,2, 100, 1,1,1, "Infantry"));
 		
 		playfield.add(list.get(0));
 		playfield.add(list.get(1));
+		
 		Map.reveal(list.get(0).tileX,list.get(0).tileY,2);
 		//Hela NPC delen används ej.
 		/*
@@ -151,15 +154,18 @@ public class RPGGame extends GameObject {
 					int xd = getMouseX();
 					int yd = getMouseY();
 					tileAt = map.getTileAt(xd, yd);
-					xs = list.get(0).getXX();
-					ys = list.get(0).getYY();
-					if (tileAt.x == xs && tileAt.y == ys){
-						list.get(0).setMov();						
-						list.get(0).setImg(getImages("CharaC.png",3,4));
-						playfield.add(list.get(1));
+					for(h = 0; h<list.size();h++){
+						xs = list.get(h).getXX();
+						ys = list.get(h).getYY();
+									
+					if (tileAt.x == xs && tileAt.y == ys && list.get(h).getTyp()=="Settler"){
+						list.get(h).setMov();						
+						list.get(h).setImg(getImages("CharaC.png",3,4));
+						list.add(new RPGSprite(this, getImages("Chara1.png",3,4), list.get(h).tileX,list.get(h).tileY, 3, RPGSprite.LEFT, 1, 2, 100,1,1,1, "Pikeman"));
+						playfield.add(list.get(list.size()-1));
 						break;						
 					}
-				}
+				}}
 				if (click()){
 					int x = getMouseX();
 					int y = getMouseY();
@@ -174,71 +180,62 @@ public class RPGGame extends GameObject {
 						}
 						
 						String dialogNP[] = new String[3];
-						talkToNPC = (RPGSprite) map.getLayer3(targetX, targetY);
-						
-						if(clicked){				
+						fiende = (RPGSprite) map.getLayer3(targetX, targetY);
+						//Battle metoden:
+						if(clicked && fiende!=null && fiende!=list.get(h)){				
 							   clicked=!clicked;
-							   							   							   
-							   if (talkToNPC!=list.get(h) && talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK()){						   
-								   playfield.remove(talkToNPC);
-								   list.get(h).test(tileAt.x,tileAt.y);
-								   talkToNPC.setX(1000);
-								   talkToNPC.setY(1000);
-								   break;
+							   int wave=rand.nextInt(100);
+							   
+							   while(wave > 0){						   
+								   int fiDEF=rand.nextInt(fiende.getDEF()*fiende.getHit());
+								   list.get(h).setHP(list.get(h).getHP()-fiDEF);					   
+								   int minATK=rand2.nextInt(list.get(h).getATK()*list.get(h).getHit());								   
+								   fiende.setHP(fiende.getHP()-minATK);
 								   
-							   }
-							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() < talkToNPC.getDEF()){						   
-								   playfield.remove(list.get(h));
-								   list.get(h).setX(1000);
-								   list.get(h).setY(1000);
-								   break;						   
-							   }
-							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && list.get(h).getATK() == talkToNPC.getDEF()){						   
+								   if (fiende.getHP()==0){						   
+									   playfield.remove(fiende);
+									   list.get(h).test(tileAt.x,tileAt.y);
+									   fiende.setX(10000);
+									   fiende.setY(10000);
+									   list.remove(fiende);
+									   break;
 								   
-								   list.get(h).setHP(50);
-								   talkToNPC.setHP(50);
-								   break;						   
+								   }
+								   else if (list.get(h).getHP()==0){						   
+									   playfield.remove(list.get(h));
+									   list.get(h).setX(10000);
+									   list.get(h).setY(10000);
+									   list.remove(list.get(h));
+									   break;						   
+								   }
+								   wave--;
 							   }
-							   else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && list.get(h).getATK() == talkToNPC.getDEF()){						   
-								   playfield.remove(talkToNPC);
-								   talkToNPC.setX(1000);
-								   talkToNPC.setY(1000);
-								   list.get(h).setHP(50);
-								   
-								   break;						   
-							   }
-							   else if (talkToNPC.getHP()==100 && list.get(h).getHP()==50 && list.get(h).getATK() == talkToNPC.getDEF()){						   
-								   playfield.remove(list.get(h));
-								   list.get(h).setX(1000);
-								   list.get(h).setY(1000);
-								   talkToNPC.setHP(50);
-								   
-								   break;						   
-							   }
+							   break;
 						}
-					
-						if (talkToNPC!=null && talkToNPC!=list.get(h)){
-							if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() > list.get(h).getATK())
-								chance=0;
-							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() < list.get(h).getATK())
-								chance=100;
-							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
+						if (fiende!=null && fiende!=list.get(h)){
+							if (fiende.getDEF() == list.get(h).getATK())
 								chance=50;
-							else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
-								chance=100;
-							else if (talkToNPC.getHP()==100 && list.get(h).getHP()==50 && talkToNPC.getDEF() == list.get(h).getATK())
-								chance=0;
-							else if (talkToNPC.getHP()==50 && list.get(h).getHP()==100 && talkToNPC.getDEF() == list.get(h).getATK())
-								chance=50;
-							dialogNP[0]=list.get(h).getTyp().toUpperCase()+" WITH "+list.get(h).getHP()+" HP";
+							else if (fiende.getDEF() > list.get(h).getATK()){
+								if (fiende.getDEF() - list.get(h).getATK() == 1)
+									chance=40;
+								if (fiende.getDEF() - list.get(h).getATK() == 2)
+									chance=30;
+								if (fiende.getDEF() - list.get(h).getATK() > 2)
+									chance=20;
+								else if (fiende.getDEF() - list.get(h).getATK() > 3)
+									chance=10;
+							}
+									
+							dialogNP[0]=list.get(h).getTyp().toUpperCase()+" WITH "+list.get(h).getHP()+" MP";
 							dialogNP[1]="HAS A "+chance+"% CHANCE";
-							dialogNP[2]="AGAINST "+talkToNPC.getTyp().toUpperCase()+" WITH "+talkToNPC.getHP()+ "HP";
+							dialogNP[2]="AGAINST "+fiende.getTyp().toUpperCase()+" WITH "+fiende.getHP()+ " MP";
 						}
-						if (talkToNPC != null && dialogNP != null && talkToNPC!=list.get(h)) {
+						if (fiende != null && dialogNP != null && fiende!=list.get(h) && clicked==false) {
 							dialog.setDialog(dialogNP,
 								(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
 							     clicked=true;
 								 gameState=TALKING;
+								 break;
 						}else list.get(h).test(tileAt.x,tileAt.y);
 						Map.reveal(list.get(h).tileX,list.get(h).tileY,2);
 						break;
@@ -274,7 +271,7 @@ public class RPGGame extends GameObject {
 						keyPressed(KeyEvent.VK_X) ||
 						keyPressed(KeyEvent.VK_ESCAPE)) {
 						
-						//talkToNPC.setDirection(talkToNPCDirection);
+						//fiende.setDirection(fiendeDirection);
 						gameState = PLAYING;
 					}
 				}
