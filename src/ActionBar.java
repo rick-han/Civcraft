@@ -18,7 +18,7 @@ public class ActionBar{
 	private final int ACTION_BAR_HEIGHT = 85;
 	private GameEngine parent = null;
 	
-	public ActionBar(GameEngine parent) {
+	public ActionBar(GameEngine parent){
 		this.parent = parent;
 	}
 	
@@ -26,7 +26,7 @@ public class ActionBar{
 		actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
 		actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
 		actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
-		
+		//Testkommentar
 		TButton btn = new TButton("AT", 5, 5, 35, 35) {
 			public void doAction() {
 				System.out.println("Hello!");
