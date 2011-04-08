@@ -12,7 +12,7 @@ import com.golden.gamedev.gui.TPanel;
 import com.golden.gamedev.gui.toolkit.FrameWork;
 
 
-public class ActionBar{
+public class ActionBar {
 	private FrameWork actionFrame = null;
 	private TPanel actionBar = null;
 	private final int ACTION_BAR_HEIGHT = 85;
