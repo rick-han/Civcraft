@@ -2,14 +2,10 @@
 
 // JFC
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import javax.swing.*;
+
 
 // GTGE
 import com.golden.gamedev.*;
-import com.golden.gamedev.object.*;
-import com.golden.gamedev.object.background.*;
 import com.golden.gamedev.funbox.*;
 
 
@@ -21,7 +17,7 @@ public class Civcraft extends GameEngine {
 	public void initResources() {
 		nextGameID = TITLE;
 		showCursor();
-//		nextGameID = GAME_MODE;
+
 	}
 
 	public GameObject getGame(int GameID) {
@@ -32,11 +28,6 @@ public class Civcraft extends GameEngine {
 
 		return null;
 	}
-
-
- /****************************************************************************/
- /***************************** MAIN-CLASS ***********************************/
- /****************************************************************************/
 
 	public static void main(String[] args) {
 //		if (args != null && args.length > 0 && args[0].equalsIgnoreCase("Java2D")) {

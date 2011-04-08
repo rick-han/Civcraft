@@ -58,7 +58,7 @@ public class PlayField2 {
                 this.groups[0] = extra;
 
                 this.collisions = new CollisionManager[0];
-                this.cacheSprite = new Sprite[0];
+                this.cacheSprite = new RPGSprite[0];
         }
 
         /**
@@ -74,7 +74,11 @@ public class PlayField2 {
  /*********************** SPRITE GROUP OPERATION *****************************/
  /****************************************************************************/
 
-        /**
+        
+
+		
+
+		/**
          * Inserts a sprite (extra sprite) directly into playfield,
          * for example animation, explosion, etc. <p>
          *
@@ -84,11 +88,12 @@ public class PlayField2 {
          * The sprite is inserted to 'extra group' and all sprites on
          * extra group will always on top of other sprites.
          */
-        public void add(Sprite extra) {
-                groups[groups.length-1].add(extra);
+    	
+        public void add(Sprite member) {
+                groups[groups.length-1].add(member);
         }
-        public void remove(Sprite extra) {
-            groups[groups.length-1].remove(extra);
+        public void remove(Sprite member) {
+            groups[groups.length-1].remove(member);
     }
         /**
          * Inserts new <code>SpriteGroup</code> into this playfield.
@@ -438,7 +443,7 @@ public class PlayField2 {
          */
         public void clearCache() {
                 cacheSprite = null;
-                cacheSprite = new Sprite[0];
+                cacheSprite = new RPGSprite[0];
         }
 
 
@@ -509,5 +514,7 @@ public class PlayField2 {
         public void setComparator(Comparator c) {
                 comparator = c;
         }
+
+		
 
 }

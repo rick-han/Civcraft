@@ -2,8 +2,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.StringTokenizer;
 
-import com.golden.gamedev.object.*;
-import com.golden.gamedev.object.background.abstraction.*;
+
 import com.golden.gamedev.util.*;
 import com.golden.gamedev.engine.*;
 
@@ -20,11 +19,12 @@ public class Map extends AbstractTileBackground2 {
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
 	static int[][]	fogofwar;
+	static int maxX = 0, maxY = 0;
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32; int b=32;
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
-		//super(0,0, i*a - (a/4 + 1) * i, j*b - b/2);
+		
 		layer1 = new int[38][25];
 		layer2 = new int[40][25];
 		layer3 = new RPGSprite[40][25];		
@@ -43,7 +43,10 @@ public class Map extends AbstractTileBackground2 {
 		}
 
 		// set the actual map size based on the read file
-		setSize(38, 25);
+		maxX = 20; 
+		maxY = 20;
+		setSize(maxX, maxY);
+		
 
 		chipsetE = new Chipset(bsLoader.getImages("ChipSet2.png", 6, 24, false));
 		chipsetF = new Chipset(bsLoader.getImages("ChipSet3.png", 6, 24));
@@ -95,12 +98,11 @@ public class Map extends AbstractTileBackground2 {
 	}
 
 	public boolean isOccupied(int tileX, int tileY) {
-	try {
-	    return (layer2[tileX][tileY] != -1 || layer3[tileX][tileY] != null);
-	} catch (Exception e) {
+	if (layer2[tileX][tileY] != -1 || layer2[tileX][tileY] == 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] == 144 || layer2[tileX][tileY] == 144)
+	   return true;
 		// out of bounds
-		return true;
-	} }
+	return false;
+	} 
 
 	public RPGSprite getLayer3(int tileX, int tileY) {
 	try {
@@ -142,11 +144,11 @@ public class Map extends AbstractTileBackground2 {
 		if (tileX >= 0 && tileY >=0)
 			fogofwar[tileX][tileY] = 0;
 		if (tileX%2 == 0){			
-			fogofwar[tileX+1][tileY] = 0; 
-			fogofwar[tileX][tileY+1] = 0;
+			if (tileX < maxX) fogofwar[tileX+1][tileY]= 0; 
+			if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
 			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
 			if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
-			if (tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
+			if (tileX < maxX && tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
 			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
 			if(count < sightRange){
 				revealRedux(tileX+1, tileY, sightRange, count);
@@ -160,11 +162,11 @@ public class Map extends AbstractTileBackground2 {
 		}
 		else{
 			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
-			if (tileX > 0) fogofwar[tileX-1][tileY+1] = 0;
+			if (tileX > 0 && tileY < maxY) fogofwar[tileX-1][tileY+1] = 0;
 			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
-			fogofwar[tileX+1][tileY] = 0;
-			fogofwar[tileX+1][tileY+1] = 0;
-			fogofwar[tileX][tileY+1] = 0;
+			if (tileX < maxX) fogofwar[tileX+1][tileY] = 0;
+			if (tileX < maxX && tileY < maxY) fogofwar[tileX+1][tileY+1] = 0;
+			if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
 			if(count < sightRange){
 				revealRedux(tileX-1, tileY, sightRange, count);
 				revealRedux(tileX-1, tileY+1, sightRange, count);
@@ -184,11 +186,11 @@ private static void revealRedux(int tileX, int tileY, int sightRange, int count)
 	if (tileX >= 0 && tileY >=0)
 		fogofwar[tileX][tileY] = 0;
 	if (tileX%2 == 0){			
-		fogofwar[tileX+1][tileY] = 0; 
-		fogofwar[tileX][tileY+1] = 0;
+		if (tileX < maxX) fogofwar[tileX+1][tileY] = 0; 
+		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
 		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
 		if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
-		if (tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
+		if (tileX < maxX && tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
 		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
 		if(count < sightRange){
 			revealRedux(tileX+1, tileY, sightRange, count);
@@ -202,11 +204,11 @@ private static void revealRedux(int tileX, int tileY, int sightRange, int count)
 	}
 	else{
 		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
-		if (tileX > 0) fogofwar[tileX-1][tileY+1] = 0;
+		if (tileX > 0 && tileY < maxY) fogofwar[tileX-1][tileY+1] = 0;
 		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
-		fogofwar[tileX+1][tileY] = 0;
-		fogofwar[tileX+1][tileY+1] = 0;
-		fogofwar[tileX][tileY+1] = 0;
+		if (tileX < maxX) fogofwar[tileX+1][tileY] = 0;
+		if (tileX < maxX && tileY < maxY) fogofwar[tileX+1][tileY+1] = 0;
+		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
 		if(count < sightRange){
 			revealRedux(tileX-1, tileY, sightRange, count);
 			revealRedux(tileX-1, tileY+1, sightRange, count);

@@ -2,17 +2,13 @@
 
 // JFC
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 
 // GTGE
-import com.golden.gamedev.object.Sprite;
-import com.golden.gamedev.object.background.abstraction.AbstractTileBackground;
 import com.golden.gamedev.object.sprite.AdvanceSprite;
 
 
 public class RPGSprite extends AdvanceSprite{
-AdvanceSprite lol;
 
 	// sprite constant direction
 	public static final int LEFT 	= 0;
@@ -24,7 +20,7 @@ AdvanceSprite lol;
 	public static final int STANDING = 0,
 							MOVING = 1;
 
-	AbstractTileBackground bg;
+	
 	public static final int[][] movingAnimation =
 		new int[][] { { 10, 11, 10, 9 }, // left animation
 			  		  { 4, 5, 4, 3 },    // right animation
@@ -46,12 +42,14 @@ AdvanceSprite lol;
 	String typ;
 	int hit;
 	int move;
+	int sightRange=2;
+	int moveThisTurn=0;
 	int range;
 	public RPGSprite(){
 	}
    
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
-					 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, String typ) {
+					 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ) {
 		super(images,(tileX*32)-8,(tileY*32)-32);
 
 		this.owner = owner;
@@ -64,6 +62,7 @@ AdvanceSprite lol;
 		this.typ=typ;
 		this.hit=hit;
 		this.range=range;
+		this.sightRange=sightRange;
 		this.move=move;
 		map.layer3[tileX][tileY] = this;	// mark sprite position
 
@@ -86,6 +85,9 @@ AdvanceSprite lol;
 	public int getMove(){
 		return move;
 	}
+	public int getMoveLeft(){
+		return move-moveThisTurn;
+	}
 	public int getHit(){
 		return hit;
 	}
@@ -95,9 +97,15 @@ AdvanceSprite lol;
 	public String getTyp(){
 		return typ;
 	}
-	
 	public void setMov(){
 		mov=false;
+	}
+	public void movement(){
+		if (move == moveThisTurn)
+			mov=false;
+		else
+			moveThisTurn+=1; //ska kolla efter terrainaddons som påverkar movement
+		Map.reveal(tileX,tileY, sightRange);
 	}
 	public int getHP(){
 		return hp;
@@ -157,10 +165,11 @@ AdvanceSprite lol;
 			setDirection(1);
 			if (even){
 				tileX+=1; 
-				tileY+=1;
-			
+				tileY+=1;		
 				if (map.isOccupied(tileX, tileY) == true){
-					return false;
+					tileX-=1;
+					tileY-=1;
+					return false;				
 				}
 		 
 				map.layer3[tileX][tileY] = null;
@@ -178,6 +187,8 @@ AdvanceSprite lol;
 				tileX-=1;
 				tileY-=1;
 				if (map.isOccupied(tileX, tileY) == true){
+					tileX+=1;
+					tileY+=1;
 					return false;
 				}
 				map.layer3[tileX][tileY] = null;
@@ -194,6 +205,8 @@ AdvanceSprite lol;
 				tileX-=1;
 				tileY+=1;
 				if (map.isOccupied(tileX, tileY) == true){
+					tileX+=1;
+					tileY-=1;
 					return false;
 				}
 				map.layer3[tileX][tileY] = null;
@@ -211,6 +224,8 @@ AdvanceSprite lol;
 				tileY-=1;
 			
 				if (map.isOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY+=1;
 					return false;
 				}
 				map.layer3[tileX][tileY] = null;
@@ -223,20 +238,59 @@ AdvanceSprite lol;
 		if(horiz > tileX){
 			setDirection(1);
 			tileX+=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				tileX-=1;
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
 			
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
 		}
+		
 		else if(horiz < tileX){
 			setDirection(0);
 			tileX-=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				tileX+=1;
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
 			
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
 		}
 		else if(vert > tileY){
 			setDirection(3);
 			tileY+=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				tileY-=1;
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
+			
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
 		}
 		else if(vert < tileY){
 			setDirection(2);
 			tileY-=1;
+			if (map.isOccupied(tileX, tileY) == true){
+				tileY+=1;
+				return false;
+			}
+			map.layer3[tileX][tileY] = null;
+			
+			map.layer3[tileX][tileY] = this;
+			setStatus(MOVING);
+			setFrame(getFrame() + 1);
+			return true;
 		}
 		//if (map.isOccupied(tileX, tileY) == true){
 			//return false;
@@ -250,41 +304,6 @@ AdvanceSprite lol;
 
 
       		// next frame
-		setFrame(getFrame() + 1);
-
-		return true;
-	}
-
-	// ANVÄNDS EJ
-	boolean walkTo(int dir, double horiz, double vert) {
-		
-		
-		//if (tileAt == tileG){}
-		setDirection(dir);
-
-		if (map.isOccupied(tileX+horiz, tileY+vert) == true) {
-			// tile is not empty!
-			// can't go to this direction
-			return false;
-		}
-
-		// unoccupy old location
-		
-		map.layer3[tileX][tileY] = null;
-
-		// set new location
-		tileX += horiz;
-		tileY += vert;
-		
-		// occupy new location
-		map.layer3[tileX][tileY] = this;
-		 
-         
-
-		setStatus(MOVING);
-
-
-		// next frame
 		setFrame(getFrame() + 1);
 
 		return true;
@@ -306,7 +325,9 @@ AdvanceSprite lol;
 		setDirection(i);
 		return true;
 	}
+	
 }
+
 
 	
 

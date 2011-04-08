@@ -127,7 +127,6 @@ public abstract class AbstractTileBackground2 extends Background {
                 int oldx = (int) this.getX(), oldy = (int) this.getY();
                 
                 super.setLocation(xb, yb);
-                
                 int x = (int) this.getX(), y = (int) this.getY();
                 if (x == oldx && y == oldy) {
                         // position is not changed
@@ -135,12 +134,11 @@ public abstract class AbstractTileBackground2 extends Background {
                 }
                 
                 //convert <x, y> into tiles
-                this.tileX = x / this.tileWidth;
-                
-                
+                this.tileX = x / this.tileWidth;              
                 this.tileY = y / this.tileHeight;
                 this.offsetX = x % this.tileWidth;
                 this.offsetY = y % this.tileHeight;
+                
         }
         
         /**

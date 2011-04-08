@@ -12,20 +12,20 @@ import com.golden.gamedev.gui.TPanel;
 import com.golden.gamedev.gui.toolkit.FrameWork;
 
 
-public class ActionBar extends GameObject{
+public class ActionBar{
 	private FrameWork actionFrame = null;
 	private TPanel actionBar = null;
 	private final int ACTION_BAR_HEIGHT = 85;
+	private GameEngine parent = null;
 	
 	public ActionBar(GameEngine parent) {
-		super(parent);
+		this.parent = parent;
 	}
 	
-	
 	public void initResources(){
-		actionFrame = new FrameWork(bsInput, 640, 480);
-		actionBar = new TPanel(0, 480 - ACTION_BAR_HEIGHT, 640, ACTION_BAR_HEIGHT);
-		actionBar.setExternalUI(getImages("ActionBarImage.png", 2, 1), false);
+		actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
+		actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
+		actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
 		
 		TButton btn = new TButton("AT", 5, 5, 35, 35) {
 			public void doAction() {
@@ -33,7 +33,7 @@ public class ActionBar extends GameObject{
 			}
 		};
 		
-		btn.setExternalUI(getImages("Button.png", 2, 1, "0100", 1), false);
+		btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
 		btn.setToolTipText(
 				"a floating panel contains title bar and content pane\n\n" +
 				"content pane is simply a panel to hold components\n" +
@@ -53,10 +53,6 @@ public class ActionBar extends GameObject{
 	
 	public void render(Graphics2D g) {
 		actionFrame.render(g);
-	}
-	
-	public FrameWork getFrameWork(){
-		return actionFrame;
 	}
 	
 }
