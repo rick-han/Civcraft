@@ -9,6 +9,7 @@ import java.util.*;
 // GTGE
 import com.golden.gamedev.GameObject;
 import com.golden.gamedev.GameEngine;
+import com.golden.gamedev.object.Sprite;
 
 
 
@@ -57,7 +58,7 @@ public class RPGGame extends GameObject {
 		playfield.setComparator(new Comparator() {
 			public int compare(Object o1, Object o2) {
 				// sort based on y-order
-				return (int) (((RPGSprite) o1).getY()-((RPGSprite) o2).getY());
+				return (int) (((Sprite) o1).getY()-((Sprite) o2).getY());
 			}
 		} );
 

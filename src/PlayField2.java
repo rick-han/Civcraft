@@ -443,7 +443,7 @@ public class PlayField2 {
          */
         public void clearCache() {
                 cacheSprite = null;
-                cacheSprite = new RPGSprite[0];
+                cacheSprite = new Sprite[0];
         }
 
 
