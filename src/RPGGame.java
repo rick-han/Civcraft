@@ -295,7 +295,7 @@ public class RPGGame extends GameObject {
 	public void newTurn(){
 		turn++;
 		System.out.println("Turn: "+turn);
-		spawnBarb();
+		//spawnBarb();
 		for (int i=0; i < list.size(); i++){
 			list.get(i).mov = true;
 			list.get(i).moveThisTurn = 0;

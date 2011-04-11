@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.image.*;
 import java.util.StringTokenizer;
+import java.util.Random;
 
 
 import com.golden.gamedev.util.*;
@@ -12,9 +13,9 @@ public class Map extends AbstractTileBackground2 {
 	public static final int TILE_WIDTH = 32, TILE_HEIGHT = 32;
 
 	Chipset		chipsetE;
-	Chipset		chipsetF;
+	Chipset		terrainAddonChipset;
 	Chipset 	chipsetEs;
-	Chipset 	csFoW;
+	Chipset 	fogOfWarChipset;
 	Chipset[] 	chipset;	
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
@@ -22,6 +23,9 @@ public class Map extends AbstractTileBackground2 {
 	static int maxX = 0, maxY = 0;
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32; int b=32;
+	Chipset terrainChipset;
+	
+	
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
 		
@@ -29,30 +33,41 @@ public class Map extends AbstractTileBackground2 {
 		layer2 = new int[40][25];
 		layer3 = new RPGSprite[40][25];		
 		fogofwar = new int[40][25];
-
-		String[] lowerTile = FileUtil.fileRead(bsIO.getStream("map00.lwr"));
-		String[] upperTile = FileUtil.fileRead(bsIO.getStream("map00.upr"));
+		
+		
+		//  KARTGENELOLTOR
+		int t;
+		Random rand = new Random();
+		//String[] lowerTile = FileUtil.fileRead(bsIO.getStream("map00.lwr"));
+		//String[] upperTile = FileUtil.fileRead(bsIO.getStream("map00.upr"));
 		for (int j=0;j < layer1[0].length;j++) {
-			StringTokenizer lowerToken = new StringTokenizer(lowerTile[j]);
-			StringTokenizer upperToken = new StringTokenizer(upperTile[j]);
+			//StringTokenizer lowerToken = new StringTokenizer(lowerTile[j]);
+			//StringTokenizer upperToken = new StringTokenizer(upperTile[j]);
 			for (int i=0;i < layer1.length;i++) {
-				layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
-				layer2[i][j] = Integer.parseInt(upperToken.nextToken());
+				//layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
+				//layer2[i][j] = Integer.parseInt(upperToken.nextToken());
+				
+				t = rand.nextInt(7);
+				layer1[i][j] = t;
+				if (t == 1 || t == 2)
+					layer2[i][j] = 0;
+				else
+					layer2[i][j] = -1;
 				fogofwar[i][j] = 1;
 			}
 		}
 
 		// set the actual map size based on the read file
-		maxX = 20; 
-		maxY = 20;
+		maxX = 38; 
+		maxY = 25;
 		setSize(maxX, maxY);
 		
 
-		chipsetE = new Chipset(bsLoader.getImages("ChipSet2.png", 6, 24, false));
-		chipsetF = new Chipset(bsLoader.getImages("ChipSet3.png", 6, 24));
-		csFoW = new Chipset(bsLoader.getImage("FoW.png"));
-
-
+		terrainAddonChipset = new Chipset(bsLoader.getImages("Test1.png", 2, 1));
+		fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
+		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 7, 1));
+		
+		/*
 		chipset = new Chipset[16];
 		BufferedImage[] image = bsLoader.getImages("ChipSet1.png", 4, 4, false);
 		int[] chipnum = new int[] { 0,1,4,5,8,9,11,12,2,3,6,7,10,11,14,15 };
@@ -61,40 +76,33 @@ public class Map extends AbstractTileBackground2 {
 			BufferedImage[] chips = ImageUtil.splitImages(image[num], 3, 4);
 			chipset[i] = new Chipset(chips);
 		}
+		*/
+		
+		
 	}
 
 	public void renderTile(Graphics2D g,
 						   int tileX, int tileY,
 						   int x, int y) {
+		
+		
+		
+		// render Fog of War
+		g.drawImage(fogOfWarChipset.image2, x, y, null);
+		
+		int tilenum = layer1[tileX][tileY];		
+		int fognum = fogofwar[tileX][tileY];
 		// render layer 1
-		g.drawImage(csFoW.image2, x, y, null);
-		
-		int tilenum = layer1[tileX][tileY];
-		//BufferedImage image = chipset[tilenum-chipsetE.image.length].image[2];
-		
-		int tilenum3 = fogofwar[tileX][tileY];
-		if (tilenum3 < 1) {
-		if (tilenum < chipsetE.image.length) {
-			//g.drawImage(chipsetE.image[tilenum], x, y, null);
-			//	g.drawImage(chipsetEs.image2, x, y, null);
-			g.drawImage(chipsetE.image[tilenum], x, y, null);
-			//g.drawImage(image, x, y, null);
-		} else if (tilenum >= chipsetE.image.length) {
-			BufferedImage image = chipset[tilenum-chipsetE.image.length].image[2];
-			g.drawImage(image, x, y, null);
-			//g.drawImage(image, x, y, null);
-			//g.drawImage(chipsetEs.image2, x, y, null);
-		}
-
+		if (fognum < 1){
+				g.drawImage(terrainChipset.image[tilenum], x, y, null);
 		// render layer 2
 		int tilenum2 = layer2[tileX][tileY];
-		if (tilenum2 != -1) {
-			//g.drawImage(image, x, y, null);
-			//g.drawImage(chipsetEs.image2, x, y, null);
-			g.drawImage(chipsetF.image[tilenum2], x, y, null);
-		}
-		}
-		// layer 3 is rendered by sprite group
+		if (tilenum2 != -1)
+			g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
+		}		
+		// sparade kodsnuttar
+		//g.drawImage(image, x, y, null);
+		//g.drawImage(chipsetEs.image2, x, y, null);
 	}
 
 	public boolean isOccupied(int tileX, int tileY) {
