@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 // GTGE
+import com.golden.gamedev.gui.TButton;
 import com.golden.gamedev.object.sprite.AdvanceSprite;
 
 
@@ -36,8 +37,10 @@ public class RPGSprite extends AdvanceSprite{
 	
 	boolean klickad=false;
 	boolean mov=true;
+	boolean selmov=false;
+	boolean fortified=false;
 	int atk;
-	int def;
+	double def;
 	int hp;
 	String typ;
 	int hit;
@@ -45,6 +48,7 @@ public class RPGSprite extends AdvanceSprite{
 	int sightRange=2;
 	int moveThisTurn=0;
 	int range;
+	double origdef;
 	public RPGSprite(){
 	}
    
@@ -64,6 +68,7 @@ public class RPGSprite extends AdvanceSprite{
 		this.range=range;
 		this.sightRange=sightRange;
 		this.move=move;
+		this.origdef=def;
 		map.layer3[tileX][tileY] = this;	// mark sprite position
 
 		// init status, standing facing direction
@@ -74,10 +79,20 @@ public class RPGSprite extends AdvanceSprite{
 
 		speed = 0.04*moveSpeed;
 	}
+	
 	public void setImg(BufferedImage[] images){
 		
 		setImages(images);
 		
+	}
+	public boolean isFortified(){
+		return fortified;
+	}
+	public void setFort(){
+		fortified=true;
+	}
+	public boolean selm(){
+		return selmov;
 	}
 	public int getRange(){
 		return range;
@@ -113,7 +128,7 @@ public class RPGSprite extends AdvanceSprite{
 	public int getATK(){
 		return atk;
 	}
-	public int getDEF(){
+	public double getDEF(){
 		return def;
 	}
 	public int getXX(){
@@ -129,7 +144,10 @@ public class RPGSprite extends AdvanceSprite{
 		tileX=x;
 	}
 	public void setY(int y){
-		tileY=y;
+		tileY=y;	
+	}
+	public void setDEF(double d){
+		this.def=d;
 	}
 	public void update(long elapsedTime) {
 		super.update(elapsedTime);
@@ -156,8 +174,8 @@ public class RPGSprite extends AdvanceSprite{
 	boolean test(int horiz, int vert){
 		if (horiz % 2 == 0){
 			even=true;
-		}else even=false;
-		map.layer3[tileX][tileY] = null;
+		}else even=false;		
+	    map.layer3[tileX][tileY] = null;
 		int tilX = tileX; int tilY = tileY;
 	  
 	// set new location

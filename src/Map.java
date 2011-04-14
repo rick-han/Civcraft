@@ -20,52 +20,47 @@ public class Map extends AbstractTileBackground2 {
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
 	static int[][]	fogofwar;
-	static int maxX = 0, maxY = 0;
+	static int sizeX = 56, sizeY = 27, maxX=sizeX-1, maxY=sizeY-1;
 	RPGSprite[][] layer3;	// the object/event/npc tiles
-	int a=32; int b=32;
+	int a=32, b=32;
 	Chipset terrainChipset;
 	
 	
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
 		
-		layer1 = new int[38][25];
-		layer2 = new int[40][25];
-		layer3 = new RPGSprite[40][25];		
-		fogofwar = new int[40][25];
-		
+		//anropar mapGenerator();
+		layer1 = new int[sizeX][sizeY];
+		layer2 = new int[sizeX][sizeY];
+		layer3 = new RPGSprite[sizeX][sizeY];		
+		fogofwar = new int[sizeX][sizeY];
+		mapGenerator(4);
 		
 		//  KARTGENELOLTOR
-		int t;
-		Random rand = new Random();
 		//String[] lowerTile = FileUtil.fileRead(bsIO.getStream("map00.lwr"));
 		//String[] upperTile = FileUtil.fileRead(bsIO.getStream("map00.upr"));
+		//StringTokenizer lowerToken = new StringTokenizer(lowerTile[j]);
+		//StringTokenizer upperToken = new StringTokenizer(upperTile[j]);
+		//layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
+		//layer2[i][j] = Integer.parseInt(upperToken.nextToken());
 		for (int j=0;j < layer1[0].length;j++) {
-			//StringTokenizer lowerToken = new StringTokenizer(lowerTile[j]);
-			//StringTokenizer upperToken = new StringTokenizer(upperTile[j]);
 			for (int i=0;i < layer1.length;i++) {
-				//layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
-				//layer2[i][j] = Integer.parseInt(upperToken.nextToken());
-				
-				t = rand.nextInt(7);
-				layer1[i][j] = t;
-				if (t == 1 || t == 2)
+				if (layer1[i][j] == 11)
 					layer2[i][j] = 0;
+				else if (layer1[i][j] == 8)
+					layer2[i][j] = 2;
 				else
 					layer2[i][j] = -1;
-				fogofwar[i][j] = 1;
+				fogofwar[i][j] = 0;
 			}
 		}
-
-		// set the actual map size based on the read file
-		maxX = 38; 
-		maxY = 25;
-		setSize(maxX, maxY);
 		
-
-		terrainAddonChipset = new Chipset(bsLoader.getImages("Test1.png", 2, 1));
+		// set the actual map size based on the read file
+		setSize(sizeX, sizeY);
+		
 		fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
-		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 7, 1));
+		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 12, 1));
+		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 3, 1));
 		
 		/*
 		chipset = new Chipset[16];
@@ -138,93 +133,342 @@ public class Map extends AbstractTileBackground2 {
 
 	public boolean isOccupied(double tileX, double tileY) {
 		try {
-		    return (layer2[(int) tileX][(int) tileY] != -1 ||
+		    return (layer1[(int) tileX][(int) tileY] == 0 ||
+		    		layer1[(int) tileX][(int) tileY] == 1 ||
+		    		layer1[(int) tileX][(int) tileY] == 11 ||
 					layer3[(int) tileX][(int) tileY] != null);
 		} catch (Exception e) {
 			// out of bounds
 			return true;
 		} }
 
-	public static void reveal(int tileX, int tileY, int sightRange){
-		int count = 1;
-		if (tileX < 0) tileX = 0; 
-		if (tileY < 0) tileY = 0;
-		if (tileX >= 0 && tileY >=0)
-			fogofwar[tileX][tileY] = 0;
-		if (tileX%2 == 0){			
-			if (tileX < maxX) fogofwar[tileX+1][tileY]= 0; 
-			if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
-			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
-			if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
-			if (tileX < maxX && tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
-			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
-			if(count < sightRange){
-				revealRedux(tileX+1, tileY, sightRange, count);
-				revealRedux(tileX, tileY+1, sightRange, count);
-				revealRedux(tileX-1, tileY, sightRange, count);
-				revealRedux(tileX-1, tileY-1, sightRange, count);
-				revealRedux(tileX+1, tileY-1, sightRange, count);
-				revealRedux(tileX, tileY-1, sightRange, count);
-			
-			}
-		}
-		else{
-			if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
-			if (tileX > 0 && tileY < maxY) fogofwar[tileX-1][tileY+1] = 0;
-			if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
-			if (tileX < maxX) fogofwar[tileX+1][tileY] = 0;
-			if (tileX < maxX && tileY < maxY) fogofwar[tileX+1][tileY+1] = 0;
-			if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
-			if(count < sightRange){
-				revealRedux(tileX-1, tileY, sightRange, count);
-				revealRedux(tileX-1, tileY+1, sightRange, count);
-				revealRedux(tileX, tileY-1, sightRange, count);
-				revealRedux(tileX+1, tileY, sightRange, count);
-				revealRedux(tileX+1, tileY+1, sightRange, count);
-				revealRedux(tileX, tileY+1, sightRange, count);
-				
-			}
-		}
-	}
-	
-private static void revealRedux(int tileX, int tileY, int sightRange, int count){
-	count++;
+public static void reveal(int tileX, int tileY, int sightRange){
+	int current = 1;
 	if (tileX < 0) tileX = 0; 
 	if (tileY < 0) tileY = 0;
-	if (tileX >= 0 && tileY >=0)
+	if (tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY)
 		fogofwar[tileX][tileY] = 0;
-	if (tileX%2 == 0){			
-		if (tileX < maxX) fogofwar[tileX+1][tileY] = 0; 
+	if (tileX%2 == 0 && tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){			
+		if (tileX < maxX) fogofwar[tileX+1][tileY]= 0; 
 		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
 		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
 		if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
 		if (tileX < maxX && tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
 		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
-		if(count < sightRange){
-			revealRedux(tileX+1, tileY, sightRange, count);
-			revealRedux(tileX, tileY+1, sightRange, count);
-			revealRedux(tileX-1, tileY, sightRange, count);
-			revealRedux(tileX-1, tileY-1, sightRange, count);
-			revealRedux(tileX+1, tileY-1, sightRange, count);
-			revealRedux(tileX, tileY-1, sightRange, count);
+		if(current < sightRange){
+			revealRedux(tileX+1, tileY, sightRange, current);
+			revealRedux(tileX, tileY+1, sightRange, current);
+			revealRedux(tileX-1, tileY, sightRange, current);
+			revealRedux(tileX-1, tileY-1, sightRange, current);
+			revealRedux(tileX+1, tileY-1, sightRange, current);
+			revealRedux(tileX, tileY-1, sightRange, current);
 		
 		}
 	}
-	else{
+	else if(tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){
 		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
 		if (tileX > 0 && tileY < maxY) fogofwar[tileX-1][tileY+1] = 0;
 		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
 		if (tileX < maxX) fogofwar[tileX+1][tileY] = 0;
 		if (tileX < maxX && tileY < maxY) fogofwar[tileX+1][tileY+1] = 0;
 		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
-		if(count < sightRange){
-			revealRedux(tileX-1, tileY, sightRange, count);
-			revealRedux(tileX-1, tileY+1, sightRange, count);
-			revealRedux(tileX, tileY-1, sightRange, count);
-			revealRedux(tileX+1, tileY, sightRange, count);
-			revealRedux(tileX+1, tileY+1, sightRange, count);
-			revealRedux(tileX, tileY+1, sightRange, count);
-			
+		if(current < sightRange){
+			revealRedux(tileX-1, tileY, sightRange, current);
+			revealRedux(tileX-1, tileY+1, sightRange, current);
+			revealRedux(tileX, tileY-1, sightRange, current);
+			revealRedux(tileX+1, tileY, sightRange, current);
+			revealRedux(tileX+1, tileY+1, sightRange, current);
+			revealRedux(tileX, tileY+1, sightRange, current);		
 		}
 	}
-}}	
+}	
+private static void revealRedux(int tileX, int tileY, int sightRange, int current){
+	current++;
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY)
+		fogofwar[tileX][tileY] = 0;
+	if (tileX%2 == 0  && tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){			
+		if (tileX < maxX) fogofwar[tileX+1][tileY]= 0; 
+		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
+		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+		if (tileX > 0 && tileY > 0) fogofwar[tileX-1][tileY-1] = 0;
+		if (tileX < maxX && tileY > 0) fogofwar[tileX+1][tileY-1] = 0;
+		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+		if(current < sightRange){
+			revealRedux(tileX+1, tileY, sightRange, current);
+			revealRedux(tileX, tileY+1, sightRange, current);
+			revealRedux(tileX-1, tileY, sightRange, current);
+			revealRedux(tileX-1, tileY-1, sightRange, current);
+			revealRedux(tileX+1, tileY-1, sightRange, current);
+			revealRedux(tileX, tileY-1, sightRange, current);
+		
+		}
+	}
+	else if(tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){
+		if (tileX > 0) fogofwar[tileX-1][tileY] = 0;
+		if (tileX > 0 && tileY < maxY) fogofwar[tileX-1][tileY+1] = 0;
+		if (tileY > 0) fogofwar[tileX][tileY-1] = 0;
+		if (tileX < maxX) fogofwar[tileX+1][tileY] = 0;
+		if (tileX < maxX && tileY < maxY) fogofwar[tileX+1][tileY+1] = 0;
+		if (tileY < maxY) fogofwar[tileX][tileY+1] = 0;
+		if(current < sightRange){
+			revealRedux(tileX-1, tileY, sightRange, current);
+			revealRedux(tileX-1, tileY+1, sightRange, current);
+			revealRedux(tileX, tileY-1, sightRange, current);
+			revealRedux(tileX+1, tileY, sightRange, current);
+			revealRedux(tileX+1, tileY+1, sightRange, current);
+			revealRedux(tileX, tileY+1, sightRange, current);		
+		}
+	}
+}
+
+private void mapGenerator(int bas){
+	Random rand = new Random();
+	int r = 0, a = 0 , b = 0, c = 0;
+	for (int j=0;j < layer1[0].length;j++) {
+		for (int i=0;i < layer1.length;i++) {
+			r = tilePicker();
+			//layer1[i][j] = bas;
+			if (i == 0 && j == 0)
+				layer1[i][j] = bas;
+			else if (j == 0){
+				a = layer1[i-1][j];
+				if (rand.nextInt(2) > 0)
+					layer1[i][j] = a;
+				else
+					layer1[i][j] = r;
+			}
+			else if (i == 0){
+				a = layer1[i][j-1];
+				if (rand.nextInt(2) > 0)
+					layer1[i][j] = a;
+				else
+					layer1[i][j] = r;
+				}
+			else {
+				a = layer1[i-1][j];
+				b = layer1[i][j-1];
+				c = layer1[i-1][j-1];
+				if (a == b && a == c){
+					if (rand.nextInt(2) > 0)
+						layer1[i][j] = a;
+					else
+						layer1[i][j] = r;
+				}
+				else if (r != a && r != b && r != c)
+					switch	(rand.nextInt(3)) {
+						case 0: layer1[i][j] = a; break;
+						case 1: layer1[i][j] = b; break;
+						case 2: layer1[i][j] = c; break;
+					}
+				else if (a == c && a != b)
+					layer1[i][j] = r;
+				else
+					switch	(rand.nextInt(5)) {
+						case 0: layer1[i][j] = a; break;
+						case 1: layer1[i][j] = b; break;
+						case 2: layer1[i][j] = c; break;
+						default: layer1[i][j] = r; break;
+				}	
+			}
+		}
+	}
+	
+	r = rand.nextInt(4)+2;
+	for (int i = 0; i < r; i++){
+		spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,1);
+		spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),0);
+	}
+	r = rand.nextInt(4)+2;;
+	for (int i = 0; i < r; i++){
+		r = rand.nextInt(3);
+		switch (r){
+			case 0:{ 
+				spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,tilePicker());
+				break;
+				}
+			case 1:{
+				spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),tilePicker());
+				break;
+			}
+		}
+	}
+	for (int j=0;j < layer1[0].length;j++) {
+		for (int i=0;i < layer1.length;i++) {
+			if (j < 2 || j > maxY-2)
+				layer1[i][j] = 6;
+		}
+	}
+}
+
+private int tilePicker(){
+	Random rand = new Random();
+	int r = rand.nextInt(11);
+	if (r > 5)
+		r++;
+	//har spexxar man troligheten för var och en lolol
+	return r;
+}
+private void spawnCircle(int tileX, int tileY, int goal, int bas){
+	int radie=1;
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileX >= 0 && tileY >=0 && tileX <= maxX && tileY <= maxY)
+		layer1[tileX][tileY] = bas;
+	if (tileX%2 == 0 && tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){			
+		if (tileX < maxX) layer1[tileX+1][tileY] = bas; 
+		if (tileY < maxY) layer1[tileX][tileY+1] = bas;
+		if (tileX > 0) layer1[tileX-1][tileY] = bas;
+		if (tileX > 0 && tileY > 0) layer1[tileX-1][tileY-1] = bas;
+		if (tileX < maxX && tileY > 0) layer1[tileX+1][tileY-1] = bas;
+		if (tileY > 0) layer1[tileX][tileY-1] = bas;
+		if(radie < goal){
+			spawnCircleRedux(tileX+1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY-1, bas, goal, radie);
+		
+		}
+	}
+	else if(tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){
+		if (tileX > 0) layer1[tileX-1][tileY] = bas;
+		if (tileX > 0 && tileY < maxY) layer1[tileX-1][tileY+1] = bas;
+		if (tileY > 0) layer1[tileX][tileY-1] = bas;
+		if (tileX < maxX) layer1[tileX+1][tileY] = bas;
+		if (tileX < maxX && tileY < maxY) layer1[tileX+1][tileY+1] = bas;
+		if (tileY < maxY) layer1[tileX][tileY+1] = bas;
+		if(radie < goal){
+			spawnCircleRedux(tileX-1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY+1, bas, goal, radie);	
+		}
+	}
+}
+private void spawnCircleRedux(int tileX, int tileY, int bas, int goal, int radie){
+	radie++;
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileX >= 0 && tileY >=0 && tileX <= maxX && tileY <= maxY)
+		layer1[tileX][tileY] = bas;
+	if (tileX%2 == 0 && tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){			
+		if (tileX < maxX) layer1[tileX+1][tileY] = bas; 
+		if (tileY < maxY) layer1[tileX][tileY+1] = bas;
+		if (tileX > 0) layer1[tileX-1][tileY] = bas;
+		if (tileX > 0 && tileY > 0) layer1[tileX-1][tileY-1] = bas;
+		if (tileX < maxX && tileY > 0) layer1[tileX+1][tileY-1] = bas;
+		if (tileY > 0) layer1[tileX][tileY-1] = bas;
+		if(radie < goal){
+			spawnCircleRedux(tileX+1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY-1, bas, goal, radie);
+		
+		}
+	}
+	else if(tileX >= 0 && tileY >= 0 && tileX <= maxX && tileY <= maxY){
+		if (tileX > 0) layer1[tileX-1][tileY] = bas;
+		if (tileX > 0 && tileY < maxY) layer1[tileX-1][tileY+1] = bas;
+		if (tileY > 0) layer1[tileX][tileY-1] = bas;
+		if (tileX < maxX) layer1[tileX+1][tileY] = bas;
+		if (tileX < maxX && tileY < maxY) layer1[tileX+1][tileY+1] = bas;
+		if (tileY < maxY) layer1[tileX][tileY+1] = bas;
+		if(radie < goal){
+			spawnCircleRedux(tileX-1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX-1, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY-1, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY, bas, goal, radie);
+			spawnCircleRedux(tileX+1, tileY+1, bas, goal, radie);
+			spawnCircleRedux(tileX, tileY+1, bas, goal, radie);	
+		}
+	}
+}
+private void spawnRange(int tileX, int tileY, int bas){
+	Random rand = new Random();
+	int size = rand.nextInt(10)+5;
+	int currSize=1;
+	int direction = rand.nextInt(4);
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileY > maxY || tileX > maxX)
+		return;
+	switch (direction){
+		case 0:{//väster
+			if (tileX > 0 && tileX < maxX){
+				layer1[tileX][tileY] = bas;
+				spawnRangeRedux(tileX-1, tileY, bas, direction, size, currSize, rand);
+			}
+			break;
+		}
+		case 1:{//öster
+			if (tileX > 0 && tileX < maxX){
+				layer1[tileX][tileY] = bas;
+				spawnRangeRedux(tileX+1, tileY, bas, direction, size, currSize, rand);
+			}
+			break;
+		}
+		case 2:{//söder
+			if (tileY > 0 && tileY < maxY){
+				layer1[tileX][tileY] = bas;
+				spawnRangeRedux(tileX, tileY+1, bas, direction, size, currSize, rand);
+			}
+			break;
+		}
+		case 3:{//norr
+			if (tileY > 0 && tileY < maxY){
+				layer1[tileX][tileY] = bas;
+				spawnRangeRedux(tileX, tileY-1, bas, direction, size, currSize, rand);
+			}
+			break;
+		}
+	}
+}
+private void spawnRangeRedux(int tileX, int tileY, int bas, int direction, int size, int currSize, Random rand){
+	currSize++;
+	if (tileX < 0) tileX = 0; 
+	if (tileY < 0) tileY = 0;
+	if (tileY > maxY || tileX > maxX)
+		return;
+	//if (currSize % 2 == 1)
+		direction = rand.nextInt(3);
+	if (currSize <= size){
+		switch (direction){
+			case 0:{//väster
+				if (tileX > 0 && tileX < maxX){
+					layer1[tileX][tileY] = bas;
+					spawnRangeRedux(tileX-1, tileY, bas, direction, size, currSize, rand);
+				}
+				break;
+			}
+			case 1:{//öster
+				if (tileX > 0 && tileX < maxX){
+					layer1[tileX][tileY] = bas;
+					spawnRangeRedux(tileX+1, tileY, bas, direction, size, currSize, rand);
+				}	
+				break;
+			}
+			case 2:{//söder
+				if (tileY > 0 && tileY < maxY){
+					layer1[tileX][tileY] = bas;
+					spawnRangeRedux(tileX, tileY+1, bas, direction, size, currSize, rand);
+				}
+				break;
+			}
+			case 3:{//norr
+				if (tileY > 0 && tileY < maxY){
+					layer1[tileX][tileY] = bas;
+					spawnRangeRedux(tileX, tileY-1, bas, direction, size, currSize, rand);
+				}	
+				break;
+			}
+		}
+	}
+}
+}
