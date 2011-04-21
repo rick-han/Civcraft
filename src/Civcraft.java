@@ -56,7 +56,7 @@ public class Civcraft extends GameEngine {
 
 
 		GameLoader game = new GameLoader();
-		game.setup(new Civcraft(), new Dimension(640, 480), false);
+		game.setup(new Civcraft(), new Dimension(1024, 640), false);
 		game.start();
 	}
 

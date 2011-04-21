@@ -25,6 +25,10 @@ public class Map extends AbstractTileBackground2 {
 	int a=32, b=32;
 	Chipset terrainChipset;
 	
+	public Map(BaseLoader bsLoader, BaseIO bsIO, int width, int height){
+		super(0, 0, width, height);
+	}
+	
 	
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
@@ -49,6 +53,8 @@ public class Map extends AbstractTileBackground2 {
 					layer2[i][j] = 0;
 				else if (layer1[i][j] == 8)
 					layer2[i][j] = 2;
+				else if (layer1[i][j] == 9)
+					layer2[i][j] = 3;
 				else
 					layer2[i][j] = -1;
 				fogofwar[i][j] = 0;
@@ -60,7 +66,7 @@ public class Map extends AbstractTileBackground2 {
 		
 		fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
 		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 12, 1));
-		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 3, 1));
+		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 4, 1));
 		
 		/*
 		chipset = new Chipset[16];
@@ -85,15 +91,15 @@ public class Map extends AbstractTileBackground2 {
 		// render Fog of War
 		g.drawImage(fogOfWarChipset.image2, x, y, null);
 		
-		int tilenum = layer1[tileX][tileY];		
+		int tilenum = layer1[tileX][tileY];
 		int fognum = fogofwar[tileX][tileY];
 		// render layer 1
 		if (fognum < 1){
-				g.drawImage(terrainChipset.image[tilenum], x, y, null);
-		// render layer 2
-		int tilenum2 = layer2[tileX][tileY];
-		if (tilenum2 != -1)
-			g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
+			g.drawImage(terrainChipset.image[tilenum], x, y, null);
+			// render layer 2
+			int tilenum2 = layer2[tileX][tileY];
+			if (tilenum2 != -1)
+				g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
 		}		
 		// sparade kodsnuttar
 		//g.drawImage(image, x, y, null);
@@ -101,10 +107,22 @@ public class Map extends AbstractTileBackground2 {
 	}
 
 	public boolean isOccupied(int tileX, int tileY) {
-	if (layer2[tileX][tileY] != -1 || layer2[tileX][tileY] == 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] == 144 || layer2[tileX][tileY] == 144)
+	if     (layer1[tileX][tileY] == 0 ||
+    		layer1[tileX][tileY] == 1 ||
+    		layer1[tileX][tileY] == 11 ||
+			layer3[tileX][tileY] != null)
 	   return true;
 		// out of bounds
 	return false;
+	} 
+	
+	public boolean boatisOccupied(int tileX, int tileY) {
+		if     (layer1[tileX][tileY] != 1 ||	    		 
+				layer3[tileX][tileY] != null ||	    		 
+				layer1[tileX][tileY] !=1)
+		   return true;
+			// out of bounds
+	 return false;
 	} 
 
 	public RPGSprite getLayer3(int tileX, int tileY) {

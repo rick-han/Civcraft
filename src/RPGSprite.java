@@ -48,12 +48,13 @@ public class RPGSprite extends AdvanceSprite{
 	int sightRange=2;
 	int moveThisTurn=0;
 	int range;
+	int food;
 	double origdef;
 	public RPGSprite(){
 	}
    
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
-					 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ) {
+					 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, int food) {
 		super(images,(tileX*32)-8,(tileY*32)-32);
 
 		this.owner = owner;
@@ -69,6 +70,7 @@ public class RPGSprite extends AdvanceSprite{
 		this.sightRange=sightRange;
 		this.move=move;
 		this.origdef=def;
+		this.food=food;
 		map.layer3[tileX][tileY] = this;	// mark sprite position
 
 		// init status, standing facing direction
@@ -80,6 +82,7 @@ public class RPGSprite extends AdvanceSprite{
 		speed = 0.04*moveSpeed;
 	}
 	
+	
 	public void setImg(BufferedImage[] images){
 		
 		setImages(images);
@@ -87,6 +90,12 @@ public class RPGSprite extends AdvanceSprite{
 	}
 	public boolean isFortified(){
 		return fortified;
+	}
+	public void setFood(int food){
+		this.food=food;
+	}
+	public int getFood(){
+		return food;
 	}
 	public void setFort(){
 		fortified=true;
@@ -137,8 +146,8 @@ public class RPGSprite extends AdvanceSprite{
 	public int getYY(){
 		return tileY;
 	}
-	public void setHP(int hp){
-		this.hp=hp;
+	public void setHP(int d){
+		this.hp=d;
 	}
 	public void setX(int x){
 		tileX=x;
@@ -171,10 +180,12 @@ public class RPGSprite extends AdvanceSprite{
 	protected void updateLogic(long elapsedTime) { }
     
 	// Denna move metod som används
-	boolean test(int horiz, int vert){
+	boolean test(int horiz, int vert, RPGSprite unit){
 		if (horiz % 2 == 0){
 			even=true;
-		}else even=false;		
+		}else even=false;	
+		
+			
 	    map.layer3[tileX][tileY] = null;
 		int tilX = tileX; int tilY = tileY;
 	  
@@ -183,13 +194,21 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(1);
 			if (even){
 				tileX+=1; 
-				tileY+=1;		
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
-					return false;				
+				tileY+=1;	
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+					if (map.boatisOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
 				}
-		 
+				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+					if (map.isOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
+				}
 				map.layer3[tileX][tileY] = null;
 		 
 				map.layer3[tileX][tileY] = this;
@@ -204,10 +223,19 @@ public class RPGSprite extends AdvanceSprite{
 			if (!even){
 				tileX-=1;
 				tileY-=1;
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX+=1;
-					tileY+=1;
-					return false;
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+					if (map.boatisOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
+				}
+				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+					if (map.isOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
 				}
 				map.layer3[tileX][tileY] = null;
 		 
@@ -222,10 +250,19 @@ public class RPGSprite extends AdvanceSprite{
 			if(even){
 				tileX-=1;
 				tileY+=1;
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX+=1;
-					tileY-=1;
-					return false;
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+					if (map.boatisOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
+				}
+				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+					if (map.isOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
 				}
 				map.layer3[tileX][tileY] = null;
 			  
@@ -241,10 +278,19 @@ public class RPGSprite extends AdvanceSprite{
 				tileX+=1;
 				tileY-=1;
 			
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY+=1;
-					return false;
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+					if (map.boatisOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
+				}
+				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+					if (map.isOccupied(tileX, tileY) == true){
+						tileX-=1;
+						tileY-=1;
+						return false;				
+					}
 				}
 				map.layer3[tileX][tileY] = null;
 				map.layer3[tileX][tileY] = this;
@@ -256,9 +302,19 @@ public class RPGSprite extends AdvanceSprite{
 		if(horiz > tileX){
 			setDirection(1);
 			tileX+=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				tileX-=1;
-				return false;
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (map.boatisOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
+			}
+			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				if (map.isOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
 			}
 			map.layer3[tileX][tileY] = null;
 			
@@ -271,9 +327,19 @@ public class RPGSprite extends AdvanceSprite{
 		else if(horiz < tileX){
 			setDirection(0);
 			tileX-=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				tileX+=1;
-				return false;
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (map.boatisOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
+			}
+			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				if (map.isOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
 			}
 			map.layer3[tileX][tileY] = null;
 			
@@ -285,9 +351,19 @@ public class RPGSprite extends AdvanceSprite{
 		else if(vert > tileY){
 			setDirection(3);
 			tileY+=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				tileY-=1;
-				return false;
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (map.boatisOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
+			}
+			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				if (map.isOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
 			}
 			map.layer3[tileX][tileY] = null;
 			
@@ -299,9 +375,19 @@ public class RPGSprite extends AdvanceSprite{
 		else if(vert < tileY){
 			setDirection(2);
 			tileY-=1;
-			if (map.isOccupied(tileX, tileY) == true){
-				tileY+=1;
-				return false;
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (map.boatisOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
+			}
+			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				if (map.isOccupied(tileX, tileY) == true){
+					tileX-=1;
+					tileY-=1;
+					return false;				
+				}
 			}
 			map.layer3[tileX][tileY] = null;
 			

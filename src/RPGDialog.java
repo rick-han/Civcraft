@@ -25,7 +25,7 @@ public class RPGDialog {
 
 	boolean			endDialog;
 
-	int				y;
+	int				y = 10;
 
 
 	public RPGDialog(GameFont font, BufferedImage box) {
@@ -74,15 +74,15 @@ public class RPGDialog {
 
 	public void render(Graphics2D g) {
 		// render the box
-		g.drawImage(box, 0, y, null);
+		g.drawImage(box, 0, 100, null);
 
 		if (endDialog) {
 			for (int i=0;i < dialog.length;i++) {
-				font.drawString(g, dialog[i], 20, y+20+(i*20));
+				font.drawString(g, dialog[i], 20, 100+20+(i*20));
 			}
 
 			if (!blink) {
-				g.drawImage(arrow, 310, y+146, null);
+				g.drawImage(arrow, 310, 100+146, null);
 			}
 
 		} else {
@@ -92,11 +92,11 @@ public class RPGDialog {
 			for (int i=0;i < dialog.length;i++) {
 				if (typing > dialog[i].length()) {
 					typing -= dialog[i].length();
-					font.drawString(g, dialog[i], 20, y+20+(i*20));
+					font.drawString(g, dialog[i], 20, 100+20+(i*20));
 
 				} else {
 					// last dialog in current rendering
-					font.drawString(g, dialog[i].substring(0, typing), 20, y+20+(i*20));
+					font.drawString(g, dialog[i].substring(0, typing), 20, 100+20+(i*20));
 					break;
 				}
 			}

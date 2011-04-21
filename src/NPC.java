@@ -19,7 +19,7 @@ public class NPC extends RPGSprite {
 			   int moveSpeed, int direction,
 			   int frequence, LogicUpdater logic,
 			   String[] dialog) {
-		super(owner,images,tileX,tileY,moveSpeed,direction, frequence, frequence, frequence, frequence, frequence, frequence, 2, typ);
+		super(owner,images,tileX,tileY,moveSpeed,direction, frequence, frequence, frequence, frequence, frequence, frequence, 2, typ,0);
 
 		moveTimer = new Timer((8-frequence)*1500);
 		if (moveTimer.getDelay() == 0) {
@@ -31,6 +31,18 @@ public class NPC extends RPGSprite {
 		this.dialog = dialog;
 	}
 
+	public NPC(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
+			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, LogicUpdater logic) {
+		super(owner,images,tileX,tileY,moveSpeed,direction, atk, def, hp, hit, range, move, 2, typ,0);
+		
+		moveTimer = new Timer((8-3)*1500);
+		if (moveTimer.getDelay() == 0) {
+			// it's not good to set the timer delay to 0!
+			moveTimer.setDelay(10);
+		}
+
+		this.logic = logic;
+	}
 
 	protected void updateLogic(long elapsedTime) {
 		if (owner.gameState == RPGGame.PLAYING) {
@@ -44,29 +56,11 @@ public class NPC extends RPGSprite {
 
 }
 
-
- /****************************************************************************/
- /***************************** NPC MOVEMENT AI ******************************/
- /****************************************************************************/
-
-/**
- * NPC Movement.
- */
 interface LogicUpdater {
 
 	public void updateLogic(RPGSprite spr, long elapsedTime);
 
 }
-
-
-class StayStill implements LogicUpdater {
-
-	public void updateLogic(RPGSprite spr, long elapsedTime) {
-		// stay still npc, just do nothing
-	}
-
-}
-
 
 class RandomMovement implements LogicUpdater {
 
@@ -75,11 +69,19 @@ class RandomMovement implements LogicUpdater {
 		boolean moved = false;
 		int i = 0;
 		while (!moved) {
-			switch (Utility.getRandom(0, 3)) {
-				case RPGSprite.LEFT: 	moved = spr.test(-1, 0); break;
-				case RPGSprite.RIGHT: 	moved = spr.test(1, 0); break;
-				case RPGSprite.UP: 		moved = spr.test(1, -1); break;
-				case RPGSprite.DOWN: 	moved = spr.test(1, 1); break;
+			switch (Utility.getRandom(0, 5)) {
+				case 0: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				case 1: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				case 2: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				case 3: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				case 4: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				case 5: 	moved = spr.test(spr.tileX, spr.tileY, spr); break;
+				//case 0: 	moved = spr.test(spr.tileX-1, spr.tileY, spr); break;
+				//case 1: 	moved = spr.test(spr.tileX+1, spr.tileY, spr); break;
+				//case 2: 	moved = spr.test(spr.tileX+1, spr.tileY-1, spr); break;
+				//case 3: 	moved = spr.test(spr.tileX+1, spr.tileY+1, spr); break;
+				//case 4: 	moved = spr.test(spr.tileX, spr.tileY-1, spr); break;
+				//case 5: 	moved = spr.test(spr.tileX-1, spr.tileY-1, spr); break;
 			}
 
 			if (i++ > 10) {
@@ -93,49 +95,4 @@ class RandomMovement implements LogicUpdater {
 }
 
 
-class CycleUpDown implements LogicUpdater {
 
-	public void updateLogic(RPGSprite spr, long elapsedTime) {
-		// going up, and down
-		boolean moved = false;
-
-		if (spr.getDirection() == RPGSprite.UP) {
-			// if the npc facing up, then moving up until the movement blocked
-			moved = spr.test(0, 0);
-			if (!moved) {
-				// can't move up, time to move down
-				spr.test(0, -0);
-			}
-
-		} else {
-			moved = spr.test(0, 0);
-			if (!moved) {
-				spr.test(0, -0);
-			}
-		}
-	}
-
-}
-
-
-class CycleLeftRight implements LogicUpdater {
-
-	public void updateLogic(RPGSprite spr, long elapsedTime) {
-		// going left, and right
-		boolean moved = false;
-
-		if (spr.getDirection() == RPGSprite.LEFT) {
-			moved = spr.test(-1, 0);
-			if (!moved) {
-				spr.test(1, 0);
-			}
-
-		} else {
-			moved = spr.test(1, 0);
-			if (!moved) {
-				spr.test(-1, 0);
-			}
-		}
-	}
-
-}

@@ -12,13 +12,16 @@ import com.golden.gamedev.object.Sprite;
 
 public class RPGGame extends GameObject {
 	
-	public static final int PLAYING = 0, TALKING = 1, CHOOSING=3;
+	public static final int PLAYING = 0, TALKING = 1, CHOOSING=3, BATTLEINFO=4, BATTLE=5, TILEI=6;
 	static int gameState = PLAYING;
-    Point tileAt;
+	static boolean zoom = false;
+	LogicUpdater randomMovement = new RandomMovement();
+	LogicUpdater logic = randomMovement;
+    Point tileAt, tileScroll;
 	PlayField2		playfield;
 	RPGSprite		hero,hero2;
 	Map map;
-    int xs=0, ys=0, xd=0,yd=0;
+    int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
     int turn=1;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
@@ -28,13 +31,19 @@ public class RPGGame extends GameObject {
 	int h = 0;								// we talk to him/her
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 	int chance=0;
-	boolean clicked=false;
+	boolean battle=false;
 	int targetX,targetY;
 	ActionBar actionBar;
+	WindowHandler windowHandler;
 	GameEngine parent;
+	boolean clicka=false;
+	int battlescore=3;
 	Random rand = new Random();
 	Random rand2 = new Random();
-	
+	Random rand3 = new Random();
+	Random rand4 = new Random();
+	String soldatTyp;
+	int gal=0;
 	public RPGGame(GameEngine parent) {
 		super(parent);
 		this.parent = parent;
@@ -42,7 +51,8 @@ public class RPGGame extends GameObject {
 	
 	public void initResources() {
 		actionBar = new ActionBar(parent);
-		
+		windowHandler = new WindowHandler(parent);
+		windowHandler.initResources();
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField2(map);
 		
@@ -55,76 +65,79 @@ public class RPGGame extends GameObject {
 		} );
 
 		
-		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "Settler"));
-		list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 1, 1, 3, RPGSprite.RIGHT, 2,2, 100, 1, 1, 1, 2, "Infantry"));
-		
+		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "Settler",100));
+		list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), 1, 1, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000));
+		list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), 2, 1, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000));
+		list.add(new RPGSprite(this, getImages("PikemanSheet.png",3,4), 3, 1, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000));
+		list.add(new RPGSprite(this, getImages("CavalrySheet.png",3,4), 4, 1, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000));
+		list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), 5, 1, 3, RPGSprite.RIGHT, 12,8, 100, 1, 1, 2, 2, "Knight",1000));
+		list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), 6, 1, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000));
+		//list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), 7, 1, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000));
+		//list.add(new RPGSprite(this, getImages("Chara1.png",3,4), 8, 1, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000));
+		//list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), 1, 2, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000));
+		list.add(new RPGSprite(this, getImages("ArcherSheet.png",3,4), 1, 3, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000));
+		list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), 1, 4, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000));
+		list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), 1, 5, 3, RPGSprite.RIGHT, 12,1, 100, 1, 2, 1, 2, "Catapult",1000));
+		list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4), 1, 6, 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000));
+		list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), 1, 7, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000));
+		fiende = list.get(1);
 		playfield.add(list.get(0));
 		playfield.add(list.get(1));
+		playfield.add(list.get(2));
+		playfield.add(list.get(3));
+		playfield.add(list.get(4));
+		playfield.add(list.get(5));
+		playfield.add(list.get(6));
+		playfield.add(list.get(7));
+		
+		playfield.add(list.get(8));
+		playfield.add(list.get(9));
+		playfield.add(list.get(10));
+		playfield.add(list.get(11));
+		
+		
+		for (int j=0;j < map.layer1[0].length;j++) {
+			for (int i=0;i < map.layer1.length;i++) {
+				if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==0){
+					list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000));
+					playfield.add(list.get(list.size()-1));
+					map.layer3[i][j] = list.get(list.size()-1);
+					gal=1;
+					break;
+				}
+				break;
+			}
+		}
+		for (int j=0;j < map.layer1[0].length;j++) {
+			for (int i=0;i < map.layer1.length;i++) {
+				if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==1 && map.layer3[i][j] == null){
+					list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000));
+					playfield.add(list.get(list.size()-1));
+					map.layer3[i][j] = list.get(list.size()-1);
+					gal=2;
+					break;
+				}
+				break;
+			}
+		}
+		for (int j=0;j < map.layer1[0].length;j++) {
+			for (int i=0;i < map.layer1.length;i++) {
+				if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==2 && map.layer3[i][j] == null){
+					list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000));
+					playfield.add(list.get(list.size()-1));
+					map.layer3[i][j] = list.get(list.size()-1);
+					gal=0;
+					break;	
+				}
+			break;
+			}
+		}
 		ActionBar.send(list.get(0), playfield, map.layer3, list, this);
 		map.setToCenter(list.get(0));
 		actionBar.initResources();
 		for (int i=0; i < list.size(); i++ )
 			Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
-		//Hela NPC delen används ej.
-		/*
-		String[] event = FileUtil.fileRead(bsIO.getStream("map00.evt"));
-		LogicUpdater stayStill = new StayStill();
-		LogicUpdater randomMovement = new Randommovement();
-		LogicUpdater cycleUpDown = new CycleUpDown();
-		LogicUpdater cycleLeftRight = new CycleLeftRight();
-		for (int i=0;i < event.length;i++) {
-			if (event[i].startsWith("#") == false) {
-				StringTokenizer token = new StringTokenizer(event[i], ",");
-				String type 	= token.nextToken();
-				String image 	= token.nextToken();
-				int posx 		= Integer.parseInt(token.nextToken());
-				int posy 		= Integer.parseInt(token.nextToken());
-				int direction 	= Integer.parseInt(token.nextToken());
-				int speed 		= Integer.parseInt(token.nextToken());
-				int frequence 	= Integer.parseInt(token.nextToken());
-
-				String logicUpdater = token.nextToken();
-				LogicUpdater logic = stayStill;
-				if (logicUpdater.equals("random")) {
-					logic = randomMovement;
-				} else if (logicUpdater.equals("updown")) {
-					logic = cycleUpDown;
-				} else if (logicUpdater.equals("leftright")) {
-					logic = cycleLeftRight;
-				}
-
-				String[] dialogNPC = null;
-				if (token.hasMoreTokens()) {
-					StringTokenizer dialogToken = new StringTokenizer(token.nextToken(),"+");
-					dialogNPC = new String[dialogToken.countTokens()];
-					for (int j=0;j < dialogNPC.length;j++) {
-						dialogNPC[j] = dialogToken.nextToken().toUpperCase();
-					}
-				}
-
-
-				BufferedImage[] npcImage = null;
-				if (image.equals("none") == false) {
-					npcImage = getImages(image,3,4);
-				}
-
-				RPGSprite npc = new NPC(this,
-										npcImage, posx, posy,
-										speed, direction,
-										frequence, logic,
-										dialogNPC);
-				if (type.equals("stepping")) {
-					npc.setAnimate(true);
-					npc.setLoopAnim(true);
-				}
-
-				//list.add(npc);
-				//playfield.add(npc);
-			}
-			
-		}
-		//Här slutar NPC delen ^^
-		*/
+		
 		
 		dialog = new RPGDialog(fontManager.getFont(getImage("BitmapFont.png")),
 							   getImage("Box.png", false));
@@ -133,16 +146,119 @@ public class RPGGame extends GameObject {
 		
 	public void update(long elapsedTime) {
 		playfield.update(elapsedTime);
-		
+		String dialogNP[] = new String[3];
+		String dialogNP2[] = new String[4];
+		Database data = new Database();
 		switch (gameState) {
 			
 			case PLAYING:
-								
+				
+				if (rightClick()){
+					
+					tileAt = map.getTileAt(getMouseX(), getMouseY());
+					int terrainCode = map.layer1[tileAt.x][tileAt.y];
+					dialogNP2[0] = "";
+					dialogNP2[1] = "";
+					dialogNP2[2] = "";
+					dialogNP2[3] = "";
+					dialogNP2[0] += "WHEAT: " + data.getWheat(terrainCode) + "";
+					dialogNP2[0] += "FISH: " + data.getFish(terrainCode) + " ";
+					dialogNP2[0] += "GAME: " + data.getGame(terrainCode) + " ";
+					dialogNP2[0] += "HAY: " + data.getHay(terrainCode) + " ";
+					dialogNP2[0] += "STONE: " + data.getStone(terrainCode) + "\n";
+					dialogNP2[1] += "ORE: " + data.getOre(terrainCode) + " ";
+					dialogNP2[1] += "LUMBER: " + data.getLumber(terrainCode) + " ";
+					dialogNP2[1] += "GOLD: " + data.getGold(terrainCode) + " ";
+					dialogNP2[1] += "COAL: " + data.getCoal(terrainCode) + " \n";
+					dialogNP2[2] += "SULFUR: " + data.getSulfur(terrainCode) + " ";
+					dialogNP2[2] += "HAPPINESS: " + data.getHappiness(terrainCode) + " ";
+					dialogNP2[2] += "SCIENCE: " + data.getScience(terrainCode) + " \n";
+					dialogNP2[3] += "ATTACKBONUS: " + data.getAttackBonus(terrainCode) + " ";
+					dialogNP2[3] += "DEFENCEBONUS: " + data.getDefenceBonus(terrainCode);
+					
+					//dialog.setDialog(dialogNP2,(list.get(0).getScreenY()+list.get(0).getHeight() < 320));
+					windowHandler.setLabel(dialogNP2[0] + dialogNP2[1] + dialogNP2[2] + dialogNP2[3]);
+					windowHandler.setVisible(true);
+					gameState = TILEI;
+					
+
+					break;
+				}
+				
+				if(battle){					
+					   battle=!battle;
+					   int wave1=rand.nextInt(12);
+					   int wave2=rand.nextInt(12);
+					   int waves = wave1+wave2;
+					   battlescore=3;
+					   if (fiende.isFortified()){								  
+						   fiende.setDEF(fiende.getDEF()*1.5);
+					   }else fiende.setDEF(fiende.origdef);
+					   					  
+					   while(waves > 0){						   
+						   double DUDP=(fiende.getDEF()*fiende.getHP()/100);								   				   
+						   double AUDP=(list.get(h).getATK()*list.get(h).getHP())/100;								   								  
+						   double ATKR1 = rand.nextDouble() * AUDP;
+						   double ATKR2 = rand2.nextDouble() * AUDP;
+						   double DEFR1 = rand3.nextDouble() * DUDP;
+						   double DEFR2 = rand4.nextDouble() * DUDP;
+						   
+						   double DAU = ATKR1 + ATKR2;
+						   double DDU = DEFR1 + DEFR2;
+						   
+						   fiende.setHP((int) (fiende.getHP()-DAU));
+						   list.get(h).setHP((int) (list.get(h).getHP()-DDU));
+						   list.get(h).setMov();
+						   if (fiende.getHP()<=0 || DDU<=0){	
+							   battlescore=1;
+							   playfield.remove(fiende);
+							   list.get(h).test(tileAt.x,tileAt.y, list.get(h));									   
+							   map.layer3[targetX][targetY] = null;
+							   list.remove(fiende);
+							   break;
+						   
+						   }
+						   else if (list.get(h).getHP()<=0 || DAU<=0){	
+							   battlescore=2;
+							   playfield.remove(list.get(h));
+							   soldatTyp = list.get(h).getTyp();
+							   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;
+							   list.remove(list.get(h));
+							   break;						   
+						   }
+						   waves--;
+					   }
+					   if(battlescore==1){
+						   dialogNP[0]=list.get(h).getTyp().toUpperCase()+" WON THIS BATTLE";
+						   dialogNP[1]="BUT LOST SOME SOLDIERS";
+						   dialogNP[2]=list.get(h).getHP()+" SOLDIERS ARE LEFT";						   
+						   dialog.setDialog(dialogNP,(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
+						   gameState=TALKING;
+						   break;	
+					   }
+					   else if(battlescore==2){
+						   dialogNP[0]=soldatTyp.toUpperCase()+" LOST THIS BATTLE";
+						   dialogNP[1]="";
+						   dialogNP[2]="";
+						   dialog.setDialog(dialogNP,(fiende.getScreenY()+fiende.getHeight() < 320));
+						   gameState=TALKING;
+						   break;	 						   
+					   }
+					   else if(battlescore==3){
+						   dialogNP[0]="THE BATTLE IS OVER";
+						   dialogNP[1]="YOU HAVE "+list.get(h).getHP();
+						   dialogNP[2]="SOLDIERS LEFT";
+						   dialog.setDialog(dialogNP,(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
+						   gameState=TALKING;
+						   break;	 						   
+					   }
+				}	
+				
 				if (click()){
 					int x = getMouseX();
-					int y = getMouseY();					
+					int y = getMouseY();
 					tileAt = map.getTileAt(x, y);
-					
+										
 					if (funnen && list.get(h).selmov){
 						funnen=false;		
 						
@@ -152,43 +268,8 @@ public class RPGGame extends GameObject {
 						}
 						list.get(h).selmov=false;
 						list.get(h).fortified=false;
-						String dialogNP[] = new String[3];						
-						//Battle metoden:
-						if(clicked && fiende!=null && fiende!=list.get(h)){				
-							   clicked=!clicked;
-							   int wave=rand.nextInt(100);
-							  
-							   if (fiende.isFortified()){								  
-								   fiende.setDEF(fiende.getDEF()*1.5);
-							   }else fiende.setDEF(fiende.origdef);
-							   
-							  
-							   while(wave > 0){						   
-								   int fiDEF=rand.nextInt((int) (fiende.getDEF()*fiende.getHit()));
-								   list.get(h).setHP(list.get(h).getHP()-fiDEF);					   
-								   int minATK=rand2.nextInt(list.get(h).getATK()*list.get(h).getHit());								   
-								   fiende.setHP(fiende.getHP()-minATK);
-								   
-								   list.get(h).setMov();
-								   if (fiende.getHP()<=0){						   
-									   playfield.remove(fiende);
-									   list.get(h).test(tileAt.x,tileAt.y);									   
-									   map.layer3[targetX][targetY] = null;
-									   list.remove(fiende);
-									   break;
-								   
-								   }
-								   else if (list.get(h).getHP()<=0){						   
-									   playfield.remove(list.get(h));
-									   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;
-									   list.remove(list.get(h));
-									   break;						   
-								   }
-								   wave--;
-							   }
-							   
-							   break;
-						}
+												
+												
 						if (fiende!=null && fiende!=list.get(h)){
 							if (fiende.getDEF() == list.get(h).getATK())
 								chance=50;
@@ -207,17 +288,18 @@ public class RPGGame extends GameObject {
 							dialogNP[1]="HAS A "+chance+"% CHANCE";
 							dialogNP[2]="AGAINST "+fiende.getTyp().toUpperCase()+" WITH "+fiende.getHP()+ " MP";
 						}
-						if (fiende != null && dialogNP != null && fiende!=list.get(h) && clicked==false) {
+						if (fiende != null && dialogNP != null && fiende!=list.get(h) && battle==false) {
 							dialog.setDialog(dialogNP,
 								(list.get(h).getScreenY()+list.get(h).getHeight() < 320));
-							     clicked=true;
-								 gameState=TALKING;
-								 break;
-						}else 												
-							list.get(h).test(tileAt.x,tileAt.y);
-						    list.get(h).movement();															
-						    break;
-					}
+						    	battle=true;
+								gameState=TALKING;		
+								break;
+																	
+								}else 												
+									list.get(h).test(tileAt.x,tileAt.y, list.get(h));
+									list.get(h).movement();															
+									break;
+							}
 					if (!funnen){
 						for(h = 0; h<list.size();h++){
 							xs = list.get(h).getXX();
@@ -247,15 +329,59 @@ public class RPGGame extends GameObject {
 					newTurn();
 					break;
 				}
+				if (keyPressed(KeyEvent.VK_RIGHT)){
+					if (xScroll < (Map.sizeX*32)-1024){
+						xScroll+=64;
+						map.setToCenter(xScroll,yScroll, 1024, 640);
+					}
+					break;
+				}
+				if (keyPressed(KeyEvent.VK_LEFT)){
+					if (xScroll >= 64){
+						xScroll-=64;
+						map.setToCenter(xScroll,yScroll, 1024, 640);
+					}
+					break;
+				}
+				if (keyPressed(KeyEvent.VK_UP)){
+					if (yScroll >= 64){
+						yScroll-=64;
+						map.setToCenter(xScroll,yScroll, 1024, 640);
+					}
+					break;
+				}
+				if (keyPressed(KeyEvent.VK_DOWN)){
+					if (yScroll < (Map.sizeY*32)-640){
+						yScroll+=64;
+						map.setToCenter(xScroll,yScroll, 1024, 640);
+					}
+					break;
+				}
+				if (keyPressed(KeyEvent.VK_O)){
+					zoom = !zoom;
+				}
 				break;
-
+		
 			case CHOOSING:
-														
 				
+			case TILEI:
+				
+					if (keyPressed(KeyEvent.VK_Z) ||
+						rightClick() ||
+						keyPressed(KeyEvent.VK_ESCAPE)) {
+						
+						//fiende.setDirection(fiendeDirection);
+						gameState = PLAYING;
+					
+				}
+
+				//dialog.update(elapsedTime);
+			break;			
+			
 			case TALKING:
 				if (dialog.endDialog) {
 					if (keyPressed(KeyEvent.VK_Z) ||
-						click() ||
+						rightClick() ||
 						keyPressed(KeyEvent.VK_ESCAPE)) {
 						
 						//fiende.setDirection(fiendeDirection);
@@ -267,15 +393,20 @@ public class RPGGame extends GameObject {
 			break;
 		}
 		actionBar.update(elapsedTime);
+		windowHandler.update(elapsedTime);
 	}
 
 	public void render(Graphics2D g) {
 		playfield.render(g);
-
+		if (gameState == TILEI){
+			windowHandler.render(g);
+		}
 		if (gameState == TALKING) {
 			dialog.render(g);
+			windowHandler.render(g);
 		}
 		actionBar.render(g);
+		
 	}
 	
 	public void newTurn(){
@@ -284,13 +415,22 @@ public class RPGGame extends GameObject {
 		for (int i=0; i < list.size(); i++){
 			list.get(i).mov = true;
 			list.get(i).moveThisTurn = 0;
+			if (list.get(i).getTyp() != "City" && list.get(i).getTyp() != "Barbarian"){
+				list.get(i).setFood(list.get(i).getFood()-list.get(i).getHP());							
+			}
+			if (list.get(i).getTyp() != "City" && list.get(i).getFood() <=0 && list.get(i).getTyp() != "Barbarian"){
+				map.layer3[list.get(i).getXX()][list.get(i).getYY()]=null;
+				playfield.remove(list.get(i));
+				list.remove(list.get(i));
+			}
 		}
 	}
 	public void spawnBarb(){
 		int x = rand.nextInt(Map.maxX-1);
 		int y = rand.nextInt(Map.maxY-1);
 		if (rand.nextInt(10)==0 && Map.fogofwar[x][y] > 0){
-			list.add(new RPGSprite(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian"));
+			list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",logic));
+			//list.add(new RPGSprite(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian"));
 			playfield.add(list.get(list.size()-1));
 			//Map.reveal(x,y,2);
 		}

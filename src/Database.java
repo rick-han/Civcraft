@@ -28,6 +28,7 @@ public class Database {
 			terrainData[terrainTypeCodes[i]] = rawTerrainData[i];
 		}
 	}
+	
 	public int getWheat(int terrainTypeCode){
 		return terrainData[terrainTypeCode][0];
 	}
