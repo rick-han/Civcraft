@@ -43,12 +43,9 @@ public class RPGSprite extends AdvanceSprite{
 	double def;
 	int hp;
 	String typ;
-	int hit;
-	int move;
+	int hit, stone, iron, gunpowder, move, range, food;
 	int sightRange=2;
 	int moveThisTurn=0;
-	int range;
-	int food;
 	double origdef;
 	public RPGSprite(){
 	}
@@ -82,6 +79,38 @@ public class RPGSprite extends AdvanceSprite{
 		speed = 0.04*moveSpeed;
 	}
 	
+	//konstruktor för bombardment units.
+	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
+			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, int food, int stone, int gunpowder, int iron) {
+		super(images,(tileX*32)-8,(tileY*32)-32);
+
+		this.owner = owner;
+		this.map = owner.map;
+		this.tileX = tileX;
+		this.tileY = tileY;
+		this.hp=hp;
+		this.atk=atk;
+		this.def=def;
+		this.typ=typ;
+		this.hit=hit;
+		this.range=range;
+		this.sightRange=sightRange;
+		this.move=move;
+		this.origdef=def;
+		this.food=food;
+		this.iron=iron;
+		this.gunpowder=gunpowder;
+		this.stone=stone;
+		map.layer3[tileX][tileY] = this;	// mark sprite position
+
+		// init status, standing facing direction
+		setAnimation(STANDING, direction);
+
+		// the animation speed related with movement speed
+		getAnimationTimer().setDelay(550/moveSpeed);
+
+		speed = 0.04*moveSpeed;
+	}
 	
 	public void setImg(BufferedImage[] images){
 		
@@ -96,6 +125,15 @@ public class RPGSprite extends AdvanceSprite{
 	}
 	public int getFood(){
 		return food;
+	}
+	public int getStone(){
+		return stone;
+	}
+	public int getIron(){
+		return iron;
+	}
+	public int getGunP(){
+		return gunpowder;
 	}
 	public void setFort(){
 		fortified=true;
@@ -184,15 +222,11 @@ public class RPGSprite extends AdvanceSprite{
 		if (horiz % 2 == 0){
 			even=true;
 		}else even=false;	
-		
-			
-	    map.layer3[tileX][tileY] = null;
-		int tilX = tileX; int tilY = tileY;
-	  
-	// set new location
+		map.layer3[tileX][tileY] = null;
+	
 		if(horiz > tileX && vert > tileY){
 			setDirection(1);
-			if (even){
+			if (even){			
 				tileX+=1; 
 				tileY+=1;	
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
@@ -202,15 +236,14 @@ public class RPGSprite extends AdvanceSprite{
 						return false;				
 					}
 				}
-				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
 					if (map.isOccupied(tileX, tileY) == true){
 						tileX-=1;
 						tileY-=1;
 						return false;				
 					}
 				}
-				map.layer3[tileX][tileY] = null;
-		 
+				map.layer3[tileX][tileY] = null;		 
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
@@ -225,20 +258,19 @@ public class RPGSprite extends AdvanceSprite{
 				tileY-=1;
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY) == true){
-						tileX-=1;
-						tileY-=1;
+						tileX+=1;
+						tileY+=1;
 						return false;				
 					}
 				}
-				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
 					if (map.isOccupied(tileX, tileY) == true){
-						tileX-=1;
-						tileY-=1;
+						tileX+=1;
+						tileY+=1;
 						return false;				
 					}
-				}
+				}		 
 				map.layer3[tileX][tileY] = null;
-		 
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
@@ -247,25 +279,24 @@ public class RPGSprite extends AdvanceSprite{
 		}	
 		else if(horiz < tileX && vert > tileY){
 			setDirection(0);
-			if(even){
+			if(even){			
 				tileX-=1;
 				tileY+=1;
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY) == true){
-						tileX-=1;
+						tileX+=1;
 						tileY-=1;
 						return false;				
 					}
 				}
-				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
 					if (map.isOccupied(tileX, tileY) == true){
-						tileX-=1;
+						tileX+=1;
 						tileY-=1;
 						return false;				
 					}
 				}
-				map.layer3[tileX][tileY] = null;
-			  
+				map.layer3[tileX][tileY] = null;		  
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
@@ -276,19 +307,18 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(1);
 			if (!even){
 				tileX+=1;
-				tileY-=1;
-			
+				tileY-=1;		
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY) == true){
 						tileX-=1;
-						tileY-=1;
+						tileY+=1;
 						return false;				
 					}
 				}
-				else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
 					if (map.isOccupied(tileX, tileY) == true){
 						tileX-=1;
-						tileY-=1;
+						tileY+=1;
 						return false;				
 					}
 				}
@@ -304,15 +334,13 @@ public class RPGSprite extends AdvanceSprite{
 			tileX+=1;
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 				if (map.boatisOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+					tileX-=1;				
 					return false;				
 				}
 			}
-			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
+			else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
 				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+					tileX-=1;				
 					return false;				
 				}
 			}
@@ -329,15 +357,13 @@ public class RPGSprite extends AdvanceSprite{
 			tileX-=1;
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 				if (map.boatisOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+					tileX+=1;				
 					return false;				
 				}
 			}
 			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
 				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+					tileX+=1;				
 					return false;				
 				}
 			}
@@ -352,15 +378,13 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(3);
 			tileY+=1;
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
-				if (map.boatisOccupied(tileX, tileY) == true){
-					tileX-=1;
+				if (map.boatisOccupied(tileX, tileY) == true){				
 					tileY-=1;
 					return false;				
 				}
 			}
 			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
+				if (map.isOccupied(tileX, tileY) == true){				
 					tileY-=1;
 					return false;				
 				}
@@ -376,16 +400,14 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(2);
 			tileY-=1;
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
-				if (map.boatisOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+				if (map.boatisOccupied(tileX, tileY) == true){			
+					tileY+=1;
 					return false;				
 				}
 			}
 			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
-				if (map.isOccupied(tileX, tileY) == true){
-					tileX-=1;
-					tileY-=1;
+				if (map.isOccupied(tileX, tileY) == true){				
+					tileY+=1;
 					return false;				
 				}
 			}
@@ -395,21 +417,11 @@ public class RPGSprite extends AdvanceSprite{
 			setStatus(MOVING);
 			setFrame(getFrame() + 1);
 			return true;
-		}
-		//if (map.isOccupied(tileX, tileY) == true){
-			//return false;
-		//}
+		}	
 		map.layer3[tileX][tileY] = null;
-	
-		map.layer3[tileX][tileY] = this;
-      		
-
-		setStatus(MOVING);
-
-
-      		// next frame
+		map.layer3[tileX][tileY] = this;     		
+		setStatus(MOVING);     		
 		setFrame(getFrame() + 1);
-
 		return true;
 	}
 
