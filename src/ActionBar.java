@@ -19,7 +19,7 @@ import com.golden.gamedev.object.Sprite;
 public class ActionBar{
 	private FrameWork actionFrame = null;
 	private TPanel actionBar = null;
-	private TTextField textField = null, textField2 = null;
+	private TTextField textField = null, textField2 = null, textField3 = null;
 	private final int ACTION_BAR_HEIGHT = 85;
 	private GameEngine parent = null;
 	static ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
@@ -28,20 +28,21 @@ public class ActionBar{
 	static boolean selmova=false;
 	static RPGSprite spr;
 	static RPGGame own;
-	String line1 = null, line2 = null;
+	String line1 = null, line2 = null, line3 = null;
 	BaseLoader bsLoader;
 	Chipset csFow;
-	Map map;
+	static Map map;
 	static Graphics2D g;
 	public ActionBar(GameEngine parent) {
 		this.parent = parent;
 	}
-	public static void send(RPGSprite h,PlayField2 playfieldd, RPGSprite[][] layer, ArrayList<RPGSprite> listd, RPGGame owna){
+	public static void send(RPGSprite h,PlayField2 playfieldd, RPGSprite[][] layer, ArrayList<RPGSprite> listd, RPGGame owna, Map mapp){
 		spr = h;
 		playfield=playfieldd;
 		list=listd;
 		layer3=layer;
 		own=owna;
+		map=mapp;
 	}
 	
 	public void initResources(){
@@ -55,15 +56,19 @@ public class ActionBar{
 			TButton btn = new TButton("Move", 5, 5, 35, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.selmov=true;				      
-				
+					if(spr.getMov()){					
+						spr.selmov=true;				      
+					}
+					else if(!spr.getMov()){					
+						RPGGame.funnen=false;				      
+					}
 				}
 			};
 			TButton btn2 = new TButton("Disband", 5, 45, 70, 35){
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					layer3[spr.getXX()][spr.getYY()]=null;
+					map.layer3[spr.getXX()][spr.getYY()] = null;		
 					playfield.remove(spr);
 					list.remove(spr);
 									
@@ -72,35 +77,24 @@ public class ActionBar{
 			TButton btn3 = new TButton("City", 45, 5, 50, 35){
 				public void doAction(){
 					RPGGame.gameState=0;
-					list.add(new RPGSprite(own,parent.getImages("CharaC.png",3,4), spr.getXX(),spr.getYY(), 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",0));						
-					layer3[spr.getXX()][spr.getYY()] = null;
+					map.layer3[spr.getXX()][spr.getYY()] = null;
+					list.add(new RPGSprite(own,parent.getImages("citytile.png",3,4), spr.getXX(),spr.getYY(), 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));											
 					playfield.remove(spr);
 					playfield.add(list.get(list.size()-1));
-					list.get(list.size()-1).setMov();
+					list.get(list.size()-1).setPOP(1000);					
 					list.remove(spr);						
-					list.add(new RPGSprite(own,parent.getImages("phalan.png",3,4), spr.getXX(),spr.getYY(), 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Phalanx",1000));
+					list.add(new RPGSprite(own,parent.getImages("phalan.png",3,4), spr.getXX(),spr.getYY()+1, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Phalanx",1000, true));
 					playfield.add(list.get(list.size()-1));
 					RPGGame.funnen=false;
 								
 				}
 			};
-			TButton btn4 = new TButton("Mine", 45, 45, 50, 35){
+			TButton btn4 = new TButton("Mine", 80, 45, 50, 35){
 				public void doAction(){
-					//RPGGame.gameState=0;
-										
-					//Map.mine=true;
-					//csFow = new Chipset(parent.getImage("mine.png"));
-					
-					//list.add(new RPGSprite(own,csFow, spr.getXX(),spr.getYY(), 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City"));						
-					//g.drawImage(csFow.image2, spr.getXX(), spr.getYY(), null);
-					//layer3[spr.getXX()][spr.getYY()] = null;
-					//playfield.remove(spr);
-					//playfield.add(list.get(list.size()-1));
-					//list.get(list.size()-1).setMov();
-					//list.remove(spr);						
-					//list.add(new RPGSprite(own,parent.getImages("Chara1.png",3,4), spr.getXX(),spr.getYY(), 3, RPGSprite.LEFT, 1, 2, 100, 1, 1, 1, 2, "Pikeman"));
-					//playfield.add(list.get(list.size()-1));
-					//RPGGame.funnen=false;
+					RPGGame.gameState=0;				
+					list.add(new RPGSprite(own,parent.getImages("minesheet.png",3,4), spr.getXX(),spr.getYY(), 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "Mine",0,0,0,0,true));											
+					playfield.add(list.get(list.size()-1));					
+					RPGGame.funnen=false;
 								
 				}
 			};
@@ -131,7 +125,12 @@ public class ActionBar{
 			TButton btn = new TButton("Move", 5, 5, 35, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.selmov=true;
+					if(spr.getMov()){					
+						spr.selmov=true;				      
+					}
+					else if(!spr.getMov()){					
+						RPGGame.funnen=false;				      
+					}
 				     
 				
 				}
@@ -140,7 +139,7 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					layer3[spr.getXX()][spr.getYY()]=null;
+					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
 					list.remove(spr);
 									
@@ -149,8 +148,8 @@ public class ActionBar{
 			TButton btn3 = new TButton("Fortify", 45, 5, 70, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.setFort();
-				      RPGGame.funnen=false;
+					spr.setFort();
+					RPGGame.funnen=false;
 				     
 				
 				}
@@ -174,7 +173,7 @@ public class ActionBar{
 			actionBar.add(textField2);
 			actionFrame.add(actionBar);
 		}
-		else if (spr.getTyp() == "Pikeman"){
+		else if (spr.getTyp() == "Cannon"){
 			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
 			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
 			actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
@@ -182,14 +181,19 @@ public class ActionBar{
 			TButton btn = new TButton("Move", 5, 5, 35, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.selmov=true;				
+					if(spr.getMov()){					
+						spr.selmov=true;				      
+					}
+					else if(!spr.getMov()){					
+						RPGGame.funnen=false;				      
+					}
 				}
 			};
 			TButton btn2 = new TButton("Disband", 5, 45, 70, 35){
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					layer3[spr.getXX()][spr.getYY()]=null;
+					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
 					list.remove(spr);
 									
@@ -198,19 +202,20 @@ public class ActionBar{
 			TButton btn3 = new TButton("Fortify", 45, 5, 70, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.setFort();
-				      RPGGame.funnen=false;
+					spr.setFort();
+					RPGGame.funnen=false;
 				
 				}
 			};
 			
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Range: "+spr.getRange());
+			line3 = ("Iron: "+spr.getIron()+" Gunpowder: "+spr.getGunP());
 			if (spr.isFortified())
 				line2+= " Fortified";
 			textField = new TTextField(line1, 333, 5, 300, 18);
 			textField2 = new TTextField(line2, 333, 22, 300, 18);
-			
+			textField3 = new TTextField(line3, 333, 39, 300, 18);
 			//btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
 			btn.setToolTipText("Use this action to move selected unit");
 			btn2.setToolTipText("Use this action to disband selected unit");
@@ -220,9 +225,43 @@ public class ActionBar{
 			actionBar.add(btn2);
 			actionBar.add(textField);
 			actionBar.add(textField2);
+			actionBar.add(textField3);
 			actionFrame.add(actionBar);
 			
-		}else if (spr.getTyp()!="Settler"){
+		}else if (spr.getTyp()=="City"){				
+			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
+			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
+			actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
+		
+			TButton btn = new TButton("Build?", 5, 5, 45, 35) {
+				public void doAction() {
+					RPGGame.gameState=0;							
+				}
+			};
+			
+			TButton btn3 = new TButton("Destroy city", 60, 5, 100, 35) {
+				public void doAction() {
+					RPGGame.gameState=0;			      
+					RPGGame.funnen=false;	
+					map.layer3[spr.getXX()][spr.getYY()]=null;
+					playfield.remove(spr);
+					list.remove(spr);
+				}
+			};
+			
+			line1 = ("Population: " + spr.getPOP());			
+			textField = new TTextField(line1, 333, 5, 300, 18);
+			
+			//btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
+			btn.setToolTipText("Use this action to build something");		
+			btn3.setToolTipText("Use this action to destroy your city");
+			actionBar.add(btn);
+			actionBar.add(btn3);					
+			actionBar.add(textField);
+			actionFrame.add(actionBar);
+							
+		}			
+		else if (spr.getTyp()!="Settler" && spr.getTyp() != "City"){
 			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
 			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
 			actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
@@ -230,7 +269,12 @@ public class ActionBar{
 			TButton btn = new TButton("Move", 5, 5, 35, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.selmov=true;
+					if(spr.getMov()){					
+						spr.selmov=true;				      
+					}
+					else if(!spr.getMov()){					
+						RPGGame.funnen=false;				      
+					}
 				     
 				
 				}
@@ -239,7 +283,7 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					layer3[spr.getXX()][spr.getYY()]=null;
+					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
 					list.remove(spr);
 									
@@ -248,8 +292,8 @@ public class ActionBar{
 			TButton btn3 = new TButton("Fortify", 45, 5, 70, 35) {
 				public void doAction() {
 					RPGGame.gameState=0;
-				      spr.setFort();
-				      RPGGame.funnen=false;
+					spr.setFort();
+					RPGGame.funnen=false;
 				     
 				
 				}
@@ -257,10 +301,6 @@ public class ActionBar{
 			
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Range: "+spr.getRange());
-			if (spr.isFortified())
-				line2+= " Fortified";
-			textField = new TTextField(line1, 333, 5, 300, 18);
-			textField2 = new TTextField(line2, 333, 22, 300, 18);
 			
 			//btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
 			btn.setToolTipText("Use this action to move selected unit");
@@ -269,12 +309,17 @@ public class ActionBar{
 			actionBar.add(btn);
 			actionBar.add(btn3);
 			actionBar.add(btn2);
-			actionBar.add(textField);
-			actionBar.add(textField2);
+			if(spr.getTyp()!="City"){
+				if (spr.isFortified())
+					line2+= " Fortified";
+				textField = new TTextField(line1, 333, 5, 300, 18);
+				textField2 = new TTextField(line2, 333, 22, 300, 18);
+				actionBar.add(textField);
+				actionBar.add(textField2);
+			}			
 			actionFrame.add(actionBar);
 							
 		}
-			
 	}		
 	public void update(long elapsedTime) {
 		actionFrame.update();

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.image.*;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Random;
 
@@ -24,6 +25,7 @@ public class Map extends AbstractTileBackground2 {
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32, b=32;
 	Chipset terrainChipset;
+	ArrayList<RPGSprite> list2;
 	
 	public Map(BaseLoader bsLoader, BaseIO bsIO, int width, int height){
 		super(0, 0, width, height);
@@ -101,27 +103,46 @@ public class Map extends AbstractTileBackground2 {
 			if (tilenum2 != -1)
 				g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
 		}		
-		// sparade kodsnuttar
-		//g.drawImage(image, x, y, null);
-		//g.drawImage(chipsetEs.image2, x, y, null);
+		
 	}
 
-	public boolean isOccupied(int tileX, int tileY) {
-	if     (layer1[tileX][tileY] == 0 ||
-    		layer1[tileX][tileY] == 1 ||
-    		layer1[tileX][tileY] == 11 ||
-			layer3[tileX][tileY] != null)
-	   return true;
-		// out of bounds
-	return false;
-	} 
-	
-	public boolean boatisOccupied(int tileX, int tileY) {
-		if     (layer1[tileX][tileY] != 1 ||	    		 
-				layer3[tileX][tileY] != null ||	    		 
-				layer1[tileX][tileY] !=1)
-		   return true;
-			// out of bounds
+	public boolean isOccupied(int tileX, int tileY, ArrayList<RPGSprite> lista, RPGSprite unit) {
+		list2=lista;
+		for(int h = 0; h<list2.size();h++){
+			int xs = list2.get(h).getXX();
+			int ys = list2.get(h).getYY();		    			
+			if (layer3[tileX][tileY] != null)
+				if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
+					return false;						
+		}
+		if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11)			
+			return true;
+		if(layer3[tileX][tileY] != null){
+			if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City")		
+				return true;					
+			if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
+				return false;
+		}
+		return false;
+		
+	}
+	public boolean boatisOccupied(int tileX, int tileY, ArrayList<RPGSprite> lista, RPGSprite unit) {
+		list2=lista;
+		for(int h = 0; h<list2.size();h++){
+			int xs = list2.get(h).getXX();
+			int ys = list2.get(h).getYY();		    			
+			if (layer3[tileX][tileY] != null)
+				if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
+					return false;						
+		}
+		if(layer1[tileX][tileY] != 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] !=1)
+			   return true;
+		if(layer3[tileX][tileY] != null){
+			if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City")		
+				return true;					
+			if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
+				return false;
+		}			
 	 return false;
 	} 
 
