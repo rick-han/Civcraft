@@ -22,13 +22,13 @@ public class RPGGame extends GameObject {
 	RPGSprite		hero,hero2;
 	Map map;
     int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
-    int turn=1;
+    static int turn=1;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
 	static boolean funnen=false;
 	RPGSprite fiende;			// the NPC we talk to
 	int	fiendeDirection, wave1, wave2;	// old NPC direction before
-	int h = 0;								// we talk to him/her
+	int h = 0, a=0,F=0;								// we talk to him/her
 	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
 	int chance=0;
 	boolean battle=false;
@@ -43,6 +43,8 @@ public class RPGGame extends GameObject {
 	Random rand3 = new Random();
 	Random rand4 = new Random();
 	String soldatTyp;
+	int j = 0;
+	boolean found=false;
 	int gal=0;
 	public RPGGame(GameEngine parent) {
 		super(parent);
@@ -65,71 +67,12 @@ public class RPGGame extends GameObject {
 		} );
 
 		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-		list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), 1, 1, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000,true));
-		list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), 2, 1, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000,true));
-		list.add(new RPGSprite(this, getImages("PikemanSheet.png",3,4), 3, 1, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000,true));
-		list.add(new RPGSprite(this, getImages("CavalrySheet.png",3,4), 4, 1, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000,true));
-		list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), 5, 1, 3, RPGSprite.RIGHT, 12,8, 100, 1, 1, 2, 2, "Knight",1000,true));
-		list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), 6, 1, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,false));
-		//list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), 7, 1, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000));
-		//list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), 8, 1, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000));
-		//list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), 1, 2, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000));
-		list.add(new RPGSprite(this, getImages("ArcherSheet.png",3,4), 1, 3, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,true));
-		list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), 1, 4, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,true));
-		list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), 1, 5, 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,true));
-		list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4), 1, 6, 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,true));
-		list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), 1, 7, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,true));
-		fiende = list.get(1);
+		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,4, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+
+		//fiende = list.get(1);
 		playfield.add(list.get(0));
 		playfield.add(list.get(1));
-		playfield.add(list.get(2));
-		playfield.add(list.get(3));
-		playfield.add(list.get(4));
-		playfield.add(list.get(5));
-		playfield.add(list.get(6));
-		playfield.add(list.get(7));
 		
-		playfield.add(list.get(8));
-		playfield.add(list.get(9));
-		playfield.add(list.get(10));
-		playfield.add(list.get(11));
-		
-		//for (int j=0;j < map.layer1[0].length;j++) {
-			//for (int i=0;i < map.layer1.length;i++) {
-				//if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==0){
-					//list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",10000,400,0,0));
-					//playfield.add(list.get(list.size()-1));
-				//	map.layer3[i][j] = list.get(list.size()-1);
-					//gal=1;
-					//break;
-				//}
-				//break;
-			//}
-		//}
-		//for (int j=0;j < map.layer1[0].length;j++) {
-			//for (int i=0;i < map.layer1.length;i++) {
-				//if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==1 && map.layer3[i][j] == null){
-					//list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",10000,0,200,200));
-					//playfield.add(list.get(list.size()-1));
-					//map.layer3[i][j] = list.get(list.size()-1);
-					//gal=2;
-					//break;
-			//	}
-				//break;
-			//}
-		//}
-		//for (int j=0;j < map.layer1[0].length;j++) {
-		//	for (int i=0;i < map.layer1.length;i++) {
-			//	if (map.layer1[i][j] == 1 || map.layer1[i][j] == 0 && gal==2 && map.layer3[i][j] == null){
-				//	list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), i, j, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000));
-					//playfield.add(list.get(list.size()-1));
-					//map.layer3[i][j] = list.get(list.size()-1);
-					//gal=0;
-					//break;	
-				//}
-			//break;
-			//}
-		//}
 		ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
 		map.setToCenter(list.get(0));
 		actionBar.initResources();
@@ -195,9 +138,19 @@ public class RPGGame extends GameObject {
 					   int waves = wave1+wave2;
 					   
 					   battlescore=3;
-					   if (fiende.isFortified()){								  
+					   if (fiende.isFortified()){									  
 						   fiende.setDEF(fiende.getDEF()*1.5);
 					   }else fiende.setDEF(fiende.origdef);
+					   
+					   for(j=0; j<list.size(); j++){
+						   int ys = fiende.getYY();
+						   int xs = fiende.getXX();
+						   if(xs == list.get(j).getXX() && ys == list.get(j).getYY() && list.get(j).getTyp()=="City"){
+							   fiende.setDEF(fiende.getDEF()*2);						   
+							   break;
+						   }
+						   
+					   }
 					   					  
 					   while(waves > 0){	
 						 
@@ -215,10 +168,12 @@ public class RPGGame extends GameObject {
 						   
 							   fiende.setHP((int) (fiende.getHP()-DAU));
 							   list.get(h).setHP((int) (list.get(h).getHP()-DDU));
-							   list.get(h).setMov();
+							   
 							   if (fiende.getHP()<=0 || DDU<=0){	
 								   battlescore=1;
-								   playfield.remove(fiende);									   
+								   playfield.remove(fiende);	
+								   list.get(h).movement();
+								   list.get(h).setFood(list.get(h).getFood()+fiende.getFood());
 								   map.layer3[targetX][targetY] = null;	
 								   
 								   break;					   
@@ -227,10 +182,11 @@ public class RPGGame extends GameObject {
 								   battlescore=2;
 								   playfield.remove(list.get(h));
 								   soldatTyp = list.get(h).getTyp();
-								   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;	
-								   
+								   fiende.setFood(fiende.getFood()+list.get(h).getFood());
+								   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;					   
 								   break;						   
 							   }
+							   
 							   
 						   }
 					   
@@ -246,19 +202,19 @@ public class RPGGame extends GameObject {
 								   double AUDP=(list.get(h).getATK()*list.get(h).getHP())/100;
 								   double DAU = rand.nextDouble() * AUDP;
 								   fiende.setHP((int) (fiende.getHP()-DAU));
-								   list.get(h).setMov();
+								  
 							   }
 							   if(list.get(h).getTyp() == "Catapult" || list.get(h).getTyp() == "Trebuchet" || list.get(h).getTyp() == "Galley" && list.get(h).getStone() > 0){
 								   double AUDP=(list.get(h).getATK()*list.get(h).getHP())/100;
 								   double DAU = rand.nextDouble() * AUDP;
 								   fiende.setHP((int) (fiende.getHP()-DAU));
-								   list.get(h).setMov();				   
+								   				   
 							   }
 							   if (fiende.getHP()<=0){	
 								   battlescore=4;
 								   playfield.remove(fiende);									   
 								   map.layer3[targetX][targetY] = null;	
-								  
+								   
 								   break;					   
 							   }
 						   }
@@ -268,7 +224,7 @@ public class RPGGame extends GameObject {
 							   double DAU = rand.nextDouble() * AUDP;
 							   double DAU2= rand2.nextDouble() * AUDP;
 							   fiende.setHP((int) (fiende.getHP()-(DAU+DAU2)));
-							   list.get(h).setMov();
+							  
 								   
 							   if (fiende.getHP()<=0){	
 								   battlescore=4;
@@ -306,6 +262,7 @@ public class RPGGame extends GameObject {
 						   dialogNP[0]="The battle is over.\n";
 						   dialogNP[1]="You have "+list.get(h).getHP()+"\n";
 						   dialogNP[2]="soldiers left";
+						   list.get(h).movement();
 						   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 						   windowHandler.setVisible(true);						   				  	
 						   gameState=TILEI;
@@ -316,6 +273,7 @@ public class RPGGame extends GameObject {
 						   dialogNP[1]="performed a bombardment\n";
 						   dialogNP[2]="on an enemy unit";
 						   list.remove(fiende);
+						   list.get(h).movement();
 						   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 						   windowHandler.setVisible(true);						   				  	
 						   gameState=TILEI;
@@ -325,6 +283,7 @@ public class RPGGame extends GameObject {
 						   dialogNP[0]="Your "+list.get(h).getTyp()+"\n";
 						   dialogNP[1]="performed a bombardment\n";
 						   dialogNP[2]="on an enemy unit";
+						   list.get(h).movement();
 						   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 						   windowHandler.setVisible(true);
 						   gameState=TILEI;							   
@@ -337,6 +296,7 @@ public class RPGGame extends GameObject {
 					tileAt = map.getTileAt(x, y);
 										
 					if (funnen && list.get(h).selmov){
+						
 						funnen=false;		
 						fiende=null;
 						if (tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange() && tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() || tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() && tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() || tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() && tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange() || tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() && tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() || tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() && tileAt.x == list.get(h).tileX +0 || tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() && tileAt.x == list.get(h).tileX +0 || tileAt.y == list.get(h).tileY +0 && tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() || tileAt.y == list.get(h).tileY +0 && tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange()){
@@ -373,33 +333,73 @@ public class RPGGame extends GameObject {
 																	
 								}else 												
 									list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-									list.get(h).movement();															
+									list.get(h).movement();	
+									a=0;
 									break;
 							}
 					if (!funnen){
+						h=0;
+						
 						for(h = 0; h<list.size();h++){
 							xs = list.get(h).getXX();
 							ys = list.get(h).getYY();						
+						    
+							if (tileAt.x == xs && tileAt.y == ys && list.get(h).getTyp()!="Mine"){		
 							
-							if (tileAt.x == xs && tileAt.y == ys && list.get(h).getTyp()!="Mine"){									
-								map.setToCenter(list.get(h)); 								
-								funnen=true;
+								map.setToCenter(list.get(h)); 
+								
 								if(list.get(h).getTyp()=="City"){
 									funnen=false;
 								}
 								list.get(h).dirSet(3);
 								ActionBar.send(list.get(h), playfield, map.layer3, list, this, map);
 								actionBar.initResources();
-								gameState=CHOOSING;
+								
+								
 								break;
 							}
+										
+							
 						}
+						
 							
 							
 					}
 				}
-		
-											
+				
+				if (keyPressed(KeyEvent.VK_S)) {					
+					if(F>0)
+						a++;
+					F++;
+					
+					while(a<=list.size()-1){						
+						
+						xs = list.get(a).getXX();
+						ys = list.get(a).getYY();
+						if (tileAt.x == xs && tileAt.y == ys && list.get(a).getTyp()!="Mine"){
+							list.get(a).dirSet(3);						
+							ActionBar.send(list.get(a), playfield, map.layer3, list, this, map);
+							actionBar.initResources();						
+							break;
+						}
+						if(a>list.size()-1)
+							a=0;
+						a++;					
+					}
+				}		
+				if (keyPressed(KeyEvent.VK_C)) {
+					if(a>list.size()-1)
+						a=list.size()-1;
+					if(list.get(a)!=null || list.get(h)!=null){		
+						if(F>0){						
+							h=a;							
+						}
+						a=0;		
+						F=0;
+						gameState=CHOOSING;
+						funnen=true;
+					}
+				}
 				// quit key
 				if (keyPressed(KeyEvent.VK_ESCAPE)) {
 					parent.nextGameID = Civcraft.TITLE;
@@ -496,6 +496,7 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void newTurn(){
+		ActionBar.addSpr();
 		for (int i=0; i < list.size(); i++){
 			if(list.get(i).getTyp()=="Barbarian"){
 				list.get(i).setOldTurn(turn);
@@ -526,13 +527,15 @@ public class RPGGame extends GameObject {
 		}
 	}
 	public void spawnBarb(){
-		int x = rand.nextInt(Map.maxX-1);
-		int y = rand.nextInt(Map.maxY-1);
-		if (rand.nextInt(10)==0 && Map.fogofwar[x][y] >= 0){
-			list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",logic));
-			//list.add(new RPGSprite(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",1000, false));
-			playfield.add(list.get(list.size()-1));
-			//Map.reveal(x,y,2);
+		if(turn>=10){
+			int x = rand.nextInt(Map.maxX-1);
+			int y = rand.nextInt(Map.maxY-1);
+			if (rand.nextInt(10)==0 && Map.fogofwar[x][y] >= 0){
+				list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",logic));
+				//list.add(new RPGSprite(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",1000, false));
+				playfield.add(list.get(list.size()-1));
+				//Map.reveal(x,y,2);
+			}
 		}
 	}
 

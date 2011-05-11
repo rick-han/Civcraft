@@ -189,8 +189,10 @@ public class RPGSprite extends AdvanceSprite{
 		mov=false;
 	}
 	public void movement(){
-		if (move == moveThisTurn)
+		if (move == moveThisTurn){
 			mov=false;
+			
+		}
 		else
 			moveThisTurn+=1; //ska kolla efter terrainaddons som påverkar movement
 		Map.reveal(tileX,tileY, sightRange);
