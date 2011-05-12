@@ -12,7 +12,7 @@ import com.golden.gamedev.funbox.*;
 public class Civcraft extends GameEngine {
 	
 
-	public static final int	TITLE = 0, GAME_MODE = 1;
+	public static final int	TITLE = 0, GAME_MODE = 1, MULTIPLAYER_MENU = 2;
 
 	public void initResources() {
 		nextGameID = TITLE;
@@ -24,6 +24,7 @@ public class Civcraft extends GameEngine {
 		switch (GameID) {
 			case TITLE : return new Title(this);
 			case GAME_MODE : return new RPGGame(this);
+			case MULTIPLAYER_MENU : return new MultiplayerMenu(this);
 		}
 
 		return null;

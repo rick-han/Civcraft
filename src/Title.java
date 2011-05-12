@@ -12,7 +12,7 @@ import com.golden.gamedev.object.background.*;
 
 public class Title extends GameObject {
 
-TButton but;
+	TButton but;
 	GameFont		font;
 
 	BufferedImage	title;
@@ -48,11 +48,14 @@ TButton but;
 					// start
 					parent.nextGameID = Civcraft.GAME_MODE;
 					finish();
-
-				} else if (option == 1) {
+				} else if (option == 1){
+					// multiplayer
+					parent.nextGameID = Civcraft.MULTIPLAYER_MENU;
+					finish();
+				} else if (option == 2) {
 					// load
 
-				} else if (option == 2) {
+				} else if (option == 3) {
 					// end
 					finish();
 				}
@@ -65,7 +68,7 @@ TButton but;
 
 			case KeyEvent.VK_DOWN :
 				option++;
-				if (option > 2) option = 0;
+				if (option > 3) option = 0;
 			break;
 
 			case KeyEvent.VK_ESCAPE :
@@ -78,8 +81,9 @@ TButton but;
 	public void render(Graphics2D g) {
 		g.drawImage(title, 0, 0, null);
 		font.drawString(g, "START", 450, 300);
-		font.drawString(g, "LOAD", 450, 320);
-		font.drawString(g, "END", 450, 340);
+		font.drawString(g, "MULTIPLAYER", 450, 320);
+		font.drawString(g, "LOAD", 450, 340);
+		font.drawString(g, "END", 450, 360);
 
 		font.drawString(g, "PRESS \"Z\" FOR ACTION", 10, 455);
 
