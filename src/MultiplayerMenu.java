@@ -1,5 +1,3 @@
-import inetclient.*;
-
 import java.util.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,10 +16,11 @@ public class MultiplayerMenu extends GameObject{
 	TTextField hostText;
 	TTextField portText;
 	TTextField nickText;
-	Proxy p;
 	Result returned;
+	Civcraft parent;
 	public MultiplayerMenu(GameEngine parent) {
 		super(parent);
+		this.parent = (Civcraft)parent;
 	}	
 
 	public void initResources() {
@@ -30,33 +29,55 @@ public class MultiplayerMenu extends GameObject{
 		TLabel msgLabel = new TLabel("", 150, 20, 200, 40);
 		
 		TLabel nickLabel = new TLabel("Nickname:", 150, 50, 200, 40);
-		nickText = new TTextField("Grupp21", 150, 80, 150, 25);
+		nickText = new TTextField("abc", 150, 80, 150, 25);
 		
 		TLabel hostLabel = new TLabel("Host:", 150, 110, 200, 40);
-		hostText = new TTextField("dvk.fishface.se", 150, 150, 150, 25);
+		hostText = new TTextField("192.168.1.4", 150, 150, 150, 25);
 		
 		TLabel portLabel = new TLabel("Port:", 150, 180, 200, 40);
 		portText = new TTextField("1339", 150, 210, 80, 25);
 		
 		TButton connectButton = new TButton("Connect", 150, 270, 90, 30){
 			public void doAction() {
-				p = new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss());
+				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
 				try {
-					returned = p.connect(nickText.getText());
+					returned = parent.getProxy().connect(nickText.getText());
 				} catch (FailedException e) {
 					e.printStackTrace();
 				}
 				if (returned.getOk()){
-					try {
-						//p.host();
-						System.out.println(returned = p.listGames());
-						//System.out.println(returned.getSessions());
-						//returned = p.host();
-						//System.out.println(returned.getHostName());
+					parent.nextGameID = Civcraft.LOBBY;
+					finish();
+				}else{
+					
+				}
+			}
+		};
+		TButton hostButton = new TButton("Connect&Host&Start", 220, 270, 120, 30){
+			public void doAction() {
+				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
+				try {
+					returned = parent.getProxy().connect(nickText.getText());
+				} catch (FailedException e) {
+					e.printStackTrace();
+				}
+				if (returned.getOk()){
 						
-					} catch (FailedException e) {
-						e.printStackTrace();
-					}
+						try {
+							parent.getProxy().host();
+							parent.getProxy().startGame();
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					
+					
 				}else{
 					
 				}
@@ -81,6 +102,7 @@ public class MultiplayerMenu extends GameObject{
 		frame.add(nickLabel);
 		frame.add(nickText);
 		frame.add(connectButton);
+		frame.add(hostButton);
 		
 	}
 
@@ -91,28 +113,5 @@ public class MultiplayerMenu extends GameObject{
 		g.drawImage(background, 0, 0, null);
 		frame.render(g);
 	}
-private class MyPackLyss implements PacketListener{
-		
-		MyPackLyss(){
-		}
 
-		public void newTurn(Result res){
-			
-		}
-
-		public void lobbyUpdated(Result res){
-			
-		}
-
-		public void gameStarted(Result res){
-			
-		}
-
-		public void chatMessageReceived(Result res){
-		}
-
-        public void gameClosed(){
-            
-        }
-	}
 }

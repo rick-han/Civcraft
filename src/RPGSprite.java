@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 // GTGE
+import com.golden.gamedev.GameEngine;
 import com.golden.gamedev.gui.TButton;
 import com.golden.gamedev.object.sprite.AdvanceSprite;
 
@@ -49,8 +50,13 @@ public class RPGSprite extends AdvanceSprite{
 	int sightRange=2;
 	int moveThisTurn=0;
 	double origdef;
+	
 	ArrayList<RPGSprite> list2;
-	public RPGSprite(){
+	GameEngine parent;
+	//Proxy p = ((Civcraft)parent).getProxy();
+	
+	public RPGSprite(GameEngine parent) {	
+		this.parent = parent;
 	}
    
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
@@ -72,7 +78,7 @@ public class RPGSprite extends AdvanceSprite{
 		this.origdef=def;
 		this.food=food;
 		this.friend=friend;
-		map.layer3[tileX][tileY] = this;	// mark sprite position
+		//map.layer3[tileX][tileY] = this;	// mark sprite position
 
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
@@ -254,15 +260,19 @@ public class RPGSprite extends AdvanceSprite{
 		map.layer3[tileX][tileY] = null;
 	
 		if(horiz > tileX && vert > tileY){
+			
 			setDirection(1);
 			if (even){			
 				tileX+=1; 
 				tileY+=1;	
+				
+				
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX-=1;
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}
@@ -271,13 +281,16 @@ public class RPGSprite extends AdvanceSprite{
 						tileX-=1;
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}
+				
 				map.layer3[tileX][tileY] = null;		 
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
+				
 				return true;
 				}
 		}
@@ -287,11 +300,13 @@ public class RPGSprite extends AdvanceSprite{
 			if (!even){
 				tileX-=1;
 				tileY-=1;
+				
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX+=1;
 						tileY+=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}
@@ -300,13 +315,16 @@ public class RPGSprite extends AdvanceSprite{
 						tileX+=1;
 						tileY+=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}		 
+				
 				map.layer3[tileX][tileY] = null;
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
+				
 				return true;
 			}
 		}	
@@ -315,11 +333,13 @@ public class RPGSprite extends AdvanceSprite{
 			if(even){			
 				tileX-=1;
 				tileY+=1;
+				
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX+=1;
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}
@@ -328,13 +348,16 @@ public class RPGSprite extends AdvanceSprite{
 						tileX+=1;
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
+						
 						return false;				
 					}
 				}
+				
 				map.layer3[tileX][tileY] = null;		  
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
+				
 				return true;
 			}
 		}
@@ -369,10 +392,12 @@ public class RPGSprite extends AdvanceSprite{
 		if(horiz > tileX){
 			setDirection(1);
 			tileX+=1;
+			
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 					tileX-=1;	
 					map.layer3[tileX][tileY] = unit;
+					
 					return false;				
 				}
 			}
@@ -380,14 +405,17 @@ public class RPGSprite extends AdvanceSprite{
 				if (map.isOccupied(tileX, tileY, list2, unit) == true){
 					tileX-=1;	
 					map.layer3[tileX][tileY] = unit;
+					
 					return false;				
 				}
 			}
+			
 			map.layer3[tileX][tileY] = null;
 			
 			map.layer3[tileX][tileY] = this;
 			setStatus(MOVING);
 			setFrame(getFrame() + 1);
+			
 			return true;
 		}
 		

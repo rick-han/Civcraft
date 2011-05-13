@@ -11,20 +11,41 @@ import com.golden.gamedev.funbox.*;
 
 public class Civcraft extends GameEngine {
 	
+	static MultiplayerMenu mm = null;
+	static Civcraft cc = null;
+	static RPGGame rg = null;
+	static Lobby lobb = null;
+	public static final int	TITLE = 0, GAME_MODE = 1, MULTIPLAYER_MENU = 2, LOBBY = 3;
+	private Proxy p = null;
 
-	public static final int	TITLE = 0, GAME_MODE = 1, MULTIPLAYER_MENU = 2;
-
+	public void setProxy(Proxy proxy){
+		p = proxy;
+	}
+	
+	public Proxy getProxy(){
+		return p;
+	}
+	
 	public void initResources() {
 		nextGameID = TITLE;
 		showCursor();
+		
+		
 
 	}
 
 	public GameObject getGame(int GameID) {
 		switch (GameID) {
 			case TITLE : return new Title(this);
-			case GAME_MODE : return new RPGGame(this);
-			case MULTIPLAYER_MENU : return new MultiplayerMenu(this);
+			case GAME_MODE :
+				rg = new RPGGame(this);
+				return rg; 
+			case MULTIPLAYER_MENU : 
+				mm = new MultiplayerMenu(this);
+				return mm;
+			case LOBBY : 
+				lobb = new Lobby(this);
+				return lobb;
 		}
 
 		return null;
@@ -57,7 +78,8 @@ public class Civcraft extends GameEngine {
 
 
 		GameLoader game = new GameLoader();
-		game.setup(new Civcraft(), new Dimension(1024, 640), false);
+		cc = new Civcraft();
+		game.setup(cc, new Dimension(1024, 720), false);
 		game.start();
 	}
 

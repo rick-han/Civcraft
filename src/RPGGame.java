@@ -3,6 +3,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.List;
 
 
 // GTGE
@@ -22,6 +23,7 @@ public class RPGGame extends GameObject {
 	RPGSprite		hero,hero2;
 	Map map;
     int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
+    static boolean multiplayer;
     static int turn=1;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
@@ -29,7 +31,7 @@ public class RPGGame extends GameObject {
 	RPGSprite fiende;			// the NPC we talk to
 	int	fiendeDirection, wave1, wave2;	// old NPC direction before
 	int h = 0, a=0,F=0;								// we talk to him/her
-	ArrayList<RPGSprite> list = new ArrayList<RPGSprite>();
+	ArrayList<RPGSprite> list;
 	int chance=0;
 	boolean battle=false;
 	int targetX,targetY;
@@ -43,49 +45,106 @@ public class RPGGame extends GameObject {
 	Random rand3 = new Random();
 	Random rand4 = new Random();
 	String soldatTyp;
+	static ArrayList<String> k;
+	ArrayList<Integer> test = new ArrayList<Integer>();
 	int j = 0;
 	boolean found=false;
 	int gal=0;
+	Proxy p;
+	RPGGame civ;
+	int xe;
+	int ye;
+	static GameEngine parent2;
+	public static Result received;
 	public RPGGame(GameEngine parent) {
 		super(parent);
 		this.parent = parent;
-	}	
+		this.parent2 = parent;	
+	}
+	public RPGGame(){
+		super(parent2);
+	}
 	
 	public void initResources() {
 		actionBar = new ActionBar(parent);
 		windowHandler = new WindowHandler(parent);
-		windowHandler.initResources();
+		windowHandler.initResources();	
 		map = new Map(bsLoader, bsIO);
 		playfield = new PlayField2(map);
-		
+		p = ((Civcraft)parent).getProxy();
+		list = new ArrayList<RPGSprite>();
 		
 		playfield.setComparator(new Comparator() {
 			public int compare(Object o1, Object o2) {
 				// sort based on y-order
 				return (int) (((Sprite) o1).getY()-((Sprite) o2).getY());
 			}
-		} );
-
-		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-		list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,4, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-
-		//fiende = list.get(1);
-		playfield.add(list.get(0));
-		playfield.add(list.get(1));
+		});
+		//if(multiplayer==true){
+			
+			//if(MyPackLyss.theType.equalsIgnoreCase("Knight")){
+				
+				//list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4),xe,ye, 3, RPGSprite.LEFT, 12,8, 100, 1, 1, 2, 2, "Knight",1000,true));
+				//playfield.add(list.get(list.size()-1));
+				//ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+				//map.setToCenter(list.get(list.size()-1));
+				//actionBar.initResources();
+			//}
+			
+	//	}
+		if(multiplayer==false){
+			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,4, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
 		
-		ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
-		map.setToCenter(list.get(0));
-		actionBar.initResources();
-		for (int i=0; i < list.size(); i++ )
-			Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
+			playfield.add(list.get(0));
+			playfield.add(list.get(1));
 		
+			ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
+			map.setToCenter(list.get(0));
+			actionBar.initResources();
+			for (int i=0; i < list.size(); i++ )
+				Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
 		
+		}
 		dialog = new RPGDialog(fontManager.getFont(getImage("BitmapFont.png")),
 							   getImage("Box.png", false));
-							
+					
+	
+		if(multiplayer=true){
+			int numberStartingPositions = received.getNumberTiles();
+			String theType;
+			for(int i=0; i<numberStartingPositions; i++){
+				xe = received.getTileX(i);
+				ye = received.getTileY(i);
+				if(received.existUnit(i)){				
+					theType = received.getUnitType(i);								
+					if(theType.equalsIgnoreCase("Knight")){				
+						list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 12,8, 100, 1, 1, 2, 2, "Knight",1000,true));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Settler")){				
+						list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+					}
+					
+				}
+				if(received.existCity(i)){	
+					list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));														
+					playfield.add(list.get(list.size()-1));
+				}
+			}
+		}
 	}
 		
+	
 	public void update(long elapsedTime) {
+		
 		playfield.update(elapsedTime);
 		String dialogNP[] = new String[3];
 		String dialogNP2[] = new String[4];
@@ -331,11 +390,28 @@ public class RPGGame extends GameObject {
 						    	battle=true;								
 								break;
 																	
-								}else 												
-									list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-									list.get(h).movement();	
-									a=0;
-									break;
+								}else 	
+									if(multiplayer==true){
+										test.add(list.get(h).getXX());
+										test.add(list.get(h).getYY());
+										list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
+										test.add(list.get(h).getXX());
+										test.add(list.get(h).getYY());
+										try {
+											p.moveUnit(test);
+											test.clear();
+										} catch (FailedException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										list.get(h).movement();	
+										a=0;
+										break;
+									}
+							list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
+							list.get(h).movement();	
+							a=0;
+							break;
 							}
 					if (!funnen){
 						h=0;
@@ -432,9 +508,10 @@ public class RPGGame extends GameObject {
 					break;
 				}
 				if (keyPressed(KeyEvent.VK_DOWN)){
-					if (yScroll < (Map.sizeY*32)-640){
+					
+					if (yScroll <= (Map.sizeY*32)-640){						
 						yScroll+=64;
-						map.setToCenter(xScroll,yScroll, 1024, 640);
+						map.setToCenter(xScroll,yScroll, 1024, 720);
 					}
 					break;
 				}
@@ -474,7 +551,8 @@ public class RPGGame extends GameObject {
 				dialog.update(elapsedTime);
 			break;
 		}
-		actionBar.update(elapsedTime);
+		if(list.size() > 0)
+			actionBar.update(elapsedTime);
 		windowHandler.update(elapsedTime);
 	}
 
@@ -487,7 +565,8 @@ public class RPGGame extends GameObject {
 			dialog.render(g);
 			windowHandler.render(g);
 		}
-		actionBar.render(g);
+		if(list.size() > 0)
+			actionBar.render(g);
 		
 	}
 	
@@ -496,6 +575,14 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void newTurn(){
+		if(multiplayer==true){
+			try {
+				p.endTurn();
+			} catch (FailedException e) {
+			// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		ActionBar.addSpr();
 		for (int i=0; i < list.size(); i++){
 			if(list.get(i).getTyp()=="Barbarian"){
@@ -510,7 +597,8 @@ public class RPGGame extends GameObject {
 			}
 				
 		}
-		spawnBarb();
+		if(multiplayer==false)
+			spawnBarb();
 		sendList();	
 		
 		for (int i=0; i < list.size(); i++){

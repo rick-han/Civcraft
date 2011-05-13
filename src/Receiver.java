@@ -37,7 +37,7 @@ public class Receiver implements Runnable
 			}
 			catch(Throwable t){}
 
-			System.out.println(getResult());
+			//System.out.println(getResult());
 		}
 		Result toReturn = getPacket();
        		setPacket(null);

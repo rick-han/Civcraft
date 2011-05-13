@@ -35,6 +35,7 @@ public class ActionBar{
 	static int oldturn=0;
 	static Map map;
 	static Graphics2D g;
+	Proxy p;
 	static boolean phal=false, infa=false, treb=false, carav=false, gall=false, trir=false, cann=false, cava=false, cata=false, legi=false, pike=false, knig=false, crus=false, arch=false, muske=false;
 	public ActionBar(GameEngine parent) {
 		this.parent = parent;
@@ -50,7 +51,7 @@ public class ActionBar{
 	
 	public void initResources(){
 		layer3 = new RPGSprite[40][25];
-		
+		p = ((Civcraft)parent).getProxy();
 		if (spr.getTyp() == "Settler"){
 			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
 			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
@@ -86,9 +87,18 @@ public class ActionBar{
 					list.get(list.size()-1).setPOP(1000);														
 					//list.add(new RPGSprite(own,parent.getImages("PhalanxSheet.png",3,4), spr.getXX(),spr.getYY()+1, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Settler",1000, true));
 					//playfield.add(list.get(list.size()-1));
+					if(RPGGame.multiplayer=true){
+						try {
+							p.builtCity(spr.getXX(), spr.getYY(), "City");
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
 					playfield.remove(spr);
 					list.remove(spr);
 					RPGGame.funnen=false;
+					
 								
 				}
 			};

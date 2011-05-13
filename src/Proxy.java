@@ -59,6 +59,7 @@ public class Proxy
                 	toSend.add(name);
 			send(toSend);
 			return receiver.getResult();
+			
 		}
 		catch(FailedException fe)
 		{

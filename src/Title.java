@@ -80,7 +80,7 @@ public class Title extends GameObject {
 
 	public void render(Graphics2D g) {
 		g.drawImage(title, 0, 0, null);
-		font.drawString(g, "START", 450, 300);
+		font.drawString(g, "SINGLEPLAYER", 450, 300);
 		font.drawString(g, "MULTIPLAYER", 450, 320);
 		font.drawString(g, "LOAD", 450, 340);
 		font.drawString(g, "END", 450, 360);

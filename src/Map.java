@@ -21,23 +21,39 @@ public class Map extends AbstractTileBackground2 {
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
 	static int[][]	fogofwar;
-	static int sizeX = 56, sizeY = 27, maxX=sizeX-1, maxY=sizeY-1;
+	
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32, b=32;
 	Chipset terrainChipset;
 	ArrayList<RPGSprite> list2;
-	
+	static int numT = MyPackLyss.numT;
+	static boolean multiplayer;
+	static ArrayList k;// = new ArrayList<String>();
+	static int sizeX = 56, sizeY = 27, maxX=sizeX-1, maxY=sizeY-1;
+	//static int sizeX = 56, sizeY = 27, maxX=sizeX-1, maxY=sizeY-1;
 	public Map(BaseLoader bsLoader, BaseIO bsIO, int width, int height){
 		super(0, 0, width, height);
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public Map(BaseLoader bsLoader, BaseIO bsIO){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
 		
-		//anropar mapGenerator();
+		
+		if(multiplayer==true){
+			int yy = ((ArrayList) k.get(0)).size();
+			int xx = k.size();
+		    
+			//anropar mapGenerator();
+			maxY=yy-1;
+			maxX=xx-1;
+			sizeX=xx;
+			sizeY=yy;
+		}
 		layer1 = new int[sizeX][sizeY];
 		layer2 = new int[sizeX][sizeY];
+		
 		layer3 = new RPGSprite[sizeX][sizeY];		
 		fogofwar = new int[sizeX][sizeY];
 		mapGenerator(4);
@@ -49,17 +65,19 @@ public class Map extends AbstractTileBackground2 {
 		//StringTokenizer upperToken = new StringTokenizer(upperTile[j]);
 		//layer1[i][j] = Integer.parseInt(lowerToken.nextToken());
 		//layer2[i][j] = Integer.parseInt(upperToken.nextToken());
-		for (int j=0;j < layer1[0].length;j++) {
-			for (int i=0;i < layer1.length;i++) {
-				if (layer1[i][j] == 11)
-					layer2[i][j] = 0;
-				else if (layer1[i][j] == 8)
-					layer2[i][j] = 2;
-				else if (layer1[i][j] == 9)
-					layer2[i][j] = 3;
-				else
-					layer2[i][j] = -1;
-				fogofwar[i][j] = 0;
+		if(multiplayer==false){
+			for (int j=0;j < layer1[0].length;j++) {
+				for (int i=0;i < layer1.length;i++) {
+					if (layer1[i][j] == 11)
+						layer2[i][j] = 0;
+					else if (layer1[i][j] == 8)
+						layer2[i][j] = 2;
+					else if (layer1[i][j] == 9)
+						layer2[i][j] = 3;
+					else
+						layer2[i][j] = -1;
+					fogofwar[i][j] = 0;
+				}
 			}
 		}
 		
@@ -68,7 +86,7 @@ public class Map extends AbstractTileBackground2 {
 		
 		fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
 		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 12, 1));
-		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 4, 1));
+		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 6, 1));
 		
 		/*
 		chipset = new Chipset[16];
@@ -87,22 +105,85 @@ public class Map extends AbstractTileBackground2 {
 	public void renderTile(Graphics2D g,
 						   int tileX, int tileY,
 						   int x, int y) {
-		
-		
-		
+				
 		// render Fog of War
-		g.drawImage(fogOfWarChipset.image2, x, y, null);
+		//g.drawImage(fogOfWarChipset.image2, x, y, null);
+		if(multiplayer==true){
+			int tilenum = layer1[tileX][tileY];
+			int fognum = fogofwar[tileX][tileY];
+			fognum = 0;
+			// render layer 1
 		
-		int tilenum = layer1[tileX][tileY];
-		int fognum = fogofwar[tileX][tileY];
-		// render layer 1
-		if (fognum < 1){
-			g.drawImage(terrainChipset.image[tilenum], x, y, null);
-			// render layer 2
-			int tilenum2 = layer2[tileX][tileY];
-			if (tilenum2 != -1)
-				g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
-		}		
+			if (fognum < 1){		
+			
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Desert")){			
+					g.drawImage(terrainChipset.image[2], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Rain Forrest")){
+					g.drawImage(terrainChipset.image[4], x, y, null);
+					g.drawImage(terrainAddonChipset.image[5], x, y, null);	
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Hills")){
+					g.drawImage(terrainChipset.image[4], x, y, null);
+					g.drawImage(terrainAddonChipset.image[1], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Tundra")){
+					g.drawImage(terrainChipset.image[6], x, y, null);				
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Broadleaf Forrest")){
+					g.drawImage(terrainChipset.image[2], x, y, null);
+					g.drawImage(terrainAddonChipset.image[4], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Marsh")){
+					g.drawImage(terrainChipset.image[4], x, y, null);
+					
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea")){
+					g.drawImage(terrainChipset.image[1], x, y, null);
+				
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean")){
+					g.drawImage(terrainChipset.image[0], x, y, null);
+					
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains")){
+					g.drawImage(terrainChipset.image[3], x, y, null);
+					g.drawImage(terrainAddonChipset.image[0], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Plains")){
+					g.drawImage(terrainChipset.image[5], x, y, null);
+					
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Conifer Forrest")){
+					g.drawImage(terrainChipset.image[3], x, y, null);
+					g.drawImage(terrainAddonChipset.image[3], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Grassland")){
+					g.drawImage(terrainChipset.image[3], x, y, null);
+					
+				}
+				// render layer 2
+				int tilenum2 = layer2[tileX][tileY];
+				//if (tilenum2 != -1)
+				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
+			}	
+		}
+		if(multiplayer==false){
+			
+			g.drawImage(fogOfWarChipset.image2, x, y, null);
+
+			int tilenum = layer1[tileX][tileY];
+			int fognum = fogofwar[tileX][tileY];
+			// render layer 1
+			if (fognum < 1){
+				g.drawImage(terrainChipset.image[tilenum], x, y, null);
+				// render layer 2
+				int tilenum2 = layer2[tileX][tileY];
+				if (tilenum2 != -1)
+					g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
+			}		
+
+		}
 		
 	}
 
