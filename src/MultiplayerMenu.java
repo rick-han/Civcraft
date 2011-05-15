@@ -32,13 +32,14 @@ public class MultiplayerMenu extends GameObject{
 		nickText = new TTextField("abc", 150, 80, 150, 25);
 		
 		TLabel hostLabel = new TLabel("Host:", 150, 110, 200, 40);
-		hostText = new TTextField("192.168.1.4", 150, 150, 150, 25);
+		hostText = new TTextField("192.168.1.3", 150, 150, 150, 25);
 		
 		TLabel portLabel = new TLabel("Port:", 150, 180, 200, 40);
 		portText = new TTextField("1339", 150, 210, 80, 25);
 		
 		TButton connectButton = new TButton("Connect", 150, 270, 90, 30){
 			public void doAction() {
+				RPGGame.nick = nickText.getText();		
 				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
 				try {
 					returned = parent.getProxy().connect(nickText.getText());
@@ -53,8 +54,10 @@ public class MultiplayerMenu extends GameObject{
 				}
 			}
 		};
+		
 		TButton hostButton = new TButton("Connect&Host&Start", 220, 270, 120, 30){
 			public void doAction() {
+				RPGGame.nick = nickText.getText();
 				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
 				try {
 					returned = parent.getProxy().connect(nickText.getText());

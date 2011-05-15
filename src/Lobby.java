@@ -11,17 +11,20 @@ import com.golden.gamedev.object.GameFont;
 
 
 public class Lobby extends GameObject{
-	
 	BufferedImage background;
 	private FrameWork frame;
 	Result returned;
 	GameEngine parent;
 	Proxy p;
 	String tmp;
+	TTextField toJoinText;
+	TLabel listItemsLabel;
+	TLabel hostItemsLabel;
+	TButton startButton;
 	public Lobby(GameEngine parent) {
 		super(parent);
 		this.parent = parent;
-	}	
+	}
 
 	public void initResources() {
 		p = ((Civcraft)parent).getProxy();
@@ -31,43 +34,73 @@ public class Lobby extends GameObject{
 		TLabel msgLabel = new TLabel("Lobby", 150, 10, 200, 25);
 		try {
 			returned = p.listGames();
-			
-			
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}
-		//System.out.println(returned.getSessions());
 		Iterator iter = returned.getSessions().iterator();
-		int counter = 1;
+		listItemsLabel = new TLabel("", 70, 30, 170, 220);
 		
 		while (iter.hasNext()){
-			counter++;
-			tmp = (String)iter.next();
-			frame.add(new TLabel(tmp, 150, 30 * counter, 200, 30));
-			frame.get().UIResource().put("Text Font", externalFont);
-			frame.get().UIResource().put("Text Color", Color.RED);
-			frame.add(new TButton("J", 350, 30 * counter, 25, 25) {
-				public void doAction() {
-					try {
-						p.joinGame(Lobby.this.tmp);
-						
-					} catch (FailedException e) {
-						e.printStackTrace();
-					}
-					
-				}
-			});
-			
+			listItemsLabel.setText(listItemsLabel.getText() + (String)iter.next());
 		}
 		
+		toJoinText = new TTextField("", 70, 410, 70 ,30);
+		frame.add(toJoinText);
+		
+		TButton joinButton =new TButton("Join", 140, 410, 60, 30) {
+			public void doAction() {
+				joinGame();
+			}
+		};
+		hostItemsLabel = new TLabel("", 260, 30, 100, 150);
+		TButton hostButton = new TButton("Host", 260, 190, 70, 30){
+			public void doAction() {
+				hostGame();
+			}
+		};
+		TButton startButton = new TButton("Start Game", 350, 190, 70, 30){
+			public void doAction() {
+				startGame();
+			}
+		};
+		
+		frame.add(startButton);
+		frame.add(hostButton);
+		frame.add(joinButton);
+		hostItemsLabel.UIResource().put("Text Font", externalFont);
+		hostItemsLabel.UIResource().put("Text Color", Color.RED);
+		listItemsLabel.UIResource().put("Text Font", externalFont);
+		listItemsLabel.UIResource().put("Text Color", Color.RED);
+		toJoinText.UIResource().put("Text Font", externalFont);
 		msgLabel.UIResource().put("Text Font", externalFont);
 		msgLabel.UIResource().put("Text Color", Color.RED);
-		
+		frame.add(hostItemsLabel);
 		frame.add(msgLabel);
-		
+		frame.add(listItemsLabel);
+	}
+	public void startGame(){
+		try {
+			p.startGame();
+		} catch (FailedException e) {
+			e.printStackTrace();
+		}
+	}
+	public void hostGame(){	
+		try {
+			//returned = p.host();
+			p.host();
+		} catch (FailedException e) {
+			e.printStackTrace();
+		}
 		
 	}
-
+	public void joinGame(){
+		try {
+			p.joinGame(toJoinText.getText());
+		} catch (FailedException e) {
+			e.printStackTrace();
+		}
+	}
 	public void update(long elapsedTime) {
 		frame.update();
 	}
@@ -76,4 +109,5 @@ public class Lobby extends GameObject{
 		frame.render(g);
 	}
 }
+
 

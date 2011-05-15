@@ -87,7 +87,7 @@ public class ActionBar{
 					list.get(list.size()-1).setPOP(1000);														
 					//list.add(new RPGSprite(own,parent.getImages("PhalanxSheet.png",3,4), spr.getXX(),spr.getYY()+1, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Settler",1000, true));
 					//playfield.add(list.get(list.size()-1));
-					if(RPGGame.multiplayer=true){
+					if(RPGGame.multiplayer==true){
 						try {
 							p.builtCity(spr.getXX(), spr.getYY(), "City");
 						} catch (FailedException e) {
@@ -111,7 +111,12 @@ public class ActionBar{
 								
 				}
 			};
-			
+			TButton btn5 = new TButton("New Turn", 200, 5, 70, 30) {
+				public void doAction() {
+					own.newTurn();
+					RPGGame.funnen=false;	
+				}
+			};
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Type: "+spr.getTyp());
 			if (spr.isFortified())
@@ -126,6 +131,7 @@ public class ActionBar{
 			actionBar.add(btn2);
 			actionBar.add(btn3);
 			actionBar.add(btn4);
+			actionBar.add(btn5);
 			actionBar.add(textField);
 			actionBar.add(textField2);
 			actionFrame.add(actionBar);
@@ -168,7 +174,12 @@ public class ActionBar{
 				
 				}
 			};
-			
+			TButton btn4 = new TButton("New Turn", 200, 5, 70, 30) {
+				public void doAction() {
+					own.newTurn();
+					RPGGame.funnen=false;	
+				}
+			};
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Type: "+spr.getTyp());
 			if (spr.isFortified())
@@ -183,6 +194,7 @@ public class ActionBar{
 			actionBar.add(btn);
 			actionBar.add(btn3);
 			actionBar.add(btn2);
+			actionBar.add(btn4);
 			actionBar.add(textField);
 			actionBar.add(textField2);
 			actionFrame.add(actionBar);
@@ -222,7 +234,12 @@ public class ActionBar{
 				
 				}
 			};
-			
+			TButton btn4 = new TButton("New Turn", 200, 5, 70, 30) {
+				public void doAction() {
+					own.newTurn();
+					RPGGame.funnen=false;	
+				}
+			};
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Type: "+spr.getTyp());
 			line3 = ("Iron: "+spr.getIron()+" Gunpowder: "+spr.getGunP());
@@ -238,6 +255,7 @@ public class ActionBar{
 			actionBar.add(btn);
 			actionBar.add(btn3);
 			actionBar.add(btn2);
+			actionBar.add(btn4);
 			actionBar.add(textField);
 			actionBar.add(textField2);
 			actionBar.add(textField3);
@@ -480,6 +498,12 @@ public class ActionBar{
 					
 				}
 			};
+			TButton btn18 = new TButton("New Turn", 470, 5, 70, 30) {
+				public void doAction() {
+					own.newTurn();
+					RPGGame.funnen=false;	
+				}
+			};
 			line1 = ("Population: " + spr.getPOP());			
 			textField = new TTextField(line1, 333, 5, 300, 18);
 			
@@ -502,6 +526,7 @@ public class ActionBar{
 			actionBar.add(btn15);
 			actionBar.add(btn16);
 			actionBar.add(btn17);
+			actionBar.add(btn18);
 			//actionBar.add(textField);
 			actionFrame.add(actionBar);
 							
@@ -544,7 +569,12 @@ public class ActionBar{
 				
 				}
 			};
-			
+			TButton btn4 = new TButton("New Turn", 200, 5, 70, 30) {
+				public void doAction() {
+					own.newTurn();
+					RPGGame.funnen=false;	
+				}
+			};
 			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
 			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Type: "+spr.getTyp());
 			//btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
@@ -554,6 +584,7 @@ public class ActionBar{
 			actionBar.add(btn);
 			actionBar.add(btn3);
 			actionBar.add(btn2);
+			actionBar.add(btn4);
 			if(spr.getTyp()!="City"){
 				if (spr.isFortified())
 					line2+= " Fortified";
