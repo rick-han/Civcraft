@@ -217,12 +217,12 @@ public class RPGGame extends GameObject {
 							if(returned.getAttackerLeft()<=0){
 								battlescore=1;
 								playfield.remove(list.get(h));
-								list.remove(list.get(h));
+								
 							}
 							else if(returned.getDefenderLeft()<=0){
 								battlescore=2;
 								playfield.remove(fiende);
-								list.remove(fiende);
+								
 							}
 							else if(returned.getAttackerLeft()>0 && returned.getDefenderLeft()>0){
 								battlescore=4;						
@@ -251,7 +251,7 @@ public class RPGGame extends GameObject {
 							if(battlescore==4){
 								   dialogNP[0]="This battle ended with no winner!\n";
 								   dialogNP[1]="you lost brave men on the field\n";
-								   dialogNP[2]=returned.getDefenderLeft()+" of your men are left";						   
+								   dialogNP[2]=returned.getAttackerLeft()+" of your men are left";						   
 								   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 								   windowHandler.setVisible(true);						   				  						   				   				   
 								   gameState=TILEI;
@@ -609,12 +609,14 @@ public class RPGGame extends GameObject {
 				if(waiting==false){		
 					if(delt==true){
 						for(int f = 0; f<list.size();f++){
-							System.out.println("del");
+							
 							playfield.remove(list.get(f));
-							list.remove(f);
+							
 							delt=false;
 						}
+						
 					}
+					list.clear();
 					int numberStartingPositions = received.getNumberTiles();
 					String theType, theOwner;
 					int hpLeft;
@@ -641,12 +643,24 @@ public class RPGGame extends GameObject {
 								
 								}
 								if(theType.equalsIgnoreCase("Knight") && !theOwner.equalsIgnoreCase(nick)){	
-									//for(int f = 0; f<list.size();f++){									
-										//playfield.remove(list.get(f));
-										//list.remove(f);
-									
-									//}			
+										
 									list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 12,8, hpLeft, 1, 1, 2, 2, "Knight",1000,false));				
+									if(map.fogofwar[xe][ye] == 0)
+										playfield.add(list.get(list.size()-1));
+									
+																
+								}
+								if(theType.equalsIgnoreCase("Infantry") && !theOwner.equalsIgnoreCase(nick)){	
+									
+									list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 3,3, hpLeft, 1, 1, 1, 2, "Infantry",1000,false));
+									if(map.fogofwar[xe][ye] == 0)
+										playfield.add(list.get(list.size()-1));
+									
+																
+								}
+								if(theType.equalsIgnoreCase("Crusader") && !theOwner.equalsIgnoreCase(nick)){	
+									
+									list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 18,12, hpLeft, 1, 1, 2, 2, "Crusader",1000,false));
 									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									
