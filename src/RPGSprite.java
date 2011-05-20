@@ -50,9 +50,10 @@ public class RPGSprite extends AdvanceSprite{
 	int sightRange=2;
 	int moveThisTurn=0;
 	double origdef;
-	
+	boolean added=false;
 	ArrayList<RPGSprite> list2;
 	GameEngine parent;
+	int origatk;
 	//Proxy p = ((Civcraft)parent).getProxy();
 	
 	public RPGSprite(GameEngine parent) {	
@@ -78,8 +79,9 @@ public class RPGSprite extends AdvanceSprite{
 		this.origdef=def;
 		this.food=food;
 		this.friend=friend;
-		//map.layer3[tileX][tileY] = this;	// mark sprite position
-
+		map.layer3[tileX][tileY] = this;	// mark sprite position
+		this.added=false;
+		this.origatk=atk;
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
 
@@ -113,7 +115,7 @@ public class RPGSprite extends AdvanceSprite{
 		this.stone=stone;
 		this.friend=friend;
 		map.layer3[tileX][tileY] = this;	// mark sprite position
-
+		this.origatk=atk;
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
 
@@ -142,6 +144,9 @@ public class RPGSprite extends AdvanceSprite{
 	}
 	public void setIron(int iron){
 		this.iron=iron;
+	}
+	public void setATK(int atk){
+		this.atk=atk;
 	}
 	public void setGunP(int gunp){
 		this.gunpowder=gunp;
@@ -505,7 +510,7 @@ public class RPGSprite extends AdvanceSprite{
 
 	public void render(Graphics2D g) {
 		// sometime the sprite/npc/event has no image
-		if (getImages() != null) {
+		if (getImages() != null && map.visible(tileX,tileY)) {
 			super.render(g);
 		}
 	}

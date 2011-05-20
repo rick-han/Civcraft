@@ -67,6 +67,7 @@ class RandomMovement implements LogicUpdater {
 				if (spr.getXX() % 2 == 0){
 					even=true;
 				}else even=false;
+				
 				if(map.layer3[spr.getXX()+1][spr.getYY()]!=null && map.layer3[spr.getXX()+1][spr.getYY()].getTyp()!="Barbarian"){
 					battle(spr, spr.getXX()+1, spr.getYY());
 					moved=true;
@@ -85,27 +86,27 @@ class RandomMovement implements LogicUpdater {
 					}
 				}
 				if(!even){
-					if(spr.getXX()-1 > 0 && spr.getYY()-1 > 0)
+					if(spr.getXX()-1 >= 0 && spr.getYY()-1 >= 0)
 						if(map.layer3[spr.getXX()-1][spr.getYY()-1]!=null && map.layer3[spr.getXX()-1][spr.getYY()-1].getTyp()!="Barbarian"){
 							battle(spr, spr.getXX()-1, spr.getYY()-1);
 							moved=true;
 							break;
 						}
 				}
-				if(spr.getXX()-1 > 0)
+				if(spr.getXX()-1 >= 0)
 					if(map.layer3[spr.getXX()-1][spr.getYY()]!=null && map.layer3[spr.getXX()-1][spr.getYY()].getTyp()!="Barbarian"){
 						battle(spr, spr.getXX()-1, spr.getYY());
 						moved=true;
 						break;
 					}
-				if(spr.getYY()-1 > 0)
+				if(spr.getYY()-1 >= 0)
 					if(map.layer3[spr.getXX()][spr.getYY()-1]!=null && map.layer3[spr.getXX()][spr.getYY()-1].getTyp()!="Barbarian"){
 						battle(spr, spr.getXX(), spr.getYY()-1);
 						moved=true;
 						break;
 					}
 				if(!even){
-					if(spr.getYY()-1 > 0)
+					if(spr.getYY()-1 >= 0)
 						if(map.layer3[spr.getXX()+1][spr.getYY()-1]!=null && map.layer3[spr.getXX()+1][spr.getYY()-1].getTyp()!="Barbarian"){
 							battle(spr, spr.getXX()+1, spr.getYY()-1);
 							moved=true;
@@ -113,7 +114,7 @@ class RandomMovement implements LogicUpdater {
 						}
 					}
 				if(even){
-					if(spr.getXX()-1 > 0)
+					if(spr.getXX()-1 >= 0)
 						if(map.layer3[spr.getXX()-1][spr.getYY()+1]!=null && map.layer3[spr.getXX()-1][spr.getYY()+1].getTyp()!="Barbarian"){
 							battle(spr, spr.getXX()-1, spr.getYY()+1);
 							moved=true;
@@ -157,13 +158,39 @@ class RandomMovement implements LogicUpdater {
 		   
 			fiende.setHP((int) (fiende.getHP()-DAU));
 			spr.setHP((int) (spr.getHP()-DDU));
-			   
-			if (fiende.getHP()<=0 || DDU<=0){	
+			
+			if (fiende.getTyp()!="City" && fiende.getHP()<=0 || DDU<=0){	
 				battlescore=1;
+				playfield.remove(fiende);									   
+				boolean sec=false;
+				for(int e = 0;e<list.size();e++){				
+					if(list.get(e).getXX() == fiende.getXX() && list.get(e).getYY() == fiende.getYY() && list.get(e).getTyp()!="City" && list.get(e).getTyp()!="Barbarian"){
+						map.layer3[fiende.getXX()][fiende.getYY()] = list.get(e);
+						sec=false;
+						break;
+					}
+					sec=true;
+				}
+				if(sec==true){
+					for(int e = 0;e<list.size();e++){
+						if(list.get(e).getXX() == fiende.getXX() && list.get(e).getYY() == fiende.getYY() && list.get(e).getTyp()=="City"){
+							map.layer3[fiende.getXX()][fiende.getYY()] = list.get(e);
+							break;
+						}
+						else map.layer3[fiende.getXX()][fiende.getYY()] = null;
+					}
+				}
+				break;
+			}
+			
+			else if (fiende.getTyp()=="City" && fiende.getHP()<=0 || DDU<=0){
+				
+				battlescore=3;
 				playfield.remove(fiende);									   
 				map.layer3[fiende.getXX()][fiende.getYY()] = null;	
 				break;					   
 			}
+			
 			else if (spr.getHP()<=0 || DAU<=0){	
 				battlescore=2;
 				playfield.remove(spr);
@@ -186,6 +213,15 @@ class RandomMovement implements LogicUpdater {
 			dialogNP[0]="Your "+fiende.getTyp()+" was attacked\n";
 			dialogNP[1]="by a barbarian and died, lol";
 			dialogNP[2]="";			
+			list.remove(fiende);
+			RPGGame.windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
+			RPGGame.windowHandler.setVisible(true);   
+			RPGGame.gameState=6;			
+		}
+		if(battlescore==3){						
+			dialogNP[0]="Your "+fiende.getTyp()+" was attacked\n";
+			dialogNP[1]="by barbarians and was destroyed.\n";
+			dialogNP[2]="You should have had units placed in it!";			
 			list.remove(fiende);
 			RPGGame.windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 			RPGGame.windowHandler.setVisible(true);   

@@ -26,8 +26,8 @@ public class MyPackLyss implements PacketListener{
 		}
 		
 		public void newTurn(Result received){	
-			System.out.println("ny turn");
-			//RPGGame.delt=true;
+			TurnBar.line1=("Its your turn!");
+			TurnBar.initResources();
 			RPGGame.received=received;
 			RPGGame.waiting=false;
 			Map.received=received;

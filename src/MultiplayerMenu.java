@@ -32,7 +32,7 @@ public class MultiplayerMenu extends GameObject{
 		nickText = new TTextField("abc", 150, 80, 150, 25);
 		
 		TLabel hostLabel = new TLabel("Host:", 150, 110, 200, 40);
-		hostText = new TTextField("192.168.1.3", 150, 150, 150, 25);
+		hostText = new TTextField("dvk.fishface.se", 150, 150, 150, 25);
 		
 		TLabel portLabel = new TLabel("Port:", 150, 180, 200, 40);
 		portText = new TTextField("1339", 150, 210, 80, 25);

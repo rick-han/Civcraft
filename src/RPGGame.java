@@ -58,6 +58,7 @@ public class RPGGame extends GameObject {
 	RPGGame civ;
 	int xe;
 	int ye;
+	TurnBar turnBar;
 	static GameEngine parent2;
 	public static Result received;
 	static String nick;
@@ -71,6 +72,8 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void initResources() {	
+		turnBar = new TurnBar(parent);
+		
 		actionBar = new ActionBar(parent);
 		windowHandler = new WindowHandler(parent);
 		windowHandler.initResources();	
@@ -85,28 +88,18 @@ public class RPGGame extends GameObject {
 				return (int) (((Sprite) o1).getY()-((Sprite) o2).getY());
 			}
 		});
-		//if(multiplayer==true){
-			
-			//if(MyPackLyss.theType.equalsIgnoreCase("Knight")){
-				
-				//list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4),xe,ye, 3, RPGSprite.LEFT, 12,8, 100, 1, 1, 2, 2, "Knight",1000,true));
-				//playfield.add(list.get(list.size()-1));
-				//ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
-				//map.setToCenter(list.get(list.size()-1));
-				//actionBar.initResources();
-			//}
-			
-	//	}
+		
 		if(multiplayer==false){
 			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
 			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,4, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
 		
 			playfield.add(list.get(0));
 			playfield.add(list.get(1));
-		
+			TurnBar.send(list.get(0), playfield, map.layer3, list, this, map);
 			ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
 			map.setToCenter(list.get(0));
 			actionBar.initResources();
+			TurnBar.initResources();
 			for (int i=0; i < list.size(); i++ )
 				Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
 		
@@ -116,6 +109,8 @@ public class RPGGame extends GameObject {
 					
 		
 		if(multiplayer==true){
+			TurnBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+			TurnBar.initResources();
 			int numberStartingPositions = received.getNumberTiles();
 			String theType, theOwner;
 			for(int i=0; i<numberStartingPositions; i++){
@@ -282,6 +277,15 @@ public class RPGGame extends GameObject {
 								   fiende.setDEF(fiende.getDEF()*2);						   
 								   break;
 							   }
+						   
+						   }
+						   for(j=0; j<list.size(); j++){
+							   int ys = fiende.getYY();
+							   int xs = fiende.getXX();
+							   if(xs == list.get(j).getXX() && ys == list.get(j).getYY() && list.get(j).getTyp()=="SiegeTower"){
+								   fiende.setATK(fiende.getATK()*2);						   
+								   break;
+							   }else fiende.setATK(fiende.origatk);
 						   
 					 	  }
 					   					  
@@ -723,8 +727,10 @@ public class RPGGame extends GameObject {
 		
 		
 		
-		if(list.size() > 0)
+		if(list.size() > 0){
 			actionBar.update(elapsedTime);
+			turnBar.update(elapsedTime);
+		}
 		windowHandler.update(elapsedTime);
 		
 	
@@ -740,9 +746,10 @@ public class RPGGame extends GameObject {
 			dialog.render(g);
 			windowHandler.render(g);
 		}
-		if(list.size() > 0)
+		if(list.size() > 0){
 			actionBar.render(g);
-		
+			turnBar.render(g);
+		}
 	}
 	
 	public void sendList(){		
@@ -781,7 +788,7 @@ public class RPGGame extends GameObject {
 				list.get(i).mov = true;
 				list.get(i).moveThisTurn = 0;
 				if (list.get(i).getTyp() != "City" && list.get(i).getTyp() != "Barbarian"){
-					list.get(i).setFood(list.get(i).getFood()-1);							
+					list.get(i).setFood(list.get(i).getFood()-1);
 				}
 				if (list.get(i).getTyp() != "City" && list.get(i).getFood() <=0 && list.get(i).getTyp() != "Barbarian" && list.get(i).getTyp() != "City" && list.get(i).getTyp() != "Mine"){
 					map.layer3[list.get(i).getXX()][list.get(i).getYY()]=null;
@@ -795,16 +802,21 @@ public class RPGGame extends GameObject {
 			waiting=true;
 			gameState=WAIT;					
 		}
+		map.updateFogOfWar();
+		for (int i = 0; i < list.size(); i++){
+			if (list.get(i).friend){
+				Map.reveal(list.get(i).tileX, list.get(i).tileY, list.get(i).move);
+			}
+		} 
 	}
 	public void spawnBarb(){
-		if(turn>=10){
+		if(turn>25){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
-			if (rand.nextInt(10)==0 && Map.fogofwar[x][y] >= 0){
-				list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",logic));
-				//list.add(new RPGSprite(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,2, 100, 1, 1, 1, 2, "Barbarian",1000, false));
-				playfield.add(list.get(list.size()-1));
-				//Map.reveal(x,y,2);
+			if (rand.nextInt(20)== 0){
+				list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,5, 100, 1, 1, 1, 2, "Barbarian",logic));
+				Map.send(playfield, list, this);
+				
 			}
 		}
 	}

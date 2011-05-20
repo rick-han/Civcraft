@@ -15,7 +15,8 @@ public class Map extends AbstractTileBackground2 {
 	public static final int TILE_WIDTH = 32, TILE_HEIGHT = 32;
 
 	Chipset		chipsetE;
-	Chipset		terrainAddonChipset;
+	Chipset 	terrainChipset, terrainDarkChipset;
+	Chipset		terrainAddonChipset, terrainAddonDarkChipset;
 	Chipset 	chipsetEs;
 	Chipset 	fogOfWarChipset;
 	Chipset[] 	chipset;	
@@ -25,8 +26,8 @@ public class Map extends AbstractTileBackground2 {
 	static PlayField2 playfield;
 	RPGSprite[][] layer3;	// the object/event/npc tiles
 	int a=32, b=32;
+	int lwrlmt = 40, uprlmt = 80; //när kartar återgår till oexplored, lwrlmt är grått.
 	static RPGGame own;
-	Chipset terrainChipset;
 	static ArrayList<RPGSprite> list2;
 	static int numT = MyPackLyss.numT;
 	static boolean multiplayer=false;
@@ -76,19 +77,23 @@ public class Map extends AbstractTileBackground2 {
 					if (layer1[i][j] == 11)
 						layer2[i][j] = 0;
 					else if (layer1[i][j] == 8)
-						layer2[i][j] = 2;
+						layer2[i][j] = 1;
 					else if (layer1[i][j] == 9)
 						layer2[i][j] = 3;
+					else if (layer1[i][j] == 2)
+						layer2[i][j] = 5;
+					else if (layer1[i][j] == 4)
+						layer2[i][j] = 4;
 					else
 						layer2[i][j] = -1;
-					fogofwar[i][j] = 0;
+					fogofwar[i][j] = 0;//uprlmt;
 				}
 			}
 		}
 		if(multiplayer==true){
 			for (int j=0;j < ((ArrayList) k.get(0)).size();j++) {
 				for (int i=0;i < k.size();i++) {
-					fogofwar[i][j] = 1;
+					fogofwar[i][j] = uprlmt;
 				}
 			}
 		}
@@ -97,7 +102,9 @@ public class Map extends AbstractTileBackground2 {
 		
 		fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
 		terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 12, 1));
+		terrainDarkChipset = new Chipset(bsLoader.getImages("TerrainDarkSpriteSheet.png", 12, 1));
 		terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 6, 1));
+		terrainAddonDarkChipset = new Chipset(bsLoader.getImages("TerrainAddonDarkSpriteSheet.png", 6, 1));
 		
 		/*
 		chipset = new Chipset[16];
@@ -119,14 +126,24 @@ public class Map extends AbstractTileBackground2 {
 				
 		// render Fog of War
 		//g.drawImage(fogOfWarChipset.image2, x, y, null);
+		if(list2!=null){
+			for(int h=0;h<list2.size();h++){
+				RPGSprite unit = list2.get(h);
+				if(unit.getTyp()=="Barbarian" && fogofwar[unit.getXX()][unit.getYY()] > uprlmt && unit.added==false){
+					playfield.add(unit);
+					unit.added=true;
+				}
+			}
+			
+		}
+		
 		if(multiplayer==true){
 			int tilenum = layer1[tileX][tileY];
 			int fognum = fogofwar[tileX][tileY];
 			
 			// render layer 1
 			g.drawImage(fogOfWarChipset.image2, x, y, null);
-			if (fognum < 1){		
-			
+			if (fognum < lwrlmt){		
 				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Desert")){			
 					g.drawImage(terrainChipset.image[2], x, y, null);
 				}
@@ -176,25 +193,80 @@ public class Map extends AbstractTileBackground2 {
 				// render layer 2
 				int tilenum2 = layer2[tileX][tileY];
 				//if (tilenum2 != -1)
-				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
+				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);
+			}
+			else if (fognum >= lwrlmt && fognum < uprlmt){	
+				
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Desert")){			
+					g.drawImage(terrainDarkChipset.image[2], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Rain Forrest")){
+					g.drawImage(terrainDarkChipset.image[4], x, y, null);
+					g.drawImage(terrainAddonDarkChipset.image[5], x, y, null);	
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Hills")){
+					g.drawImage(terrainDarkChipset.image[4], x, y, null);
+					g.drawImage(terrainAddonDarkChipset.image[1], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Tundra")){
+					g.drawImage(terrainDarkChipset.image[6], x, y, null);				
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Broadleaf Forrest")){
+					g.drawImage(terrainDarkChipset.image[2], x, y, null);
+					g.drawImage(terrainAddonDarkChipset.image[4], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Marsh")){
+					g.drawImage(terrainDarkChipset.image[4], x, y, null);
+					
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea")){
+					g.drawImage(terrainDarkChipset.image[1], x, y, null);	
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean")){
+					g.drawImage(terrainDarkChipset.image[0], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains")){
+					g.drawImage(terrainDarkChipset.image[3], x, y, null);
+					g.drawImage(terrainAddonDarkChipset.image[0], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Plains")){
+					g.drawImage(terrainDarkChipset.image[5], x, y, null);
+					
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Conifer Forrest")){
+					g.drawImage(terrainDarkChipset.image[3], x, y, null);
+					g.drawImage(terrainAddonDarkChipset.image[3], x, y, null);
+				}
+				if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Grassland")){
+					g.drawImage(terrainDarkChipset.image[3], x, y, null);
+					
+				}
+				// render layer 2
+				int tilenum2 = layer2[tileX][tileY];
+				//if (tilenum2 != -1)
+				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);
 			}
 		}
-		
 		if(multiplayer==false){
-			
 			g.drawImage(fogOfWarChipset.image2, x, y, null);
 
 			int tilenum = layer1[tileX][tileY];
 			int fognum = fogofwar[tileX][tileY];
 			// render layer 1
-			if (fognum < 1){
+			if (fognum < lwrlmt){
 				g.drawImage(terrainChipset.image[tilenum], x, y, null);
 				// render layer 2
 				int tilenum2 = layer2[tileX][tileY];
 				if (tilenum2 != -1)
 					g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);		
-			}		
-
+			}
+			else if (fognum >= lwrlmt && fognum < uprlmt){
+				g.drawImage(terrainDarkChipset.image[tilenum], x, y, null);
+				// render layer 2
+				int tilenum2 = layer2[tileX][tileY];
+				if (tilenum2 != -1)
+					g.drawImage(terrainAddonDarkChipset.image[tilenum2], x, y-6, null);
+			}
 		}
 		
 	}
@@ -216,10 +288,13 @@ public class Map extends AbstractTileBackground2 {
 			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11)			
 				return true;
 			if(layer3[tileX][tileY] != null){
-				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City")		
-					return true;					
+								
 				if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
 					return false;
+				if(layer3[tileX][tileY].getTyp()=="SiegeTower" && layer3[tileX][tileY].friend==unit.friend)
+					return false;
+				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City" || layer3[tileX][tileY].getTyp()!="SiegeTower")		
+					return true;	
 			}
 			
 		}
@@ -241,7 +316,7 @@ public class Map extends AbstractTileBackground2 {
 				int ys = list2.get(h).getYY();		    			
 				if (layer3[tileX][tileY] != null)
 					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
-						return false;						
+						return false;
 			}
 			if(layer1[tileX][tileY] != 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] !=1)
 				return true;
@@ -286,14 +361,34 @@ public class Map extends AbstractTileBackground2 {
 
 	public boolean isOccupied(double tileX, double tileY) {
 		try {
-		    return (layer1[(int) tileX][(int) tileY] == 0 ||
-		    		layer1[(int) tileX][(int) tileY] == 1 ||
-		    		layer1[(int) tileX][(int) tileY] == 11 ||
+			return (layer1[(int) tileX][(int) tileY] == 0 ||
+					layer1[(int) tileX][(int) tileY] == 1 ||
+					layer1[(int) tileX][(int) tileY] == 11 ||
 					layer3[(int) tileX][(int) tileY] != null);
 		} catch (Exception e) {
 			// out of bounds
 			return true;
 		} }
+
+
+void updateFogOfWar(){
+	if(multiplayer==false){
+		for (int j=0;j < layer1[0].length;j++) {
+			for (int i=0;i < layer1.length;i++) {
+				if (fogofwar[i][j] <= uprlmt)
+					fogofwar[i][j]++;
+			}
+		}
+	}
+	if(multiplayer==true){
+		for (int j=0;j < ((ArrayList) k.get(0)).size();j++) {
+			for (int i=0;i < k.size();i++) {
+				if (fogofwar[i][j] <= uprlmt)
+					fogofwar[i][j]++;
+			}
+		}
+	}
+}
 
 public static void reveal(int tileX, int tileY, int sightRange){
 	int current = 1;
@@ -374,6 +469,15 @@ private static void revealRedux(int tileX, int tileY, int sightRange, int curren
 			revealRedux(tileX, tileY+1, sightRange, current);		
 		}
 	}
+}
+
+public boolean visible(int x, int y){
+	if (fogofwar[x][y] < lwrlmt)
+		return true;
+	else if (fogofwar[x][y] < uprlmt && (layer3[x][y].typ.equalsIgnoreCase("city") || layer3[x][y].typ.equalsIgnoreCase("mine"))) //lägg till fler undantag kanske med en metod
+		return true;
+	else
+		return false;
 }
 
 private void mapGenerator(int bas){
