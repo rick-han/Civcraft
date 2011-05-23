@@ -94,8 +94,31 @@ public class RPGGame extends GameObject {
 		});
 		
 		if(multiplayer==false){
-			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-			list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0,4, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+			if (map.sizeX==1 && map.sizeY == 1){
+				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+			}
+			else{
+				int rX = rand.nextInt(map.maxX+1);
+				int rY = rand.nextInt(map.maxY+1);
+				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX, rY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				int rX2=(rand.nextInt(7))-3;
+				int rY2=(rand.nextInt(7))-3;
+				if (rX+rX2>map.maxX && rY+rY2>map.maxY)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), map.maxX, map.maxY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else if (rX+rX2>map.maxX)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), map.maxX, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else if (rY+rY2>map.maxY)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, map.maxY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else if (rX+rX2<0 && rY+rY2<0)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else if (rX+rX2<0)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else if (rY+rY2<0)
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				else
+					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+			}
 		
 			playfield.add(list.get(0));
 			playfield.add(list.get(1));

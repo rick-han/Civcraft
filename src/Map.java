@@ -86,7 +86,7 @@ public class Map extends AbstractTileBackground2 {
 						layer2[i][j] = 4;
 					else
 						layer2[i][j] = -1;
-					fogofwar[i][j] = 0;//uprlmt;
+					fogofwar[i][j] = uprlmt;
 				}
 			}
 		}
@@ -372,7 +372,7 @@ public class Map extends AbstractTileBackground2 {
 					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
 						return false;
 			}
-			if(layer1[tileX][tileY] != 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] !=1)
+			if(layer1[tileX][tileY] != 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] !=0)
 				return true;
 			if(layer3[tileX][tileY] != null){
 				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City")		
@@ -587,21 +587,24 @@ private void mapGenerator(int bas){
 	}
 	
 	r = rand.nextInt(4)+2;
-	for (int i = 0; i < r; i++){
-		spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,1);
-		spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),0);
-	}
-	r = rand.nextInt(4)+2;;
-	for (int i = 0; i < r; i++){
-		r = rand.nextInt(3);
-		switch (r){
-			case 0:{ 
-				spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,tilePicker());
-				break;
+	if (sizeX > 5 && sizeY > 5){
+		for (int i = 0; i < r; i++){
+			spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,1);
+			spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),0);
+		
+		}
+		r = rand.nextInt(4)+2;
+		for (int i = 0; i < r; i++){
+			r = rand.nextInt(3);
+			switch (r){
+				case 0:{ 
+					spawnCircle(rand.nextInt(maxX),rand.nextInt(maxY), rand.nextInt(4)+1,tilePicker());
+					break;
+					}
+				case 1:{
+					spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),tilePicker());
+					break;
 				}
-			case 1:{
-				spawnRange(rand.nextInt(maxX),rand.nextInt(maxY),tilePicker());
-				break;
 			}
 		}
 	}

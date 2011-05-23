@@ -32,10 +32,10 @@ public class SingleplayerMenu extends GameObject{
 		nickText = new TTextField("abc", 150, 80, 150, 25);
 		
 		TLabel heightLabel = new TLabel("Height: ", 150, 110, 200, 40);
-		heightText = new TTextField("256", 150, 140, 150, 25);
+		heightText = new TTextField("50", 150, 140, 150, 25);
 		
 		TLabel widthLabel = new TLabel("Width:", 150, 170, 200, 40);
-		widthText = new TTextField("512", 150, 200, 150, 25);
+		widthText = new TTextField("30", 150, 200, 150, 25);
 		
 		TButton startButton = new TButton("Start Game", 150, 270, 90, 30){
 			public void doAction() {
