@@ -1,12 +1,10 @@
-
-
 import java.util.*;
 import java.io.*;
 import java.net.*;
 
 public class Receiver implements Runnable
 {
-
+    
 	private Result packet = null;
 	private InputStream m_inStream;
 	private OutputStream m_outStream;
@@ -34,10 +32,9 @@ public class Receiver implements Runnable
 			try
 			{
 				Thread.sleep(100);
-			}
-			catch(Throwable t){}
+			}catch(Throwable t){}
 
-			//System.out.println(getResult());
+		//	System.out.println("getResult()");
 		}
 		Result toReturn = getPacket();
        		setPacket(null);
@@ -86,9 +83,7 @@ public class Receiver implements Runnable
 		Result toReturn = new Result();
 		try
 		{
-		//	System.out.println("Waiting for header.");
 			int header = m_inStream.read();		// First the header.
-		//	System.out.println("Header: " + header);
 
 			// Header 3, welcome to the real world.
 			if(header == 3)
@@ -113,7 +108,7 @@ public class Receiver implements Runnable
 				toReturn.addOk(true);
 				setPacket(toReturn);
 			}
-		
+
 			// Header 4, a ping and answers directly with a pong.
 			else if(header == 4)
 			{
@@ -122,7 +117,7 @@ public class Receiver implements Runnable
 				toSend.add(true);
 				send(toSend);
 			}	
-	
+
 			// Header 6, listGameAnswer, returns a list of games.
 			else if(header == 6)
 			{
@@ -151,7 +146,7 @@ public class Receiver implements Runnable
 				toReturn.addLocked(receiveBool());
 
 				pl.lobbyUpdated(toReturn);
-				
+
 			}
 
 			// Header 14, Start game answer, receives the map and hopefully returns it.
@@ -221,24 +216,27 @@ public class Receiver implements Runnable
 				}
 			setPacket(toReturn);
 			}
-	
+
 		}catch(IOException e)
 		{
 			e.printStackTrace();
 		}	
 	}
 
-	// L√§ser in ett heltal fr√•n inStream:en.
+	// L‰ser in ett heltal frÂn inStream:en.
 	private int receiveInt()
 	{
-		byte[] toParse = new byte[4];
-		try
-		{
-			m_inStream.read(toParse);
-		}catch(IOException e)
-		{
-			e.printStackTrace();
-		}
+        byte[] toParse = new byte[4];
+        for(int i = 0; i < 4; i++)
+        {
+            try
+            {
+                toParse[i] += m_inStream.read();
+            }catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
 		int toReturn = ((int)toParse[0]<<24)
 				+(makeInt(toParse[1])<<16)
 				+(makeInt(toParse[2])<<8)
@@ -246,7 +244,7 @@ public class Receiver implements Runnable
 		return toReturn;
 	}
 
-	// G√∂r om 4 bytes till ett heltal.
+	// Gˆr om 4 bytes till ett heltal.
 	private int makeInt(byte b)
 	{
 		if((int)b < 0)
@@ -258,7 +256,7 @@ public class Receiver implements Runnable
 			return (int)b;
 		}
 	}
-	
+
 	// To receive Strings from the server.
 	private String receiveString() 
 	{
@@ -288,7 +286,7 @@ public class Receiver implements Runnable
 		return toReturn;
 	}
 
-	// L√§ser in en lista av heltal och returnerar den.
+	// L‰ser in en lista av heltal och returnerar den.
 	private ArrayList<Integer> receiveListInteger(int size)
 	{
 		ArrayList<Integer> toReturn = new ArrayList<Integer>();
@@ -298,9 +296,9 @@ public class Receiver implements Runnable
 		}
 		return toReturn;
 	}
-	
-	// L√§ser in en lista av str√§ngar och returnerar den.
-	
+
+	// L‰ser in en lista av str‰ngar och returnerar den.
+
 	private ArrayList<String> receiveListString(int size)
 	{
 		ArrayList<String> toReturn = new ArrayList<String>();
@@ -311,7 +309,7 @@ public class Receiver implements Runnable
 		return toReturn;
 	}
 
-	// L√§ser in en lista av listor av str√§ngar, 2D-lista av str√§ngar.
+	// L‰ser in en lista av listor av str‰ngar, 2D-lista av str‰ngar.
 	private ArrayList<ArrayList<String>> receiveListList(int size)
 	{
 		ArrayList<ArrayList<String>> toReturn = new ArrayList<ArrayList<String>>();
@@ -323,11 +321,30 @@ public class Receiver implements Runnable
 		return toReturn;
 	}
 
-	// Method for reading a boolean from the inputStream.
-	private boolean receiveBool()
-	{
-		boolean bool = false;
-		int boolVal = 0;
+    private ArrayList<Unit> receiveListUnits(int size)
+    {
+		ArrayList<Unit> toReturn = new ArrayList<Unit>();
+        for(int i=0; i<size; i++){
+            Unit tmp = receiveUnit();
+            toReturn.add(tmp);
+        }
+        return toReturn;
+    }
+
+    private Unit receiveUnit(){
+        String o = receiveString();
+        String t = receiveString();
+        int mp = receiveInt();
+        ArrayList<Unit> units = receiveListUnits(receiveInt());
+        Unit unit = new Unit(o, t, mp, units);
+        return unit;
+    }
+
+    // Method for reading a boolean from the inputStream.
+    private boolean receiveBool()
+    {
+        boolean bool = false;
+        int boolVal = 0;
 		try
 		{
 			boolVal = m_inStream.read();
@@ -346,10 +363,12 @@ public class Receiver implements Runnable
 	// Method to receive a tile from the server.
 	private void receiveTile(Result toAddTo)
 	{
-		toAddTo.setUpdatedTile(receiveInt(), receiveInt());
+        int f = receiveInt();
+        int s = receiveInt();
+		toAddTo.setUpdatedTile(f, s);
 		if(receiveBool())
 		{
-			toAddTo.setUnit(receiveString(), receiveString(), receiveInt());
+			toAddTo.setUnit(receiveUnit());
 		}
 		if(receiveBool())
 		{
@@ -357,16 +376,13 @@ public class Receiver implements Runnable
 			int size = receiveInt();
 			for(int i=0; i<size; i++)
 			{
-				toAddTo.addCityUnit(receiveString(), receiveString(), receiveInt());
+				toAddTo.addCityUnit(receiveUnit());
 			}
-			size = receiveInt();
-			ArrayList<String> buildings = receiveListString(size);
-			toAddTo.setCity(owner, receiveString(), buildings);
-		}
-		if(receiveBool())
-		{
-			toAddTo.setImprovement(receiveString());
+			toAddTo.setCity(owner, receiveString());
 		}
 		toAddTo.addUpdatedTile();
 	}
+
 }
+
+

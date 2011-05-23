@@ -531,8 +531,83 @@ public class ActionBar{
 			//actionBar.add(textField);
 			actionFrame.add(actionBar);
 							
-		}			
-		else if (spr.getTyp()!="Settler" && spr.getTyp() != "City"){
+		}
+		else if (spr.getTyp()=="Galley" || spr.getTyp()=="Caravel" || spr.getTyp()=="Trireme"){
+			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
+			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
+			actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
+		
+			TButton btn = new TButton("Move", 5, 5, 35, 30) {
+				public void doAction() {
+					RPGGame.gameState=0;
+					if(spr.getMov()){					
+						spr.selmov=true;				      
+					}
+					else if(!spr.getMov()){					
+						RPGGame.funnen=false;				      
+					}
+				     
+				
+				}
+			};
+			TButton btn2 = new TButton("Disband", 5, 45, 70, 30){
+				public void doAction(){
+					RPGGame.gameState=0;
+					RPGGame.funnen=false;
+					map.layer3[spr.getXX()][spr.getYY()]=null;
+					playfield.remove(spr);
+					list.remove(spr);
+									
+				}
+			};
+			TButton btn3 = new TButton("Fortify", 45, 5, 70, 30) {
+				public void doAction() {
+					RPGGame.gameState=0;
+					spr.setFort();
+					spr.movement();
+					RPGGame.funnen=false;
+				}
+			};
+			TButton btn4 = new TButton("Unload", 115, 5, 70, 30) {
+				public void doAction() {
+					RPGGame.gameState=0;
+					RPGGame.funnen=false;
+					for (int i =0 ; i < spr.capacity.length; i++){
+						if(spr.capacity[i]!=null){
+							spr.capacity[i].tileX = spr.tileX;
+							spr.capacity[i].tileY = spr.tileY;
+							list.add(spr.capacity[i]);
+							playfield.add(spr.capacity[i]);
+							spr.capacity[i]=null;
+						}
+					}
+				}
+			};
+			
+			line1 = ("Manpower: " + spr.getHP() + " Attack: " + spr.getATK()+" Defence: "+spr.getDEF());
+			line2 = ("Move: "+spr.getMoveLeft()+" Food: "+spr.getFood()+" Type: "+spr.getTyp());
+			//btn.setExternalUI(parent.getImages("Button.png", 2, 1, "0100", 1), false);
+			btn.setToolTipText("Use this action to move selected unit");
+			btn2.setToolTipText("Use this action to disband selected unit");
+			btn3.setToolTipText("Use this action to fortify selected unit");
+			actionBar.add(btn);
+			actionBar.add(btn3);
+			actionBar.add(btn2);
+			actionBar.add(btn4);
+			
+			if(spr.getTyp()!="City"){
+				if (spr.isFortified())
+					line2+= " Fortified";
+				textField = new TTextField(line1, 333, 5, 300, 18);
+				textField2 = new TTextField(line2, 333, 22, 300, 18);
+				actionBar.add(textField);
+				actionBar.add(textField2);
+			}			
+			actionFrame.add(actionBar);
+							
+		}
+		
+		else if (spr.getTyp()!="Settler" && spr.getTyp() != "City" && !(spr.getTyp()=="Galley" || spr.getTyp()=="Caravel" || spr.getTyp()=="Trireme")){
 			actionFrame = new FrameWork(parent.bsInput, parent.getWidth(), parent.getHeight());
 			actionBar = new TPanel(0, parent.getHeight() - ACTION_BAR_HEIGHT, parent.getWidth(), ACTION_BAR_HEIGHT);
 			actionBar.setExternalUI(parent.getImages("ActionBarImage.png", 2, 1), false);
@@ -699,7 +774,7 @@ public class ActionBar{
 			crus=false;
 		}
 		else if(RPGGame.turn - oldturn == 16 && trir){
-			list.add(new RPGSprite(own, parent.getImages("TriremeSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true));
+			list.add(new RPGSprite(own, parent.getImages("TriremeSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true, 2));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;		
 			trir=false;
@@ -711,13 +786,13 @@ public class ActionBar{
 			cann=false;
 		}
 		else if(RPGGame.turn - oldturn == 58 && gall){
-			list.add(new RPGSprite(own, parent.getImages("GalleySheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, true));
+			list.add(new RPGSprite(own, parent.getImages("GalleySheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, true, 5));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			gall=false;
 		}
 		else if(RPGGame.turn - oldturn == 70 && carav){
-			list.add(new RPGSprite(own, parent.getImages("CaravelSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true));
+			list.add(new RPGSprite(own, parent.getImages("CaravelSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true, 3));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			carav=false;

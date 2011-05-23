@@ -1,27 +1,25 @@
-
-
 import java.util.*;
 
-public class Result{
-	
-	// HÃ¤r Ã¤r medlemsvariabler som ska kunna returneras.
+class Result{
+
+	// Här är medlemsvariabler som ska kunna returneras.
 	private boolean ok = true, locked;
 	private String failMsg, hostName, chatMessage, chatName, fromWhom;
 	private List sessions, players, map, updatedTiles;
 	private int requestFail, requestOk, attackerLeft, defenderLeft;
 
-	// HÃ¤r Ã¤r medlemsvariabler som bara Ã¤r hjÃ¤lpvariabler till vissa metoder.
-	private List cityUnits = new ArrayList<Unit>();
+	// Här är medlemsvariabler som bara är hjälpvariabler till vissa metoder.
+	private List<Unit> cityUnits = new ArrayList<Unit>();
 	private Tile temp;
 
 	public Result(){
 	}
 
 	// --------------------------------------------
-	// HÃ¤r under Ã¤r setters/tillÃ¤ggsfunktioner!
+	// Här under är setters/tilläggsfunktioner!
 	//
-	// FÃ¶rst sÃ¥ kommer booleans.
-	
+	// Först så kommer booleans.
+
 	public void addOk(boolean ok){
 		this.ok = ok;
 	}
@@ -30,7 +28,7 @@ public class Result{
 		this.locked = locked;
 	}
 
-	// Sen sÃ¥ kommer strÃ¤ngar.
+	// Sen så kommer strängar.
 
 	public void addFailMsg(String msg){
 		failMsg = msg;
@@ -48,8 +46,8 @@ public class Result{
 		fromWhom = name;
 	}
 
-	// HÃ¤r nedan Ã¤r det fÃ¶r listor.
-	
+	// Här nedan är det för listor.
+
 	public void addSessions(List sessions){
 		this.sessions = sessions;
 	}
@@ -76,10 +74,10 @@ public class Result{
 		defenderLeft = defLeft;
 	}
 
-	// Sets fÃ¶r komplexa strukturer.
-	
-	// FÃ¶r listan med spelare fÃ¶rst.
-	
+	// Sets för komplexa strukturer.
+
+	// För listan med spelare först.
+
 	public void setupPlayers(){
 		players = new ArrayList<Player>();
 	}
@@ -88,7 +86,7 @@ public class Result{
 		players.add(new Player(name, civ));
 	}
 
-	// Sen till den aningen stÃ¶rre fÃ¶r listan med uppdaterade tiles.
+	// Sen till den aningen större för listan med uppdaterade tiles.
 
 	public void setupTiles(){
 		updatedTiles = new ArrayList<Tile>();
@@ -98,16 +96,16 @@ public class Result{
 		temp = new Tile(new Position(x, y));
 	}
 
-	public void setUnit(String owner, String type, int manPower){
-		temp.addUnit(new Unit(owner, type, manPower));
+	public void setUnit(Unit unit){
+		temp.addUnit(unit);
 	}
 
-	public void addCityUnit(String owner, String type, int manPower){
-		cityUnits.add(new Unit(owner, type, manPower));
+	public void addCityUnit(Unit unit){
+		cityUnits.add(unit);
 	}
 
-	public void setCity(String owner, String name, List<String> buildings){
-		temp.addCity(new City(owner, name, buildings, cityUnits));
+	public void setCity(String owner, String name){
+		temp.addCity(new City(owner, name, cityUnits));
 	}
 
 	public void setImprovement(String name){
@@ -118,11 +116,11 @@ public class Result{
 		updatedTiles.add(temp);
 	}
 
-	// HÃ¤r slutar setters/tillÃ¤ggsfunktioner.
+	// Här slutar setters/tilläggsfunktioner.
 	// --------------------------------------------
-	// HÃ¤r under Ã¤r getters!
+	// Här under är getters!
 	//
-	// FÃ¶rst booleans.
+	// Först booleans.
 
 	public boolean getOk(){
 		return ok;
@@ -132,7 +130,7 @@ public class Result{
 		return locked;
 	}
 
-	// Sen StrÃ¤ngar.
+	// Sen Strängar.
 
 	public String getFailMsg(){
 		return failMsg;
@@ -150,7 +148,7 @@ public class Result{
 		return fromWhom;
 	}
 
-	// Under finns getters fÃ¶r listor.
+	// Under finns getters för listor.
 
 	public List getSessions(){
 		return sessions;
@@ -160,7 +158,7 @@ public class Result{
 		return map;
 	}
 
-	// HÃ¤r kommer getters fÃ¶r heltal.
+	// Här kommer getters för heltal.
 
 	public int getRequestFail(){
 		return requestFail;
@@ -178,10 +176,10 @@ public class Result{
 		return defenderLeft;
 	}
 
-	// HÃ¤r under kommer det att finnas getters fÃ¶r dom mer komplexa strukturerna.
+	// Här under kommer det att finnas getters för dom mer komplexa strukturerna.
 	//
-	// BÃ¶rjar med get fÃ¶r spelare.
-	
+	// Börjar med get för spelare.
+
 	public int getNumberPlayers(){
 		return players.size();
 	}
@@ -194,7 +192,7 @@ public class Result{
 		return ((Player)players.get(n)).getCiv();
 	}
 
-	// Och sen fÃ¶r den gigantiska Tile-klassen som dessutom dÃ¥ Ã¤r i en lista.
+	// Och sen för den gigantiska Tile-klassen som dessutom då är i en lista.
 
 	public int getNumberTiles(){
 		return updatedTiles.size();
@@ -229,6 +227,10 @@ public class Result{
 		return ((Tile)updatedTiles.get(n)).getUnit().getManPower();
 	}
 
+    public List<Unit> getUnitUnits(int n){
+        return ((Tile)updatedTiles.get(n)).getUnit().getUnits();
+    }
+
 	public boolean existCity(int n){
 		if(((Tile)updatedTiles.get(n)).getCity() != null){
 			return true;
@@ -244,10 +246,6 @@ public class Result{
 
 	public String getCityName(int n){
 		return ((Tile)updatedTiles.get(n)).getCity().getName();
-	}
-
-	public List<String> getCityBuildings(int n){
-		return ((Tile)updatedTiles.get(n)).getCity().getBuildings();
 	}
 
 	public int getAmountCityUnits(int n){
@@ -270,46 +268,17 @@ public class Result{
 		return ((Tile)updatedTiles.get(n)).getImprovement();
 	}
 
-	// HÃ¤r slutar getters.
+	// Här slutar getters.
 	// --------------------------------------------
-	// HÃ¤r under Ã¤r nestlade klasser fÃ¶r ytterligare containers!
-	
-	private class Unit{
-		private String owner, type;
-		private int manPower;
-
-		public Unit(String owner, String type, int manPower){
-			this.owner = owner;
-			this.type = type;
-			this.manPower = manPower;
-		}
-
-		public String getOwner(){
-			return owner;
-		}
-
-		public String getType(){
-			return type;
-		}
-
-		public int getManPower(){
-			return manPower;
-		}
-
-		public String toString(){
-			return "Unit type: " + type + "\nUnit owner: " + owner + "\nUnit manpower: " + manPower + "\n";
-		}
-	}
+	// Här under är nestlade klasser för ytterligare containers!
 
 	private class City{
 		private String owner, name;
-		private List<String> buildings;
 		private List<Unit> units;
 
-		public City(String owner, String name, List<String> buildings, List<Unit> units){
+		public City(String owner, String name, List<Unit> units){
 			this.owner = owner;
 			this.name = name;
-			this.buildings = buildings;
 			this.units = units;
 		}
 
@@ -321,22 +290,16 @@ public class Result{
 			return name;
 		}
 
-		public List<String> getBuildings(){
-			return buildings;
-		}
-
 		public int getAmountUnits(){
 			return units.size();
 		}
-
-		
 
 		public Unit getUnit(int n){
 			return units.get(n);
 		}
 
 		public String toString(){
-			return "City name: " + name + "\nCity owner: " + owner + "\nBuildings in city: " + buildings + "\nUnits in city: " + units + "\n";
+			return "City name: " + name + "\nCity owner: " + owner + "\nUnits in city: " + units + "\n";
 		}
 	}
 
@@ -425,8 +388,8 @@ public class Result{
 		}
 	}
 
-	// TÃ¤nkte lÃ¤gga en toString hÃ¤r nedan, om man vill se det mesta kommer den bli cp-lÃ¥ng.
-	
+	// Tänkte lägga en toString här nedan, om man vill se det mesta kommer den bli cp-lång.
+
 	public String toString(){
 		return "Request accepted: " + ok + "\n" + updatedTiles;
 	}

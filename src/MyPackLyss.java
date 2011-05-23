@@ -65,7 +65,7 @@ public class MyPackLyss implements PacketListener{
 				} if(received.existCity(i)){
 					String theOwner = received.getCityOwner(i);
 					String theName = received.getCityName(i);
-					ArrayList<String> buildings = (ArrayList<String>) received.getCityBuildings(i);
+					
 					int amountCityUnits = received.getAmountCityUnits(i);
 					for(int j=0; j<amountCityUnits; j++){
 						String cityUnitOwner = received.getCityUnitOwner(i, j);

@@ -119,7 +119,46 @@ public class Map extends AbstractTileBackground2 {
 		
 		
 	}
-
+    public Map(BaseLoader bsLoader, BaseIO bsIO, GameEngine parent, String nick, int mapHeight, int mapWidth){
+		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
+		this.parent = parent;
+		this.nick=nick;
+		maxX=mapHeight-1;
+		maxY=mapWidth-1;
+		sizeX=mapHeight;
+		sizeY=mapWidth;
+		layer1 = new int[sizeX][sizeY];
+		layer2 = new int[sizeX][sizeY];
+		layer3 = new RPGSprite[sizeX][sizeY];		
+		fogofwar = new int[sizeX][sizeY];
+		mapGenerator(1);
+		if(multiplayer==false){
+			for (int j=0;j < layer1[0].length;j++) {
+				for (int i=0;i < layer1.length;i++) {
+					if (layer1[i][j] == 11)
+						layer2[i][j] = 0;
+					else if (layer1[i][j] == 8)
+						layer2[i][j] = 1;
+					else if (layer1[i][j] == 9)
+						layer2[i][j] = 3;
+				else if (layer1[i][j] == 2)
+					layer2[i][j] = 5;
+				else if (layer1[i][j] == 4)
+					layer2[i][j] = 4;
+				else
+					layer2[i][j] = -1;
+				fogofwar[i][j] = 0;//uprlmt;
+			}
+		}
+	}
+	// set the actual map size based on the read file
+	setSize(sizeX, sizeY);
+	fogOfWarChipset = new Chipset(bsLoader.getImage("FoW.png"));
+	terrainChipset = new Chipset(bsLoader.getImages("TerrainSpriteSheet.png", 12, 1));
+	terrainDarkChipset = new Chipset(bsLoader.getImages("TerrainDarkSpriteSheet.png", 12, 1));
+	terrainAddonChipset = new Chipset(bsLoader.getImages("TerrainAddonSpriteSheet.png", 6, 1));
+	terrainAddonDarkChipset = new Chipset(bsLoader.getImages("TerrainAddonDarkSpriteSheet.png", 6, 1));
+	}
 	public void renderTile(Graphics2D g,
 						   int tileX, int tileY,
 						   int x, int y) {
@@ -282,19 +321,34 @@ public class Map extends AbstractTileBackground2 {
 				int xs = list2.get(h).getXX();
 				int ys = list2.get(h).getYY();		    			
 				if (layer3[tileX][tileY] != null)
-					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
-						return false;						
+					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")
+						return false;
 			}
-			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11)			
-				return true;
-			if(layer3[tileX][tileY] != null){
+			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11){
+				if(layer3[tileX][tileY] != null){
+					for (int i = 0; i < list2.size(); i++){
+						if (layer3[tileX][tileY].friend==true && layer3[tileX][tileY].checkCapacity()){
+							for (int j = 0; j < layer3[tileX][tileY].capacity.length; j++){
 								
+								if (layer3[tileX][tileY].capacity[i]==null){
+									layer3[tileX][tileY].capacity[i]=unit;
+									layer3[tileX][tileY]=null;
+									RPGGame.bordat=true;
+									return false;
+								}
+							}
+						}
+					}
+				}
+				return true;
+			}
+			if(layer3[tileX][tileY] != null){
 				if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
 					return false;
 				if(layer3[tileX][tileY].getTyp()=="SiegeTower" && layer3[tileX][tileY].friend==unit.friend)
 					return false;
 				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City" || layer3[tileX][tileY].getTyp()!="SiegeTower")		
-					return true;	
+					return true;
 			}
 			
 		}

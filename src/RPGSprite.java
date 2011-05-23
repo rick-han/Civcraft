@@ -54,6 +54,8 @@ public class RPGSprite extends AdvanceSprite{
 	ArrayList<RPGSprite> list2;
 	GameEngine parent;
 	int origatk;
+	int cap = 0;
+	RPGSprite[] capacity = null;
 	//Proxy p = ((Civcraft)parent).getProxy();
 	
 	public RPGSprite(GameEngine parent) {	
@@ -90,7 +92,42 @@ public class RPGSprite extends AdvanceSprite{
 
 		speed = 0.04*moveSpeed;
 	}
-	
+	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
+			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, int food, boolean friend, int cap) {
+		super(images,(tileX*32)-8,(tileY*32)-32);
+
+
+		this.owner = owner;
+		this.map = owner.map;
+		this.tileX = tileX;
+		this.tileY = tileY;
+		this.hp=hp;
+		this.atk=atk;
+		this.def=def;
+		this.typ=typ;
+		this.hit=hit;
+		this.range=range;
+		this.sightRange=sightRange;
+		this.move=move;
+		this.origdef=def;
+		this.food=food;
+		this.friend=friend;
+		map.layer3[tileX][tileY] = this;	// mark sprite position
+		this.added=false;
+		this.origatk=atk;
+		this.cap=cap;
+		capacity = new RPGSprite[cap];
+		for (int i = 0; i < capacity.length; i++){
+			capacity[i]=null;
+		}
+		// init status, standing facing direction
+		setAnimation(STANDING, direction);
+
+		// the animation speed related with movement speed
+		getAnimationTimer().setDelay(550/moveSpeed);
+
+		speed = 0.04*moveSpeed;
+	}
 	//konstruktor för bombardment units.
 	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
 			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, int food, int stone, int gunpowder, int iron, boolean friend) {
@@ -252,7 +289,17 @@ public class RPGSprite extends AdvanceSprite{
 			updateLogic(elapsedTime);
 		}
 	}
-
+	public boolean checkCapacity(){
+		if (capacity==null){
+			System.out.print("capacity null");
+			return false;
+		}
+		for(int i = 0; i < capacity.length; i++){
+			if (capacity[i]==null)
+				return true;
+		}
+		return false;
+	}
 	// the npc is standing and do nothing, time to think what to do next
 	protected void updateLogic(long elapsedTime) { }
     

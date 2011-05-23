@@ -18,9 +18,15 @@ public class Lobby extends GameObject{
 	Proxy p;
 	String tmp;
 	TTextField toJoinText;
+	TTextField newCivText;
 	TLabel listItemsLabel;
-	TLabel hostItemsLabel;
 	TButton startButton;
+	TButton hostButton;
+	TButton joinButton;
+	TButton newCivButton;
+	TLabel hostItemsLabel;
+	TButton listButton;
+	TButton leaveButton;
 	public Lobby(GameEngine parent) {
 		super(parent);
 		this.parent = parent;
@@ -32,51 +38,100 @@ public class Lobby extends GameObject{
 		background = getImage("Title.png", false);
 		GameFont externalFont = fontManager.getFont(new Font("Arial", Font.BOLD, 16));
 		TLabel msgLabel = new TLabel("Lobby", 150, 10, 200, 25);
+		
+		listItemsLabel = new TLabel("", 40, 50, 255, 305);
+		listGames();
+		toJoinText = new TTextField("", 40, 410, 150 ,30);
+		frame.add(toJoinText);
+		hostItemsLabel = new TLabel("", 315, 50, 300, 235);
+		newCivText = new TTextField("", 315, 380, 110 ,30);
+		frame.add(newCivText);
+		newCivButton =new TButton("Change Civilisation", 445, 380, 180, 30) {
+			public void doAction() {
+				changeCivilisation(newCivText.getText());
+			}
+		};
+		listButton =new TButton("List", 40, 370, 80, 30) {
+			public void doAction() {
+				listGames();
+			}
+		};
+		joinButton = new TButton("Join", 210, 410, 80, 30) {
+			public void doAction() {
+				joinGame();
+			}
+		};
+		hostButton = new TButton("Host", 315, 300, 90, 30){
+			public void doAction() {
+				hostGame();
+			}
+		};
+		startButton = new TButton("Start Game", 425, 300, 140, 30){
+			public void doAction() {
+				startGame();
+			}
+		};
+		leaveButton = new TButton("Leave Game", 315, 340, 160, 30){
+			public void doAction(){
+				leaveGame();
+			}
+		};
+		startButton.setEnabled(false);
+		leaveButton.setEnabled(false);
+		newCivButton.setEnabled(false);
+		frame.add(startButton);
+		frame.add(hostButton);
+		frame.add(joinButton);
+		frame.add(listButton);
+		frame.add(leaveButton);
+		frame.add(newCivButton);
+		listItemsLabel.UIResource().put("Background Color", Color.orange);
+		listItemsLabel.UIResource().put("Text Font", externalFont);
+		listItemsLabel.UIResource().put("Text Color", Color.RED);
+		hostItemsLabel.UIResource().put("Background Color", Color.orange);
+		hostItemsLabel.UIResource().put("Text Font", externalFont);
+		hostItemsLabel.UIResource().put("Text Color", Color.RED);
+		toJoinText.UIResource().put("Text Font", externalFont);
+		msgLabel.UIResource().put("Text Font", externalFont);
+		msgLabel.UIResource().put("Text Color", Color.RED);
+		frame.add(msgLabel);
+		frame.add(listItemsLabel);
+		frame.add(hostItemsLabel);
+	}
+	public void changeCivilisation(String civ){
+		try{
+			p.changeCiv(civ);
+		}
+		catch(FailedException fe){
+			System.out.println(fe);
+		}
+	}
+	public void leaveGame(){
+		hostItemsLabel.setText("");
+		try{
+			p.leaveGame();
+		}catch(FailedException fe){
+			System.out.println(fe);
+		}
+		listButton.setEnabled(true);
+		leaveButton.setEnabled(false);
+		hostButton.setEnabled(true);
+		joinButton.setEnabled(true);
+		startButton.setEnabled(false);
+		newCivButton.setEnabled(false);
+		listGames();
+	}
+	public void listGames(){
 		try {
 			returned = p.listGames();
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}
 		Iterator iter = returned.getSessions().iterator();
-		listItemsLabel = new TLabel("", 70, 30, 170, 220);
-		
+		listItemsLabel.setText("");
 		while (iter.hasNext()){
-			listItemsLabel.setText(listItemsLabel.getText() + (String)iter.next());
+			listItemsLabel.setText(listItemsLabel.getText() + "\n" + (String)iter.next());
 		}
-		
-		toJoinText = new TTextField("", 70, 410, 70 ,30);
-		frame.add(toJoinText);
-		
-		TButton joinButton =new TButton("Join", 140, 410, 60, 30) {
-			public void doAction() {
-				joinGame();
-			}
-		};
-		hostItemsLabel = new TLabel("", 260, 30, 100, 150);
-		TButton hostButton = new TButton("Host", 260, 190, 70, 30){
-			public void doAction() {
-				hostGame();
-			}
-		};
-		TButton startButton = new TButton("Start Game", 350, 190, 70, 30){
-			public void doAction() {
-				startGame();
-			}
-		};
-		
-		frame.add(startButton);
-		frame.add(hostButton);
-		frame.add(joinButton);
-		hostItemsLabel.UIResource().put("Text Font", externalFont);
-		hostItemsLabel.UIResource().put("Text Color", Color.RED);
-		listItemsLabel.UIResource().put("Text Font", externalFont);
-		listItemsLabel.UIResource().put("Text Color", Color.RED);
-		toJoinText.UIResource().put("Text Font", externalFont);
-		msgLabel.UIResource().put("Text Font", externalFont);
-		msgLabel.UIResource().put("Text Color", Color.RED);
-		frame.add(hostItemsLabel);
-		frame.add(msgLabel);
-		frame.add(listItemsLabel);
 	}
 	public void startGame(){
 		try {
@@ -92,13 +147,31 @@ public class Lobby extends GameObject{
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}
+		startButton.setEnabled(true);
+		listButton.setEnabled(false);
+		leaveButton.setEnabled(true);
+		joinButton.setEnabled(false);
+		hostButton.setEnabled(false);
+		newCivButton.setEnabled(true);
 		
 	}
 	public void joinGame(){
+		listButton.setEnabled(false);
+		leaveButton.setEnabled(true);
+		hostButton.setEnabled(false);
+		joinButton.setEnabled(false);
+		newCivButton.setEnabled(true);
 		try {
 			p.joinGame(toJoinText.getText());
 		} catch (FailedException e) {
-			e.printStackTrace();
+			hostItemsLabel.setText("Game does not exist!");
+			listButton.setEnabled(true);
+			leaveButton.setEnabled(false);
+			hostButton.setEnabled(true);
+			joinButton.setEnabled(true);
+			startButton.setEnabled(false);
+			newCivButton.setEnabled(false);
+			listGames();
 		}
 	}
 	public void update(long elapsedTime) {

@@ -1,5 +1,3 @@
-
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -8,9 +6,9 @@ public class Proxy
 {
 	private Socket 		m_clientSocket;
 	private OutputStream 	m_outStream;
-	private final int	protocolVersion = 2;
+	private final int	protocolVersion = 3;
 	private Receiver	receiver;
-	
+
 	public Proxy(String host, int port, PacketListener pl)
 	{
 		try
@@ -22,8 +20,7 @@ public class Proxy
 			Thread recvThread = new Thread(receiver);
 
 			recvThread.start();
-			
-		//	System.out.println("[+] Connected to server \""+ host +"\" on port "+ port);
+
 		}
 		catch(UnknownHostException e)
 		{
@@ -59,7 +56,6 @@ public class Proxy
                 	toSend.add(name);
 			send(toSend);
 			return receiver.getResult();
-			
 		}
 		catch(FailedException fe)
 		{
@@ -240,24 +236,8 @@ public class Proxy
 		}
 	}
 
-	public Result builtImprovement(int x, int y, String improvement) throws FailedException
-	{
-		try
-		{
-			Packet toSend = new Packet((byte)22);
-			toSend.add(x);
-			toSend.add(y);
-			toSend.add(improvement);
-			send(toSend);
-			return receiver.getResult();
-		}
-		catch(FailedException fe)
-		{
-			throw fe;
-		}
-	}
-
-	public Result madeUnit(int x, int y, String owner, String type, int manPower) throws FailedException
+	public Result madeUnit(int x, int y, String owner, String type,
+           int manPower) throws FailedException
 	{
 		try
 		{
@@ -267,6 +247,7 @@ public class Proxy
 			toSend.add(owner);
 			toSend.add(type);
 			toSend.add(manPower);
+            toSend.add(new ArrayList());
 			send(toSend);
 			return receiver.getResult();
 		}
@@ -289,6 +270,62 @@ public class Proxy
 		}
 	}
 
+    public Result insertUnit(int fromX, int fromY, int toX, int toY) throws FailedException
+    {
+		try
+		{
+			Packet toSend = new Packet((byte)26);
+			toSend.add(fromX);
+			toSend.add(fromY);
+			toSend.add(toX);
+			toSend.add(toY);
+			send(toSend);
+			return receiver.getResult();
+		}
+		catch(FailedException fe)
+		{
+			throw fe;
+		}
+    }
+
+    public Result moveOutUnit(int fromX, int fromY, String type, int mp,
+           int toX, int toY) throws FailedException
+    {
+        try
+        {
+		Packet toSend = new Packet((byte)28);
+		toSend.add(fromX);
+		toSend.add(fromY);
+        toSend.add(type);
+        toSend.add(mp);
+		toSend.add(toX);
+		toSend.add(toY);
+		send(toSend);
+		return receiver.getResult();
+        }
+	catch(FailedException fe)
+	{
+		throw fe;
+	}
+    }
+
+    public Result disbandUnit(int px, int py) throws FailedException
+    {
+	    try
+	    {
+		    Packet toSend = new Packet((byte)29);
+		    toSend.add(px);
+		    toSend.add(py);
+		    send(toSend);
+		    return receiver.getResult();
+	    }
+	    catch(FailedException fe)
+	    {
+		    throw fe;
+	    }
+    }
+
+
 	// Method to test sending and receiving lists.
 	private Result listTest(int x, int y) throws FailedException
 	{
@@ -306,24 +343,4 @@ public class Proxy
 		}
 	}
 
-	public static void main(String [] args)
-	{
-	//	Proxy k = new Proxy("130.237.238.239", 1234);//130.229.128.72", 1234);
-		/*
-		Packet test = new Packet((byte)2);
-		test.add(0);
-		test.add("Kalle");
-		k.send(test, true);
-		*/
-	/*	ArrayList<Integer> skaMed = new ArrayList<Integer>();
-		skaMed.add(1);
-		skaMed.add(3);
-		skaMed.add(1);
-		skaMed.add(4);
-		skaMed.add(2);
-		skaMed.add(5);
-		skaMed.add(3);
-		skaMed.add(5);
-	*///	System.out.println(k.listTest(14,13));
-	}
 }

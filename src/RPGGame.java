@@ -15,7 +15,8 @@ public class RPGGame extends GameObject {
 	
 	public static final int PLAYING = 0, TALKING = 1, CHOOSING=3, BATTLEINFO=4, BATTLE=5, TILEI=6, WAIT=7;
 	static int gameState = PLAYING;
-	static boolean zoom = false;
+	static int spX=0, spY=0;//storleksvariabler för síngleplaýerkartan
+	static boolean bordat=false, zoom = false;
 	LogicUpdater randomMovement = new RandomMovement();
 	LogicUpdater logic = randomMovement;
     Point tileAt, tileScroll;
@@ -77,7 +78,10 @@ public class RPGGame extends GameObject {
 		actionBar = new ActionBar(parent);
 		windowHandler = new WindowHandler(parent);
 		windowHandler.initResources();	
-		map = new Map(bsLoader, bsIO, parent, nick);
+		if (multiplayer)
+			map = new Map(bsLoader, bsIO, parent, nick);
+		else if (!multiplayer)
+			map = new Map(bsLoader, bsIO, parent, nick, spX, spY);
 		playfield = new PlayField2(map);
 		p = ((Civcraft)parent).getProxy();
 		list = new ArrayList<RPGSprite>();
@@ -109,8 +113,7 @@ public class RPGGame extends GameObject {
 					
 		
 		if(multiplayer==true){
-			TurnBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
-			TurnBar.initResources();
+			
 			int numberStartingPositions = received.getNumberTiles();
 			String theType, theOwner;
 			for(int i=0; i<numberStartingPositions; i++){
@@ -150,11 +153,15 @@ public class RPGGame extends GameObject {
 					if(list.get(r).friend==true)
 						Map.reveal(list.get(r).tileX,list.get(r).tileY,list.get(r).sightRange);
 				}
+				//TurnBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+				//TurnBar.initResources();
 				Map.send(playfield, list, this);
 			}
 		}
 	}
-		
+    public void spMap(String nick, int x, int y){
+		map = new Map(bsLoader, bsIO, parent, nick, x, y);
+	}	
 	
 	public void update(long elapsedTime) {
 		
@@ -286,6 +293,15 @@ public class RPGGame extends GameObject {
 								   fiende.setATK(fiende.getATK()*2);						   
 								   break;
 							   }else fiende.setATK(fiende.origatk);
+						   
+					 	  }
+						   for(j=0; j<list.size(); j++){
+							   int ys = list.get(h).getYY();
+							   int xs = list.get(h).getXX();
+							   if(xs == list.get(j).getXX() && ys == list.get(j).getYY() && list.get(j).getTyp()=="SiegeTower"){
+								   list.get(h).setATK(list.get(h).getATK()*2);						   
+								   break;
+							   }else list.get(h).setATK(list.get(h).origatk);
 						   
 					 	  }
 					   					  
@@ -496,9 +512,14 @@ public class RPGGame extends GameObject {
 										break;
 									}
 							list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-							list.get(h).movement();	
+							if (!bordat)
+								list.get(h).movement();	
 							a=0;
-							break;
+							if (bordat){
+								playfield.remove(list.get(h));
+								list.remove(h);
+								bordat=false;
+							}
 							}
 					if (!funnen){
 						h=0;
@@ -813,12 +834,37 @@ public class RPGGame extends GameObject {
 		if(turn>25){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
-			if (rand.nextInt(20)== 0){
-				list.add(new NPC(this, getImages("Chara1.png",3,4), x, y, 3, RPGSprite.DOWN, 2,5, 100, 1, 1, 1, 2, "Barbarian",logic));
+			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] > 0){
+				if(map.layer1[x][y] == 1 || map.layer1[x][y] == 0)
+					if (rand.nextInt(2) == 0)
+						list.add(new NPC(this, getImages("GalleySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Barbarian",logic));
+					else
+						list.add(new NPC(this, getImages("TriremeSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Barbarian",logic));
+				else{
+					int rnd = rand.nextInt(9);
+					if (rnd == 0)
+						list.add(new NPC(this, getImages("ArcherSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Barbarian",logic));
+					else if (rnd == 1)
+						list.add(new NPC(this, getImages("MusketeerSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Barbarian",logic));
+					else if (rnd == 2)
+						list.add(new NPC(this, getImages("PhalanxSheet.png",3,4), x,y, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Barbarian",logic));
+					else if (rnd == 3)
+						list.add(new NPC(this, getImages("LegionSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Barbarian",logic));
+					else if (rnd == 4)
+						list.add(new NPC(this, getImages("InfantrySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Barbarian",logic));
+					else if (rnd == 5)
+						list.add(new NPC(this, getImages("PikemanSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Barbarian",logic));
+					else if (rnd == 6)
+						list.add(new NPC(this, getImages("CavalrySheet.png",3,4),x,y, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Barbarian",logic));
+					else if (rnd == 7)
+						list.add(new NPC(this, getImages("KnightSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 12,8, 100, 1, 1, 2, 2, "Barbarian",logic));
+					else if (rnd == 8)	
+						list.add(new NPC(this, getImages("CrusaderSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Barbarian",logic));
+				}
 				Map.send(playfield, list, this);
 				
 			}
-		}
-	}
+		}}}
+	
 
-}
+				

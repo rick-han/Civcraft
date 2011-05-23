@@ -14,8 +14,10 @@ public class Civcraft extends GameEngine {
 	static MultiplayerMenu mm = null;
 	static Civcraft cc = null;
 	static RPGGame rg = null;
+	static SingleplayerMenu sm = null;
 	static Lobby lobb = null;
-	public static final int	TITLE = 0, GAME_MODE = 1, MULTIPLAYER_MENU = 2, LOBBY = 3;
+	static Instruction instr = null;
+	public static final int	TITLE = 0, GAME_MODE = 1, MULTIPLAYER_MENU = 2, LOBBY = 3, INSTRUCTIONS=4, SINGLEPLAYER_MENU=5;
 	private Proxy p = null;
 
 	public void setProxy(Proxy proxy){
@@ -46,6 +48,12 @@ public class Civcraft extends GameEngine {
 			case LOBBY : 
 				lobb = new Lobby(this);
 				return lobb;
+			case INSTRUCTIONS : 
+				instr = new Instruction(this);
+				return instr;
+			case SINGLEPLAYER_MENU : 
+				sm = new SingleplayerMenu(this);
+				return sm;	
 		}
 
 		return null;

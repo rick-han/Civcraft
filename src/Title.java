@@ -46,7 +46,7 @@ public class Title extends GameObject {
 			case KeyEvent.VK_ENTER :
 				if (option == 0) {
 					// start
-					parent.nextGameID = Civcraft.GAME_MODE;
+					parent.nextGameID = Civcraft.SINGLEPLAYER_MENU;
 					finish();
 				} else if (option == 1){
 					// multiplayer
@@ -59,11 +59,16 @@ public class Title extends GameObject {
 					// end
 					finish();
 				}
+				else if (option == -1) {
+					
+					parent.nextGameID = Civcraft.INSTRUCTIONS;
+					finish();
+				}
 			break;
 
 			case KeyEvent.VK_UP :
 				option--;
-				if (option < 0) option = 2;
+				if (option < -1) option = 2;
 			break;
 
 			case KeyEvent.VK_DOWN :
@@ -80,12 +85,13 @@ public class Title extends GameObject {
 
 	public void render(Graphics2D g) {
 		g.drawImage(title, 0, 0, null);
+		font.drawString(g, "INSTRUCTIONS", 450, 280);
 		font.drawString(g, "SINGLEPLAYER", 450, 300);
 		font.drawString(g, "MULTIPLAYER", 450, 320);
 		font.drawString(g, "LOAD", 450, 340);
 		font.drawString(g, "END", 450, 360);
 
-		font.drawString(g, "PRESS \"Z\" FOR ACTION", 10, 455);
+		
 
 		if (!blink) {
 			g.drawImage(arrow, 434, 297+(option*20), null);
