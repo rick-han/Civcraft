@@ -611,6 +611,7 @@ public class RPGGame extends GameObject {
 							 if(multiplayer==false)
 								 fiende = (RPGSprite) map.getLayer3(targetX, targetY);
 							 else if(multiplayer==true){
+								// fiende = (RPGSprite) map.getLayer3(targetX, targetY);
 								 for(int g=0;g<list.size();g++){
 									 if(list.get(g).getXX()==targetX && list.get(g).getYY()==targetY){
 										 fiende = list.get(g);
@@ -897,7 +898,7 @@ public class RPGGame extends GameObject {
 					String theType, theOwner;
 					int hpLeft;
 					ActionBar.addSpr();
-					
+					spawnBarb();
 					for(int i=0; i<numberStartingPositions; i++){
 						xe = received.getTileX(i);
 						ye = received.getTileY(i);
@@ -1457,7 +1458,7 @@ public class RPGGame extends GameObject {
 		if(turn>25){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
-			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] > 0){
+			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] < map.lwrlmt){
 				if(map.layer1[x][y] == 1 || map.layer1[x][y] == 0)
 					if (rand.nextInt(2) == 0)
 						list.add(new NPC(this, getImages("GalleySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "BarbarianB",logic));

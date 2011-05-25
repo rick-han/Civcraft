@@ -17,7 +17,7 @@ public class NPC extends RPGSprite {
 	LogicUpdater	logic;
 	String[]		dialog;
     static String typ="npc";
-
+    Proxy p;
 	public NPC(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
 			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, LogicUpdater logic) {
 		super(owner,images,tileX,tileY,moveSpeed,direction, atk, def, hp, hit, range, move, 2, typ,0,false);
@@ -52,6 +52,8 @@ class RandomMovement implements LogicUpdater {
 	WindowHandler windowHandler;
 	String dialogNP[] = new String[3];
 	static GameEngine parent;
+	Proxy p;
+	
 	public static void getList(ArrayList<RPGSprite> lista, Map mapp, PlayField2 pf, GameEngine parenta){
 		list=lista;
 		map = mapp;
@@ -138,7 +140,7 @@ class RandomMovement implements LogicUpdater {
 		wave1=randa.nextInt(12);
 		wave2=randa.nextInt(12);
 		int waves = wave1+wave2;
-	   
+		p = ((Civcraft)parent).getProxy();
 		battlescore=3;
 		if (fiende.isFortified()){								  
 			fiende.setDEF(fiende.getDEF()*1.5);
@@ -212,7 +214,15 @@ class RandomMovement implements LogicUpdater {
 		if(battlescore==1){						
 			dialogNP[0]="Your "+fiende.getTyp()+" was attacked\n";
 			dialogNP[1]="by a barbarian and died, lol";
-			dialogNP[2]="";			
+			dialogNP[2]="";	
+			//if(RPGGame.multiplayer==true){
+				//try {
+					//p.disbandUnit(fiende.getXX(),fiende.getYY());
+				//} catch (FailedException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				//}
+			//}
 			list.remove(fiende);
 			RPGGame.windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 			RPGGame.windowHandler.setVisible(true);   
