@@ -1014,7 +1014,7 @@ public class ActionBar{
 				}
 			}
 		}
-		else if(RPGGame.turn - oldturn == 2 && trir){ // <--- 16
+		else if(RPGGame.turn - oldturn == 16 && trir){
 			list.add(new RPGSprite(own, parent.getImages("TriremeSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true, 2));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;		
