@@ -27,6 +27,7 @@ public class RPGGame extends GameObject {
     int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
     static boolean multiplayer=false;
     static int turn=1;
+    boolean fajtats=false;
     static boolean attacked=false;
     static int bombX=1000,bombY=1000,hpL=1000;
 	RPGDialog		dialog;
@@ -355,6 +356,7 @@ public class RPGGame extends GameObject {
 					  
 					   battle=!battle;
 					   if(multiplayer==true){
+						   	fajtats=true;
 						    faild=false;
 						   	battlescore=3;
 							try {
@@ -1130,7 +1132,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > 0){
+									if(map.fogofwar[xe][ye] == 0){
 										playfield.add(list.get(list.size()-1));
 										
 									}
@@ -1140,7 +1142,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1148,7 +1150,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("CavalrySheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1156,7 +1158,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("SiegeTowerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 2, 1, 2, "SiegeTower",50,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1164,7 +1166,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("WagonTrainSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 1, 2, 2, "WagonTrain",100,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1172,7 +1174,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, false, 5));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1180,7 +1182,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, false, 2));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye]> map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1188,7 +1190,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, false, 3));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1196,7 +1198,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1204,7 +1206,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1212,7 +1214,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1220,7 +1222,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, parent.getImages("ArcherSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1228,7 +1230,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1236,7 +1238,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1252,7 +1254,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this,getImages("PhalanxSheet.png",3,4), xe,ye, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 3, 2, "Phalanx",1000, false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1260,7 +1262,7 @@ public class RPGGame extends GameObject {
 									list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,false));
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(map.fogofwar[xe][ye] > map.uprlmt)
+									if(map.fogofwar[xe][ye] == 0)
 										playfield.add(list.get(list.size()-1));
 									Map.send(playfield, list, this);
 								}
@@ -1306,16 +1308,32 @@ public class RPGGame extends GameObject {
 					}
 				}
 				if(multiplayer==true){
-					if (attacked==true && keyPressed(KeyEvent.VK_Z) ||
+					if (keyPressed(KeyEvent.VK_Z) ||
 							rightClick() ||
 							keyPressed(KeyEvent.VK_ESCAPE)) {
-							attacked=false;
 							
+							
+							if(attacked==true){
+								attacked=false;
+								gameState=WAIT;
+								
+							}
+							else if(fajtats==true){
+								fajtats=false;
+								gameState=PLAYING;
+								
+							}
+							else if(fajtats==false && attacked==false){
+								
+								gameState=PLAYING;
+								
+							}
 							//fiende.setDirection(fiendeDirection);
 							windowHandler.setVisible(false);
-							gameState = WAIT;
-						
+							
+											
 					}
+					
 				}
 				//dialog.update(elapsedTime);
 			break;			
@@ -1437,7 +1455,7 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void spawnBarb(){
-		if(turn>100){
+		if(turn>25){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
 			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] > 0){

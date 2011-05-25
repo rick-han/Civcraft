@@ -169,7 +169,7 @@ public class Map extends AbstractTileBackground2 {
 		if(list2!=null){
 			for(int h=0;h<list2.size();h++){
 				RPGSprite unit = list2.get(h);
-				if(unit.getTyp()=="Barbarian" || unit.getTyp()=="BarbarianB "&& fogofwar[unit.getXX()][unit.getYY()] > uprlmt && unit.added==false){
+				if(unit.getTyp()=="Barbarian" || unit.getTyp()=="BarbarianB "&& fogofwar[unit.getXX()][unit.getYY()] == 0 && unit.added==false){
 					playfield.add(unit);
 					unit.added=true;
 				}
