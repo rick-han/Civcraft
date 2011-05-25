@@ -6,7 +6,7 @@ class Result{
 	private boolean ok = true, locked;
 	private String failMsg, hostName, chatMessage, chatName, fromWhom;
 	private List sessions, players, map, updatedTiles;
-	private int requestFail, requestOk, attackerLeft, defenderLeft;
+	private int requestFail, requestOk, attackerLeft, defenderLeft, bombX, bombY, healthLost;
 
 	// Här är medlemsvariabler som bara är hjälpvariabler till vissa metoder.
 	private List<Unit> cityUnits = new ArrayList<Unit>();
@@ -74,6 +74,18 @@ class Result{
 		defenderLeft = defLeft;
 	}
 
+	public void addBombX(int x){
+		bombX = x;
+	}
+
+	public void addBombY(int y){
+		bombY = y;
+	}
+
+	public void addHealthLost(int healthLost){
+		this.healthLost = healthLost;
+	}
+
 	// Sets för komplexa strukturer.
 
 	// För listan med spelare först.
@@ -98,6 +110,10 @@ class Result{
 
 	public void setUnit(Unit unit){
 		temp.addUnit(unit);
+	}
+
+	public void prepareForCityUnits(){
+		cityUnits = new ArrayList<Unit>();
 	}
 
 	public void addCityUnit(Unit unit){
@@ -174,6 +190,18 @@ class Result{
 
 	public int getDefenderLeft(){
 		return defenderLeft;
+	}
+
+	public int getBombX(){
+		return bombX;
+	}
+
+	public int getBombY(){
+		return bombY;
+	}
+
+	public int getHealthLost(){
+		return healthLost;
 	}
 
 	// Här under kommer det att finnas getters för dom mer komplexa strukturerna.

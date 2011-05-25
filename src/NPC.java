@@ -122,7 +122,7 @@ class RandomMovement implements LogicUpdater {
 						}
 					}
 				for(int h = 0; h<list.size();h++){
-					if (list.get(h).getTyp()=="City"){
+					if (list.get(h).getTyp()=="City" && list.get(h).friend==true){
 						moved = spr.test(list.get(h).tileX, list.get(h).tileY, spr, list);
 						moved=true;
 						break;

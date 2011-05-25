@@ -32,11 +32,11 @@ public class RPGSprite extends AdvanceSprite{
 
 	int tileX;
 	int tileY;
-
+	boolean render = true;
 	RPGGame		owner;
 	Map			map;
 	double		speed;
-	
+	boolean sparad=false;
 	boolean klickad=false;
 	boolean mov=true;
 	boolean selmov=false;
@@ -55,7 +55,7 @@ public class RPGSprite extends AdvanceSprite{
 	GameEngine parent;
 	int origatk;
 	int cap = 0;
-	RPGSprite[] capacity = null;
+	 RPGSprite[] capacity = new RPGSprite[1];
 	//Proxy p = ((Civcraft)parent).getProxy();
 	
 	public RPGSprite(GameEngine parent) {	
@@ -221,6 +221,9 @@ public class RPGSprite extends AdvanceSprite{
 	public int getMove(){
 		return move;
 	}
+	public void setMove(int mo){
+		this.move=mo;
+	}
 	public int getMoveLeft(){
 		return move-moveThisTurn;
 	}
@@ -290,13 +293,13 @@ public class RPGSprite extends AdvanceSprite{
 		}
 	}
 	public boolean checkCapacity(){
-		if (capacity==null){
-			System.out.print("capacity null");
+		if (capacity.length==1){
 			return false;
 		}
 		for(int i = 0; i < capacity.length; i++){
-			if (capacity[i]==null)
+			if (capacity[i]==null){
 				return true;
+			}
 		}
 		return false;
 	}
@@ -310,7 +313,7 @@ public class RPGSprite extends AdvanceSprite{
 		}else even=false;	
 		list2=lista;
 		map.layer3[tileX][tileY] = null;
-	
+		
 		if(horiz > tileX && vert > tileY){
 			
 			setDirection(1);
@@ -319,7 +322,7 @@ public class RPGSprite extends AdvanceSprite{
 				tileY+=1;	
 				
 				
-				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX-=1;
 						tileY-=1;
@@ -353,7 +356,7 @@ public class RPGSprite extends AdvanceSprite{
 				tileX-=1;
 				tileY-=1;
 				
-				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX+=1;
 						tileY+=1;
@@ -386,7 +389,7 @@ public class RPGSprite extends AdvanceSprite{
 				tileX-=1;
 				tileY+=1;
 				
-				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX+=1;
 						tileY-=1;
@@ -418,7 +421,7 @@ public class RPGSprite extends AdvanceSprite{
 			if (!even){
 				tileX+=1;
 				tileY-=1;		
-				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 						tileX-=1;
 						tileY+=1;
@@ -445,7 +448,7 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(1);
 			tileX+=1;
 			
-			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 					tileX-=1;	
 					map.layer3[tileX][tileY] = unit;
@@ -474,7 +477,7 @@ public class RPGSprite extends AdvanceSprite{
 		else if(horiz < tileX){
 			setDirection(0);
 			tileX-=1;
-			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 					tileX+=1;
 					map.layer3[tileX][tileY] = unit;
@@ -498,7 +501,7 @@ public class RPGSprite extends AdvanceSprite{
 		else if(vert > tileY){
 			setDirection(3);
 			tileY+=1;
-			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){				
 					tileY-=1;
 					map.layer3[tileX][tileY] = unit;
@@ -522,7 +525,7 @@ public class RPGSprite extends AdvanceSprite{
 		else if(vert < tileY){
 			setDirection(2);
 			tileY-=1;
-			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme"){
+			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){			
 					tileY+=1;
 					map.layer3[tileX][tileY] = unit;
@@ -557,7 +560,7 @@ public class RPGSprite extends AdvanceSprite{
 
 	public void render(Graphics2D g) {
 		// sometime the sprite/npc/event has no image
-		if (getImages() != null && map.visible(tileX,tileY)) {
+		if (getImages() != null && map.visible(tileX,tileY) && render) {
 			super.render(g);
 		}
 	}

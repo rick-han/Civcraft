@@ -17,29 +17,38 @@ public class MyPackLyss implements PacketListener{
 		Lobby lobby;
 		static String theType;
 		MultiplayerMenu parent;
-		
-		public MyPackLyss(){
+		Civcraft par;
+		public MyPackLyss(Civcraft par){
+			this.par=par;
 			this.civa=Civcraft.cc;
 			this.parent=Civcraft.mm;
 			this.rpg=Civcraft.rg;
 			this.lobby=Civcraft.lobb;
 		}
 		
-		public void newTurn(Result received){	
+		public void newTurn(Result received){
+			
 			TurnBar.line1=("Its your turn!");
-			TurnBar.initResources();
+			
 			RPGGame.received=received;
-			RPGGame.waiting=false;
 			Map.received=received;
-									
+			
+			if(RPGGame.turn==1){
+				RPGGame.gameState=7;
+				RPGGame.waiting=true;
+			}
+			RPGGame.waiting=false;
+			
+								
 		}
 
 		public void lobbyUpdated(Result recieved){
-			
-		//	java.util.Iterator iter = recieved.getSessions().iterator();
-			//while (iter.hasNext()){
-				//lobby.listItemsLabel.setText(lobby.listItemsLabel.getText() + (String)iter.next());
-			//}
+			par.lobb.hostItemsLabel.setText("");
+			int amount = recieved.getNumberPlayers();
+			for(int i=0; i<amount; i++){
+				par.lobb.hostItemsLabel.setText(par.lobb.hostItemsLabel.getText() + "\n" + recieved.getPlayerName(i) + " " + "\"" + recieved.getPlayerCiv(i)  + "\"");
+			}
+		
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -89,6 +98,18 @@ public class MyPackLyss implements PacketListener{
         public void gameClosed(){
             
         }
+
+		@Override
+		public void casualtyReport(Result res) {
+			
+				RPGGame.bombX=res.getBombX();
+				RPGGame.bombY=res.getBombY();
+				RPGGame.hpL=res.getHealthLost();
+				RPGGame.attacked=true;
+			
+			// TODO Auto-generated method stub
+			
+		}
 
 		
 		

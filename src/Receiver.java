@@ -199,6 +199,14 @@ public class Receiver implements Runnable
                 pl.gameClosed();
             }
 
+	    else if(header == 30)
+	    {
+		toReturn.addBombX(receiveInt());
+		toReturn.addBombY(receiveInt());
+		toReturn.addHealthLost(receiveInt());
+		    pl.casualtyReport(toReturn);
+	    }
+
 			// Test
 			else if(header == 99)
 			{
@@ -374,6 +382,7 @@ public class Receiver implements Runnable
 		{
 			String owner = receiveString();
 			int size = receiveInt();
+			toAddTo.prepareForCityUnits();
 			for(int i=0; i<size; i++)
 			{
 				toAddTo.addCityUnit(receiveUnit());
@@ -384,5 +393,3 @@ public class Receiver implements Runnable
 	}
 
 }
-
-

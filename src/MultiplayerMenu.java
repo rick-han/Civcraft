@@ -40,7 +40,7 @@ public class MultiplayerMenu extends GameObject{
 		TButton connectButton = new TButton("Connect", 150, 270, 90, 30){
 			public void doAction() {
 				RPGGame.nick = nickText.getText();		
-				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
+				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss(parent)));
 				try {
 					returned = parent.getProxy().connect(nickText.getText());
 				} catch (FailedException e) {
@@ -58,7 +58,7 @@ public class MultiplayerMenu extends GameObject{
 		TButton hostButton = new TButton("Connect&Host&Start", 220, 270, 120, 30){
 			public void doAction() {
 				RPGGame.nick = nickText.getText();
-				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss()));
+				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss(parent)));
 				try {
 					returned = parent.getProxy().connect(nickText.getText());
 				} catch (FailedException e) {

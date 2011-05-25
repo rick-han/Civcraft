@@ -1,7 +1,5 @@
-
-
 public interface PacketListener{
-	
+
 	public void newTurn(Result received);
 
 	public void lobbyUpdated(Result received);
@@ -11,4 +9,6 @@ public interface PacketListener{
 	public void chatMessageReceived(Result received);
 
 	public void gameClosed();
+
+	public void casualtyReport(Result received);
 }

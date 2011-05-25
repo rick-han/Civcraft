@@ -30,7 +30,7 @@ public class TurnBar{
 	static RPGSprite spr;
 	static RPGGame own;
 	static RPGSprite sprC;
-	static String line1 = "Its your turn!";
+	static String line1 = "Not your turn!";
 	String line2 = null, line3 = null;
 	BaseLoader bsLoader;
 	Chipset csFow;
@@ -42,13 +42,10 @@ public class TurnBar{
 	public TurnBar(GameEngine parent) {
 		this.parent = parent;
 	}
-	public static void send(RPGSprite h,PlayField2 playfieldd, RPGSprite[][] layer, ArrayList<RPGSprite> listd, RPGGame owna, Map mapp){
-		spr = h;
-		playfield=playfieldd;
-		list=listd;
-		layer3=layer;
+	public static void send(RPGGame owna){
+		
 		own=owna;
-		map=mapp;
+		
 	}
 	
 	public static void initResources(){
@@ -77,8 +74,9 @@ public class TurnBar{
 		actionFrame.update();
 	}
 	
-	public void render(Graphics2D g) {
-		actionFrame.render(g);
+	public void render(Graphics2D ga) {
+		actionFrame.render(ga);
+		g=ga;
 	}
 	class Chipset {
 		BufferedImage[] image;

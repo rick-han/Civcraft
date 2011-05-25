@@ -27,6 +27,8 @@ public class RPGGame extends GameObject {
     int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
     static boolean multiplayer=false;
     static int turn=1;
+    static boolean attacked=false;
+    static int bombX=1000,bombY=1000,hpL=1000;
 	RPGDialog		dialog;
 	boolean gubbeklickad=false		;
 	static boolean funnen=false;
@@ -35,6 +37,7 @@ public class RPGGame extends GameObject {
 	int	fiendeDirection, wave1, wave2;	// old NPC direction before
 	int h = 0, a=0,F=0;								// we talk to him/her
 	ArrayList<RPGSprite> list;
+	ArrayList<RPGSprite> listny;
 	int t=0;
 	int chance=0;
 	boolean battle=false;
@@ -62,7 +65,11 @@ public class RPGGame extends GameObject {
 	TurnBar turnBar;
 	static GameEngine parent2;
 	public static Result received;
+	public static Result receivedS;
 	static String nick;
+	boolean istad=false;
+	boolean faild=false;
+	static RPGSprite enhet = null;
 	public RPGGame(GameEngine parent) {
 		super(parent);
 		this.parent = parent;
@@ -78,6 +85,8 @@ public class RPGGame extends GameObject {
 		actionBar = new ActionBar(parent);
 		windowHandler = new WindowHandler(parent);
 		windowHandler.initResources();	
+		TurnBar.send(this);
+		TurnBar.initResources();
 		if (multiplayer)
 			map = new Map(bsLoader, bsIO, parent, nick);
 		else if (!multiplayer)
@@ -85,6 +94,7 @@ public class RPGGame extends GameObject {
 		playfield = new PlayField2(map);
 		p = ((Civcraft)parent).getProxy();
 		list = new ArrayList<RPGSprite>();
+		listny = new ArrayList<RPGSprite>();
 		Map.send(playfield, list, this);
 		playfield.setComparator(new Comparator() {
 			public int compare(Object o1, Object o2) {
@@ -99,37 +109,48 @@ public class RPGGame extends GameObject {
 				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
 			}
 			else{
-				int rX = rand.nextInt(map.maxX+1);
+				int rX = rand.nextInt(map.maxX+1); 
 				int rY = rand.nextInt(map.maxY+1);
+				int rXX = 0, rYY = 0;
+				while (map.layer1[rX][rY]==0 || map.layer1[rX][rY]==1 || map.layer1[rX][rY]==11){
+					rX = rand.nextInt(map.maxX+1); 
+					rY = rand.nextInt(map.maxY+1);
+				}
 				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX, rY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				int rX2=(rand.nextInt(7))-3;
-				int rY2=(rand.nextInt(7))-3;
-				if (rX+rX2>map.maxX && rY+rY2>map.maxY)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), map.maxX, map.maxY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else if (rX+rX2>map.maxX)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), map.maxX, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else if (rY+rY2>map.maxY)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, map.maxY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else if (rX+rX2<0 && rY+rY2<0)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else if (rX+rX2<0)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), 0, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else if (rY+rY2<0)
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, 0, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
-				else
-					list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rX2, rY+rY2, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+				rXX = rand.nextInt(7)-3;
+				rYY = rand.nextInt(7)-3;
+				while (rX+rXX>map.maxX)
+					rXX-=2;
+				while (rY+rYY>map.maxY)
+					rYY-=2;
+				while (rX+rXX<0)
+					rXX+=2;
+				while (rY+rYY<0)
+					rYY+=2;
+				while (map.layer1[rX+rXX][rY+rYY]==0 || map.layer1[rX+rXX][rY+rYY]==1 || map.layer1[rX+rXX][rY+rYY]==11){
+					rXX = rand.nextInt(7)-3;
+					rYY = rand.nextInt(7)-3;
+					while (rX+rXX>map.maxX)
+						rXX-=2;
+					while (rY+rYY>map.maxY)
+						rYY-=2;
+					while (rX+rXX<0)
+						rXX+=2;
+					while (rY+rYY<0)
+						rYY+=2;
+				}
+				list.add(new RPGSprite(this, getImages("Chara2.png",3,4), rX+rXX, rY+rYY, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
+
+				playfield.add(list.get(0));
+				playfield.add(list.get(1));
+				TurnBar.send(this);
+				ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
+				map.setToCenter(list.get(0));
+				actionBar.initResources();
+				TurnBar.initResources();
+				for (int i=0; i < list.size(); i++)
+					Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
 			}
-		
-			playfield.add(list.get(0));
-			playfield.add(list.get(1));
-			TurnBar.send(list.get(0), playfield, map.layer3, list, this, map);
-			ActionBar.send(list.get(0), playfield, map.layer3, list, this, map);
-			map.setToCenter(list.get(0));
-			actionBar.initResources();
-			TurnBar.initResources();
-			for (int i=0; i < list.size(); i++ )
-				Map.reveal(list.get(i).tileX,list.get(i).tileY,list.get(i).sightRange);
-		
 		}
 		dialog = new RPGDialog(fontManager.getFont(getImage("BitmapFont.png")),
 							   getImage("Box.png", false));
@@ -152,6 +173,8 @@ public class RPGGame extends GameObject {
 						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
 						map.setToCenter(list.get(list.size()-1));
 						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
 					}
 					else if(theType.equalsIgnoreCase("Settler") && theOwner.equalsIgnoreCase(nick)){				
 						list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.UP, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true));
@@ -159,26 +182,127 @@ public class RPGGame extends GameObject {
 						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
 						map.setToCenter(list.get(list.size()-1));
 						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
 					}
-					else if(theType.equalsIgnoreCase("Knight") && theOwner!=(nick)){				
+					else if(theType.equalsIgnoreCase("Galley") && theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, true, 5));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Crusader") && theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,true));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Trireme") && theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true, 2));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Caravel") && theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true, 3));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Cannon") && theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,true));
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+					}
+					else if(theType.equalsIgnoreCase("Knight") && !theOwner.equalsIgnoreCase(nick)){				
 						list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 12,8, 100, 1, 1, 2, 2, "Knight",1000,false));
 					}
-					else if(theType.equalsIgnoreCase("Settler") && theOwner!=(nick)){				
+					else if(theType.equalsIgnoreCase("Settler") && !theOwner.equalsIgnoreCase(nick)){				
 						list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,false));
+					}
+					else if(theType.equalsIgnoreCase("Crusader") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,false));
+					}
+					else if(theType.equalsIgnoreCase("Galley") && !theOwner.equalsIgnoreCase(nick)){			
+						list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, false, 5));
+					}
+					else if(theType.equalsIgnoreCase("Trireme") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, false, 2));
+					}
+					else if(theType.equalsIgnoreCase("Caravel") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, false, 3));
+					}
+					else if(theType.equalsIgnoreCase("Cannon") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,false));
+					}
+					else if(theType.equalsIgnoreCase("Catapult") && !theOwner.equalsIgnoreCase(nick)){			
+						list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,false));
+					}
+					else if(theType.equalsIgnoreCase("Trebuchet") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,false));
+					}
+					else if(theType.equalsIgnoreCase("Archer") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, parent.getImages("ArcherSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,false));
+					}
+					else if(theType.equalsIgnoreCase("Infantry") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000,false));
+					}
+					else if(theType.equalsIgnoreCase("Legion") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000,false));
+					}
+					else if(theType.equalsIgnoreCase("Pikeman") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this, getImages("PikemanSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000,false));
+					}
+					else if(theType.equalsIgnoreCase("Phalanx") && !theOwner.equalsIgnoreCase(nick)){				
+						list.add(new RPGSprite(this,getImages("PhalanxSheet.png",3,4), xe,ye, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 3, 2, "Phalanx",1000, false));
+					}
+					else if(theType.equalsIgnoreCase("Musketeer") && !theOwner.equalsIgnoreCase(nick)){			
+						list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,false));
 					}
 					
 				}
-				if(received.existCity(i)){	
-					list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));														
-					playfield.add(list.get(list.size()-1));
+				if(received.existCity(i)){
+					theOwner = received.getCityOwner(i);
+					if(theOwner==(nick)){
+						list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));														
+						playfield.add(list.get(list.size()-1));
+						ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+						map.setToCenter(list.get(list.size()-1));
+						actionBar.initResources();
+						TurnBar.send(this);
+						TurnBar.initResources();
+						
+					}
+					if(!theOwner.equalsIgnoreCase(nick)){
+						list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false));														
+						if(map.fogofwar[xe][ye] == 0)
+							playfield.add(list.get(list.size()-1));
+						
+					}
 				}
 				for (int r=0; r < list.size(); r++ ){
 					if(list.get(r).friend==true)
 						Map.reveal(list.get(r).tileX,list.get(r).tileY,list.get(r).sightRange);
 				}
-				//TurnBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
-				//TurnBar.initResources();
+				
 				Map.send(playfield, list, this);
+				
 			}
 		}
 	}
@@ -231,59 +355,62 @@ public class RPGGame extends GameObject {
 					  
 					   battle=!battle;
 					   if(multiplayer==true){
+						    faild=false;
 						   	battlescore=3;
 							try {
 								returned = p.combatRequest(list.get(h).getXX(), list.get(h).getYY(), fiende.getXX(), fiende.getYY());
 							} catch (FailedException e) {
+								faild=true;
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							
-							if(returned.getAttackerLeft()<=0){
-								battlescore=1;
-								playfield.remove(list.get(h));
+							if(returned!=null && faild==false){
+								if(returned.getAttackerLeft()<=0){
+									battlescore=1;
+									playfield.remove(list.get(h));
 								
-							}
-							else if(returned.getDefenderLeft()<=0){
-								battlescore=2;
-								playfield.remove(fiende);
+								}
+								else if(returned.getDefenderLeft()<=0){
+									battlescore=2;
+									playfield.remove(fiende);
 								
-							}
-							else if(returned.getAttackerLeft()>0 && returned.getDefenderLeft()>0){
-								battlescore=4;						
-								list.get(h).setHP(returned.getAttackerLeft());
-								fiende.setHP(returned.getDefenderLeft());
-							}
+								}
+								else if(returned.getAttackerLeft()>0 && returned.getDefenderLeft()>0){
+									battlescore=4;						
+									list.get(h).setHP(returned.getAttackerLeft());
+									fiende.setHP(returned.getDefenderLeft());
+								}
 							
-							if(battlescore==1){
-								   dialogNP[0]="You lost this battle\n";
-								   dialogNP[1]="but atleast you tried..\n";
-								   dialogNP[2]="";						   
-								   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-								   windowHandler.setVisible(true);						   				  						   				   				   
-								   gameState=TILEI;
-								   break;	
-							}
-							if(battlescore==2){
-								   dialogNP[0]="You won this battle!!\n";
-								   dialogNP[1]="congratulations sir!\n";
-								   dialogNP[2]="";						   
-								   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-								   windowHandler.setVisible(true);						   				  						   				   				   
-								   gameState=TILEI;
-								   break;	
-							}
-							if(battlescore==4){
-								   dialogNP[0]="This battle ended with no winner!\n";
-								   dialogNP[1]="you lost brave men on the field\n";
-								   dialogNP[2]=returned.getAttackerLeft()+" of your men are left";						   
-								   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-								   windowHandler.setVisible(true);						   				  						   				   				   
-								   gameState=TILEI;
-								   break;	
-							}
-							break;
-						} 
+								if(battlescore==1){
+									dialogNP[0]="You lost this battle\n";
+									dialogNP[1]="but atleast you tried..\n";
+									dialogNP[2]="";						   
+									windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
+									windowHandler.setVisible(true);						   				  						   				   				   
+									gameState=TILEI;
+									break;	
+								}
+								if(battlescore==2){
+									dialogNP[0]="You won this battle!!\n";
+									dialogNP[1]="congratulations sir!\n";
+									dialogNP[2]="";						   
+									windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
+									windowHandler.setVisible(true);						   				  						   				   				   
+									gameState=TILEI;
+								 	break;	
+								}
+								if(battlescore==4){
+									dialogNP[0]="This battle ended with no winner!\n";
+									dialogNP[1]="you lost brave men on the field\n";
+									dialogNP[2]=returned.getAttackerLeft()+" of your men are left";						   
+									windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
+									windowHandler.setVisible(true);						   				  						   				   				   
+									gameState=TILEI;
+									break;	
+								}	
+								break;
+							} 
+					   }
 					   if(multiplayer==false){
 						   if(list.get(h).getTyp()!="Archer" && list.get(h).getTyp()!="Musketeer" && list.get(h).getTyp()!="Trireme"){
 							   wave1=rand.nextInt(12);
@@ -518,21 +645,75 @@ public class RPGGame extends GameObject {
 																	
 								}else 	
 									if(multiplayer==true){
+										istad=false;
+										int g = list.get(h).getXX();
+										int gt = list.get(h).getYY();
 										test.add(list.get(h).getXX());
 										test.add(list.get(h).getYY());
 										list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-										test.add(list.get(h).getXX());
-										test.add(list.get(h).getYY());
-										try {
-											p.moveUnit(test);
-											test.clear();
-										} catch (FailedException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
+										//if(Map.boot==null){
+											test.add(list.get(h).getXX());
+											test.add(list.get(h).getYY());
+										//}else{
+										//	test.add(enhet.getXX());
+											//test.add(enhet.getYY());
+									//	}
+										for(int o=0;o<list.size();o++){
+											
+											if(g == list.get(o).getXX() && gt == list.get(o).getYY() && list.get(o).getTyp()=="City"){
+												istad=true;
+												
+												try {
+													
+													p.moveOutUnit(g,gt, list.get(h).getTyp(), list.get(h).getHP(), list.get(h).getXX(), list.get(h).getYY());
+													list.get(h).sparad=false;
+													test.clear();
+													
+													
+												} catch (FailedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+											}
 										}
-										list.get(h).movement();	
+										if(istad==false){
+											
+											for(int o=0;o<list.size();o++){
+												
+												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="City"){
+													
+													list.get(h).sparad=true;
+												}
+											}
+											try {
+												
+												p.moveUnit(test);
+												test.clear();
+												ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+
+											
+											} catch (FailedException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+												
+											}
+										}
+										
+										//list.get(h).movement();	
+										if (!bordat)
+											list.get(h).movement();	
+										//a=0;
+										if (bordat){
+											playfield.remove(list.get(h));
+											
+											list.remove(list.get(h));
+											bordat=false;
+										}
+										
+											
 										a=0;
 										break;
+										
 									}
 							list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
 							if (!bordat)
@@ -540,6 +721,7 @@ public class RPGGame extends GameObject {
 							a=0;
 							if (bordat){
 								playfield.remove(list.get(h));
+								
 								list.remove(h);
 								bordat=false;
 							}
@@ -603,8 +785,23 @@ public class RPGGame extends GameObject {
 						}
 						a=0;		
 						F=0;
-						gameState=CHOOSING;
-						funnen=true;
+						if(multiplayer==true){
+							if(h<list.size()){
+								if(list.get(h)!=null){
+									gameState=CHOOSING;
+									funnen=true;
+								}
+							}
+						}
+						if(multiplayer==false){
+							if(h<list.size()){
+								if(list.get(h)!=null){
+									gameState=CHOOSING;
+									funnen=true;
+								}
+							}
+							
+						}
 					}
 				}
 				// quit key
@@ -653,28 +850,60 @@ public class RPGGame extends GameObject {
 				break;
 				
 					
-			case WAIT:					
+			case WAIT:	
+				if(attacked==true){
+					
+					dialogNP[0]="You were attacked on tile "+bombX+","+bombY+"\n";
+					dialogNP[1]="and lost "+hpL+" MP\n";
+					dialogNP[2]="";						   
+					windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
+					windowHandler.setVisible(true);						   				  						   				   				   
+					gameState=TILEI;
+				}
 				if(waiting==false){		
+					TurnBar.send(this);
+					TurnBar.initResources();
+				  if(turn>1){	
 					if(delt==true){
 						for(int f = 0; f<list.size();f++){
+							if(list.get(f).sparad==false)
+								playfield.remove(list.get(f));
 							
-							playfield.remove(list.get(f));
 							
-							delt=false;
 						}
+						delt=false;
 						
 					}
+					listny.clear();
+					for(int f=0;f<list.size();f++){
+						if(list.get(f).sparad==true){
+							list.get(f).mov = true;
+							list.get(f).moveThisTurn = 0;					
+							list.get(f).setMove(2);
+							listny.add(list.get(f));
+						}
+					}
 					list.clear();
+					if(listny!=null){
+						for(int f=0;f<listny.size();f++){
+							
+							list.add(listny.get(f));
+						
+						}
+					}
+					Map.send(playfield, list, this);
 					int numberStartingPositions = received.getNumberTiles();
 					String theType, theOwner;
 					int hpLeft;
-						
+					ActionBar.addSpr();
+					
 					for(int i=0; i<numberStartingPositions; i++){
 						xe = received.getTileX(i);
 						ye = received.getTileY(i);
 							
 							if(received.existUnit(i)){	
-								
+								xe = received.getTileX(i);
+								ye = received.getTileY(i);
 								hpLeft = received.getUnitManPower(i);							
 								theType = received.getUnitType(i);	
 								theOwner = received.getUnitOwner(i);
@@ -686,50 +915,378 @@ public class RPGGame extends GameObject {
 									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
 									map.setToCenter(list.get(list.size()-1));
 									actionBar.initResources();
-										
-										
-								
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
 								}
+								if(theType.equalsIgnoreCase("Galley") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, true, 5));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Cavalry") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CavalrySheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Crusader") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Trireme") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true, 2));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Caravel") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true, 3));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Cannon") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Infantry") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 3,3, hpLeft, 1, 1, 1, 2, "Infantry",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Catapult") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Trebuchet") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 20,2, hpLeft, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Archer") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("ArcherSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,2, hpLeft, 1, 2, 1, 2, "Archer",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Legion") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 6,4, hpLeft, 1, 1, 1, 2, "Legion",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Pikeman") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("PikemanSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Phalanx") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this,getImages("PhalanxSheet.png",3,4), xe,ye, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 3, 2, "Phalanx",1000, true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Musketeer") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Siege Tower") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("SiegeTowerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 2, 1, 2, "SiegeTower",50,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(theType.equalsIgnoreCase("Wagon Train") && theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("WagonTrainSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 1, 2, 2, "WagonTrain",100,true));
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								
 								if(theType.equalsIgnoreCase("Knight") && !theOwner.equalsIgnoreCase(nick)){	
 										
 									list.add(new RPGSprite(this, getImages("KnightSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 12,8, hpLeft, 1, 1, 2, 2, "Knight",1000,false));				
-									if(map.fogofwar[xe][ye] == 0)
-										playfield.add(list.get(list.size()-1));
+									TurnBar.send(this);
+									TurnBar.initResources();
 									
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
 																
 								}
 								if(theType.equalsIgnoreCase("Infantry") && !theOwner.equalsIgnoreCase(nick)){	
 									
 									list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 3,3, hpLeft, 1, 1, 1, 2, "Infantry",1000,false));
-									if(map.fogofwar[xe][ye] == 0)
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
 										playfield.add(list.get(list.size()-1));
-									
+									Map.send(playfield, list, this);
 																
 								}
 								if(theType.equalsIgnoreCase("Crusader") && !theOwner.equalsIgnoreCase(nick)){	
 									
 									list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.DOWN, 18,12, hpLeft, 1, 1, 2, 2, "Crusader",1000,false));
-									if(map.fogofwar[xe][ye] == 0)
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
 										playfield.add(list.get(list.size()-1));
-									
+									Map.send(playfield, list, this);
 																
 								}
 							
-								if(theType.equalsIgnoreCase("Settler") && theOwner.equalsIgnoreCase(nick)){				
-									list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.DOWN, 0, 2, hpLeft, 1, 1, 1, 2, "Settler",100,false));
+								if(theType.equalsIgnoreCase("Settler") && theOwner.equalsIgnoreCase(nick)){	
+									
+									list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.UP, 0, 2, hpLeft, 1, 1, 1, 2, "Settler",100,true));
 									playfield.add(list.get(list.size()-1));
 									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
 									map.setToCenter(list.get(list.size()-1));
 									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+									
 								}
-						
+								
+								if(theType.equalsIgnoreCase("Settler") && !theOwner.equalsIgnoreCase(nick)){
+									
+									list.add(new RPGSprite(this, getImages("Chara2.png",3,4), xe,ye, 3, RPGSprite.DOWN, 0, 2, 10, 1, 1, 1, 2, "Settler",100,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > 0){
+										playfield.add(list.get(list.size()-1));
+										
+									}
+									//Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Crusader") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CrusaderSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Cavalry") && !theOwner.equalsIgnoreCase(nick)){			
+									list.add(new RPGSprite(this, getImages("CavalrySheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Siege Tower") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("SiegeTowerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 2, 1, 2, "SiegeTower",50,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Wagon Train") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("WagonTrainSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 1,0, 100, 1, 1, 2, 2, "WagonTrain",100,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Galley") && !theOwner.equalsIgnoreCase(nick)){			
+									list.add(new RPGSprite(this, getImages("GalleySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, false, 5));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Trireme") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("TriremeSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, false, 2));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye]> map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Caravel") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CaravelSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, false, 3));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Cannon") && !theOwner.equalsIgnoreCase(nick)){		
+									list.add(new RPGSprite(this, getImages("CannonSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Catapult") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("CatapultSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Trebuchet") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("TrebuchetSheet.png",3,4),xe,ye, 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Archer") && !theOwner.equalsIgnoreCase(nick)){			
+									list.add(new RPGSprite(this, parent.getImages("ArcherSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Infantry") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("InfantrySheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Legion") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("LegionSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Pikeman") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this, getImages("PikemanSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] == 0)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Phalanx") && !theOwner.equalsIgnoreCase(nick)){				
+									list.add(new RPGSprite(this,getImages("PhalanxSheet.png",3,4), xe,ye, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 3, 2, "Phalanx",1000, false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
+								if(theType.equalsIgnoreCase("Musketeer") && !theOwner.equalsIgnoreCase(nick)){			
+									list.add(new RPGSprite(this, getImages("MusketeerSheet.png",3,4), xe,ye, 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,false));
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] > map.uprlmt)
+										playfield.add(list.get(list.size()-1));
+									Map.send(playfield, list, this);
+								}
 							}
-							if(received.existCity(i)){	
-								list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false));														
-								playfield.add(list.get(list.size()-1));
-								break;
-							}
-							}
+							if(received.existCity(i)){
+								theOwner = received.getCityOwner(i);
+								
+								if(theOwner.equalsIgnoreCase(nick)){
+									list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));														
+									playfield.add(list.get(list.size()-1));
+									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+									map.setToCenter(list.get(list.size()-1));
+									actionBar.initResources();
+									TurnBar.send(this);
+									TurnBar.initResources();
+									
+								}
+								if(!theOwner.equalsIgnoreCase(nick)){
+									list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false));														
+									TurnBar.send(this);
+									TurnBar.initResources();
+									if(map.fogofwar[xe][ye] == 0)
+										playfield.add(list.get(list.size()-1));
+									
+								}
+							}}}
 						gameState = PLAYING;
 					
 						//break;
@@ -737,7 +1294,7 @@ public class RPGGame extends GameObject {
 				break;
 				
 			case TILEI:
-				
+				if(multiplayer==false){
 					if (keyPressed(KeyEvent.VK_Z) ||
 						rightClick() ||
 						keyPressed(KeyEvent.VK_ESCAPE)) {
@@ -746,8 +1303,20 @@ public class RPGGame extends GameObject {
 						windowHandler.setVisible(false);
 						gameState = PLAYING;
 					
+					}
 				}
-
+				if(multiplayer==true){
+					if (attacked==true && keyPressed(KeyEvent.VK_Z) ||
+							rightClick() ||
+							keyPressed(KeyEvent.VK_ESCAPE)) {
+							attacked=false;
+							
+							//fiende.setDirection(fiendeDirection);
+							windowHandler.setVisible(false);
+							gameState = WAIT;
+						
+					}
+				}
 				//dialog.update(elapsedTime);
 			break;			
 			
@@ -773,6 +1342,7 @@ public class RPGGame extends GameObject {
 		
 		if(list.size() > 0){
 			actionBar.update(elapsedTime);
+			
 			turnBar.update(elapsedTime);
 		}
 		windowHandler.update(elapsedTime);
@@ -801,16 +1371,28 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void newTurn(){
+		if(multiplayer==true){
+			TurnBar.line1=("Not your turn!");
+			TurnBar.initResources();
+		}
+		if(multiplayer==false){
+			TurnBar.line1=("Its your turn!");
+			TurnBar.initResources();
+			ActionBar.addSpr();
+		}
+		
 		Map.send(playfield, list, this);
 		if(multiplayer==true){
-		try {
+			try {
+				
 				p.endTurn();			
 			} catch (FailedException e) {
 			// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		ActionBar.addSpr();
+		
+		
 		for (int i=0; i < list.size(); i++){
 			if(list.get(i).getTyp()=="Barbarian"){
 				list.get(i).setOldTurn(turn);
@@ -853,16 +1435,17 @@ public class RPGGame extends GameObject {
 			}
 		} 
 	}
+	
 	public void spawnBarb(){
-		if(turn>25){
+		if(turn>100){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
 			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] > 0){
 				if(map.layer1[x][y] == 1 || map.layer1[x][y] == 0)
 					if (rand.nextInt(2) == 0)
-						list.add(new NPC(this, getImages("GalleySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Barbarian",logic));
+						list.add(new NPC(this, getImages("GalleySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "BarbarianB",logic));
 					else
-						list.add(new NPC(this, getImages("TriremeSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Barbarian",logic));
+						list.add(new NPC(this, getImages("TriremeSheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "BarbarianB",logic));
 				else{
 					int rnd = rand.nextInt(9);
 					if (rnd == 0)

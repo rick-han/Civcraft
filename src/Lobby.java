@@ -135,15 +135,15 @@ public class Lobby extends GameObject{
 	}
 	public void startGame(){
 		try {
-			p.startGame();
+			p.startGame(30,50);
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}
 	}
 	public void hostGame(){	
 		try {
-			//returned = p.host();
-			p.host();
+			returned = p.host();
+			//p.host();
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}

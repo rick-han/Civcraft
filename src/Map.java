@@ -20,6 +20,7 @@ public class Map extends AbstractTileBackground2 {
 	Chipset 	chipsetEs;
 	Chipset 	fogOfWarChipset;
 	Chipset[] 	chipset;	
+	static RPGSprite boot = null;
 	int[][] layer1;			// the lower tiles
 	int[][]	layer2;			// the fringe tiles
 	static int[][]	fogofwar;
@@ -147,7 +148,7 @@ public class Map extends AbstractTileBackground2 {
 					layer2[i][j] = 4;
 				else
 					layer2[i][j] = -1;
-				fogofwar[i][j] = 0;//uprlmt;
+				fogofwar[i][j] = uprlmt;
 			}
 		}
 	}
@@ -168,7 +169,7 @@ public class Map extends AbstractTileBackground2 {
 		if(list2!=null){
 			for(int h=0;h<list2.size();h++){
 				RPGSprite unit = list2.get(h);
-				if(unit.getTyp()=="Barbarian" && fogofwar[unit.getXX()][unit.getYY()] > uprlmt && unit.added==false){
+				if(unit.getTyp()=="Barbarian" || unit.getTyp()=="BarbarianB "&& fogofwar[unit.getXX()][unit.getYY()] > uprlmt && unit.added==false){
 					playfield.add(unit);
 					unit.added=true;
 				}
@@ -285,6 +286,12 @@ public class Map extends AbstractTileBackground2 {
 				//if (tilenum2 != -1)
 				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);
 			}
+			for(int h=0;h<list2.size();h++){
+				if(fogofwar[list2.get(h).getXX()][list2.get(h).getYY()] == 0 && list2.get(h).friend==false && list2.get(h).added==false){
+					//playfield.add(list2.get(h));
+					//list2.get(h).added=true;
+				}
+			}
 		}
 		if(multiplayer==false){
 			g.drawImage(fogOfWarChipset.image2, x, y, null);
@@ -316,6 +323,7 @@ public class Map extends AbstractTileBackground2 {
 	}
 	public boolean isOccupied(int tileX, int tileY, ArrayList<RPGSprite> lista, RPGSprite unit) {
 		list2=lista;
+		boot = null;
 		if (multiplayer==false){
 			for(int h = 0; h<list2.size();h++){
 				int xs = list2.get(h).getXX();
@@ -326,16 +334,19 @@ public class Map extends AbstractTileBackground2 {
 			}
 			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11){
 				if(layer3[tileX][tileY] != null){
-					for (int i = 0; i < list2.size(); i++){
-						if (layer3[tileX][tileY].friend==true && layer3[tileX][tileY].checkCapacity()){
-							for (int j = 0; j < layer3[tileX][tileY].capacity.length; j++){
-								
-								if (layer3[tileX][tileY].capacity[i]==null){
-									layer3[tileX][tileY].capacity[i]=unit;
-									layer3[tileX][tileY]=null;
-									RPGGame.bordat=true;
-									return false;
-								}
+					for (int l = 0; l < lista.size(); l++){
+						if (list2.get(l).getXX()==tileX && list2.get(l).getYY()==tileY && list2.get(l).checkCapacity())	
+							boot = list2.get(l);
+					}
+					if (layer3[tileX][tileY].friend==true && boot!=null){
+						for (int j = 0; j < boot.capacity.length; j++){
+							if (boot.capacity[j]==null){
+								unit.render=false;
+								boot.capacity[j]=unit;
+								playfield.remove(unit);
+								list2.remove(unit);
+								RPGGame.bordat=true;
+								return false;
 							}
 						}
 					}
@@ -350,44 +361,77 @@ public class Map extends AbstractTileBackground2 {
 				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City" || layer3[tileX][tileY].getTyp()!="SiegeTower")		
 					return true;
 			}
-			
+
 		}
 		if (multiplayer==true){
+			if (((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains")){
+				if(layer3[tileX][tileY] != null){
+					for (int l = 0; l < lista.size(); l++){
+						if (list2.get(l).getXX()==tileX && list2.get(l).getYY()==tileY && list2.get(l).checkCapacity())	
+							boot = list2.get(l);
+					}
+					if (layer3[tileX][tileY].friend==true && boot!=null){
+						for (int j = 0; j < boot.capacity.length; j++){
+							if (boot.capacity[j]==null){
+								unit.render=false;
+								boot.capacity[j]=unit;
+								//RPGGame.enhet=unit;
+								//playfield.remove(unit);
+								//list2.remove(unit);
+								RPGGame.bordat=true;
+								
+								return false;
+							}
+						}
+					}
+				}
+				return true;
+			}		
 			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea"))
 				return true;
 			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean"))
 				return true;
-			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountain"))
+			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains"))
 				return true;
 		}
 		return false;
+		
 	}
 	public boolean boatisOccupied(int tileX, int tileY, ArrayList<RPGSprite> lista, RPGSprite unit) {
 		list2=lista;
 		if(multiplayer==false){
-			for(int h = 0; h<list2.size();h++){
-				int xs = list2.get(h).getXX();
-				int ys = list2.get(h).getYY();		    			
-				if (layer3[tileX][tileY] != null)
-					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")				
-						return false;
-			}
-			if(layer1[tileX][tileY] != 1 || layer3[tileX][tileY] != null || layer1[tileX][tileY] !=0)
-				return true;
-			if(layer3[tileX][tileY] != null){
-				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City")		
-					return true;					
-				if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
+			if (layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 0){
+				if (layer3[tileX][tileY]==null){
+					
 					return false;
-			}			
-			
+					
+				}
+				else if (layer3[tileX][tileY]!=null && layer3[tileX][tileY].getTyp()!="City")
+					return true;
+			}
+			else if(layer1[tileX][tileY] != 1 && layer1[tileX][tileY] != 0){
+				for (int i=0; i<list2.size();i++){
+					if (list2.get(i).tileX==tileX && list2.get(i).tileY==tileY && list2.get(i)!=null){
+						if (list2.get(i).getTyp()=="City"){
+							
+							return false;
+						}
+						else if (list2.get(i).getTyp()!="City")
+							return true;
+					}
+				}
+			}
+			else if (layer1[tileX][tileY] != 1 && layer1[tileX][tileY] != 0){
+				return true;
+			}
 		}
 		if (multiplayer==true){
-			if(((String) (((ArrayList) k.get(tileX))).get(tileY))!=("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY))!=("Ocean"))
-				return true;
+			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean"))
+				return false;
 		}
-		return false;
-	} 
+		return true;
+	}
+
 
 	public RPGSprite getLayer3(int tileX, int tileY) {
 	try {

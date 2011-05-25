@@ -35,7 +35,8 @@ public class ActionBar{
 	static int oldturn=0;
 	static Map map;
 	static Graphics2D g;
-	Proxy p;
+	static Proxy p;
+	Result ret=null;
 	static boolean phal=false,diplo=false, siege=false, wagon=false, infa=false, treb=false, carav=false, gall=false, trir=false, cann=false, cava=false, cata=false, legi=false, pike=false, knig=false, crus=false, arch=false, muske=false;
 	public ActionBar(GameEngine parent) {
 		this.parent = parent;
@@ -72,9 +73,19 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					map.layer3[spr.getXX()][spr.getYY()] = null;		
 					playfield.remove(spr);
-					list.remove(spr);
+					if(RPGGame.multiplayer==true){
+						try {						
+							p.disbandUnit(spr.getXX(), spr.getYY());						
+							list.remove(spr);
+							
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
+					map.layer3[spr.getXX()][spr.getYY()] = null;		
+					
 									
 				}
 			};
@@ -154,9 +165,19 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
-					list.remove(spr);
+					if(RPGGame.multiplayer==true){
+						try {
+							
+							p.disbandUnit(spr.getXX(), spr.getYY());						
+							list.remove(spr);
+							
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
+					map.layer3[spr.getXX()][spr.getYY()] = null;	
 									
 				}
 			};
@@ -210,9 +231,19 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
-					list.remove(spr);
+					if(RPGGame.multiplayer==true){
+						try {
+							
+							p.disbandUnit(spr.getXX(), spr.getYY());						
+							list.remove(spr);
+							
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
+					map.layer3[spr.getXX()][spr.getYY()] = null;	
 									
 				}
 			};
@@ -554,9 +585,19 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
-					list.remove(spr);
+					if(RPGGame.multiplayer==true){
+						try {
+							
+							p.disbandUnit(spr.getXX(), spr.getYY());						
+							list.remove(spr);
+							
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
+					map.layer3[spr.getXX()][spr.getYY()] = null;	
 									
 				}
 			};
@@ -574,11 +615,71 @@ public class ActionBar{
 					RPGGame.funnen=false;
 					for (int i =0 ; i < spr.capacity.length; i++){
 						if(spr.capacity[i]!=null){
-							spr.capacity[i].tileX = spr.tileX;
-							spr.capacity[i].tileY = spr.tileY;
-							list.add(spr.capacity[i]);
-							playfield.add(spr.capacity[i]);
-							spr.capacity[i]=null;
+							if(RPGGame.multiplayer==false){
+								spr.capacity[i].tileX = spr.tileX;
+								spr.capacity[i].tileY = spr.tileY;
+								spr.capacity[i].render=true;
+								list.add(spr.capacity[i]);
+								playfield.add(spr.capacity[i]);
+								spr.capacity[i]=null;
+							}
+							if(RPGGame.multiplayer==true){
+								try {
+									if(!((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Sea") && !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Ocean") && !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Mountains")){
+										System.out.println("s");
+										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX+1, spr.tileY);
+										if(ret.getOk()){
+											spr.capacity[i].tileY = spr.tileY;
+											spr.capacity[i].tileX = spr.tileX+1;
+											spr.capacity[i].render=true;
+											list.add(spr.capacity[i]);
+											playfield.add(spr.capacity[i]);
+											spr.capacity[i]=null;
+										}
+									}
+									else if(!((String) (((ArrayList) Map.k.get(spr.tileX-1))).get(spr.tileY)).equalsIgnoreCase("Sea") && !((String) (((ArrayList) Map.k.get(spr.tileX-1))).get(spr.tileY)).equalsIgnoreCase("Ocean") && !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Mountains")){
+										System.out.println("s2");
+										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX-1, spr.tileY);
+										if(ret.getOk()){
+											spr.capacity[i].tileY = spr.tileY;
+											spr.capacity[i].tileX = spr.tileX-1;
+											spr.capacity[i].render=true;
+											list.add(spr.capacity[i]);
+											playfield.add(spr.capacity[i]);
+											spr.capacity[i]=null;
+										}
+									}
+									else if(!((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY+1)).equalsIgnoreCase("Sea") && !((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY+1)).equalsIgnoreCase("Ocean") && !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Mountains")){
+										System.out.println("s3");
+										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX, spr.tileY+1);
+										if(ret.getOk()){
+											spr.capacity[i].tileX = spr.tileX;
+											spr.capacity[i].tileY = spr.tileY+1;
+											spr.capacity[i].render=true;
+											list.add(spr.capacity[i]);
+											playfield.add(spr.capacity[i]);
+											spr.capacity[i]=null;
+										}
+									}
+									else if(!((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY-1)).equalsIgnoreCase("Sea") && !((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY-1)).equalsIgnoreCase("Ocean") && !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Mountains")){
+										System.out.println("s4");
+										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX, spr.tileY-1);
+										if(ret.getOk()){
+											spr.capacity[i].tileX = spr.tileX;
+											spr.capacity[i].tileY = spr.tileY-1;
+											spr.capacity[i].render=true;
+											list.add(spr.capacity[i]);
+											playfield.add(spr.capacity[i]);
+											spr.capacity[i]=null;
+										}
+									}
+									} catch (FailedException e) {
+									// TODO Auto-generated catch block
+								e.printStackTrace();
+								}
+							}
+							
+							
 						}
 					}
 				}
@@ -629,9 +730,19 @@ public class ActionBar{
 				public void doAction(){
 					RPGGame.gameState=0;
 					RPGGame.funnen=false;
-					map.layer3[spr.getXX()][spr.getYY()]=null;
 					playfield.remove(spr);
-					list.remove(spr);
+					if(RPGGame.multiplayer==true){
+						try {
+							
+							p.disbandUnit(spr.getXX(), spr.getYY());						
+							list.remove(spr);
+							
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+						e.printStackTrace();
+						}
+					}
+					map.layer3[spr.getXX()][spr.getYY()] = null;	
 									
 				}
 			};
@@ -690,112 +801,278 @@ public class ActionBar{
 	}
 	public static void addSpr(){
 		if(RPGGame.turn - oldturn == 2 && arch){
+			
 			list.add(new RPGSprite(own, parent.getImages("ArcherSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,true));
 			playfield.add(list.get(list.size()-1));
+			list.get(list.size()-1).sparad=true;
 			oldturn = 0;
 			arch=false;
+			
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Archer",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 3 && phal){
+			
 			list.add(new RPGSprite(own,parent.getImages("PhalanxSheet.png",3,4), sprC.getXX(),sprC.getYY(), 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Phalanx",1000, true));
 			playfield.add(list.get(list.size()-1));
+			list.get(list.size()-1).sparad=true;
 			oldturn = 0;
 			phal=false;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Phalanx",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
+			
 		}
 		else if(RPGGame.turn - oldturn == 2 && diplo){
 			list.add(new RPGSprite(own,parent.getImages("PhalanxSheet.png",3,4), sprC.getXX(),sprC.getYY(), 3, RPGSprite.LEFT, 1, 0, 25, 1, 1, 3, 2, "Diplomat",25, true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			diplo=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Diplomat",25);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 3 && infa){
 			list.add(new RPGSprite(own, parent.getImages("InfantrySheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 3,3, 100, 1, 1, 1, 2, "Infantry",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			infa=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Infantry",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 3 && wagon){
-			list.add(new RPGSprite(own, parent.getImages("InfantrySheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 1,0, 100, 1, 1, 2, 2, "WagonTrain",100,true));
+			list.add(new RPGSprite(own, parent.getImages("WagonTrainSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 1,0, 100, 1, 1, 2, 2, "WagonTrain",100,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			wagon=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Wagon Train",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 4 && cata){
 			list.add(new RPGSprite(own, parent.getImages("CatapultSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			cata=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Catapult",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 4 && legi){
 			list.add(new RPGSprite(own, parent.getImages("LegionSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 1, 2, "Legion",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			legi=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Legion",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 4 && pike){
 			list.add(new RPGSprite(own, parent.getImages("PikemanSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 2,3, 100, 1, 1, 1, 2, "Pikeman",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			pike=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Pikeman",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 5 && muske){
 			list.add(new RPGSprite(own, parent.getImages("MusketeerSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 8,6, 100, 1, 2, 1, 2, "Musketeer",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			muske=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Musketeer",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 6 && siege){
-			list.add(new RPGSprite(own, parent.getImages("MusketeerSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 1,0, 100, 1, 2, 1, 2, "SiegeTower",50,true));
+			list.add(new RPGSprite(own, parent.getImages("SiegeTowerSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 1,0, 100, 1, 2, 1, 2, "SiegeTower",50,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			siege=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Siege Tower",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 7 && treb){
 			list.add(new RPGSprite(own, parent.getImages("TrebuchetSheet.png",3,4),sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 20,2, 100, 1, 3, 1, 2, "Trebuchet",1000,75,0,0,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;	
 			treb=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Trebuchet",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 8 && cava){
 			list.add(new RPGSprite(own, parent.getImages("CavalrySheet.png",3,4),sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 6,4, 100, 1, 1, 2, 2, "Cavalry",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			cava=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Cavalry",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 10 && knig){
 			list.add(new RPGSprite(own, parent.getImages("KnightSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 12,8, 100, 1, 1, 2, 2, "Knight",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			knig=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Knight",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 12 && crus){
 			list.add(new RPGSprite(own, parent.getImages("CrusaderSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 18,12, 100, 1, 1, 2, 2, "Crusader",1000,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			crus=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Crusader",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
-		else if(RPGGame.turn - oldturn == 16 && trir){
+		else if(RPGGame.turn - oldturn == 2 && trir){ // <--- 16
 			list.add(new RPGSprite(own, parent.getImages("TriremeSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 4,3, 50, 1, 1, 3, 2, "Trireme",1000, true, 2));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;		
 			trir=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Trireme",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 20 && cann){
 			list.add(new RPGSprite(own, parent.getImages("CannonSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 30,3, 100, 1, 4, 1, 2, "Cannon",1000,0,100,100,true));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;	
 			cann=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Cannon",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 58 && gall){
 			list.add(new RPGSprite(own, parent.getImages("GalleySheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "Galley",1000, true, 5));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			gall=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Galley",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 		else if(RPGGame.turn - oldturn == 70 && carav){
 			list.add(new RPGSprite(own, parent.getImages("CaravelSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true, 3));
 			playfield.add(list.get(list.size()-1));
 			oldturn = 0;
 			carav=false;
+			list.get(list.size()-1).sparad=true;
+			if(RPGGame.multiplayer==true){
+				try {
+					p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Caravel",100);
+				} catch (FailedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			}
 		}
 	}
 	public static void get(Graphics2D g2) {
