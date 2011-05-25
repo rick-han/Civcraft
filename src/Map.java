@@ -283,8 +283,7 @@ public class Map extends AbstractTileBackground2 {
 				}
 				// render layer 2
 				int tilenum2 = layer2[tileX][tileY];
-				//if (tilenum2 != -1)
-				//	g.drawImage(terrainAddonChipset.image[tilenum2], x, y-6, null);
+				
 			}
 			for(int h=0;h<list2.size();h++){
 				if(fogofwar[list2.get(h).getXX()][list2.get(h).getYY()] == 0 && list2.get(h).friend==false && list2.get(h).added==false){
@@ -375,9 +374,6 @@ public class Map extends AbstractTileBackground2 {
 							if (boot.capacity[j]==null){
 								unit.render=false;
 								boot.capacity[j]=unit;
-								//RPGGame.enhet=unit;
-								//playfield.remove(unit);
-								//list2.remove(unit);
 								RPGGame.bordat=true;
 								
 								return false;

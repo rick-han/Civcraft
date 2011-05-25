@@ -37,7 +37,7 @@ public class ActionBar{
 	static Graphics2D g;
 	static Proxy p;
 	Result ret=null;
-	static boolean phal=false,diplo=false, siege=false, wagon=false, infa=false, treb=false, carav=false, gall=false, trir=false, cann=false, cava=false, cata=false, legi=false, pike=false, knig=false, crus=false, arch=false, muske=false;
+	static boolean phal=false,diplo=false, sett=false, siege=false, wagon=false, infa=false, treb=false, carav=false, gall=false, trir=false, cann=false, cava=false, cata=false, legi=false, pike=false, knig=false, crus=false, arch=false, muske=false;
 	public ActionBar(GameEngine parent) {
 		this.parent = parent;
 	}
@@ -501,16 +501,14 @@ public class ActionBar{
 						if (!map.boatisOccupied(spr.getXX()+1, spr.getYY(), list, spr) || !map.boatisOccupied(spr.getXX()-1, spr.getYY(), list, spr) || !map.boatisOccupied(spr.getXX(), spr.getYY()+1, list, spr) || !map.boatisOccupied(spr.getXX(), spr.getYY()-1, list, spr) || !map.boatisOccupied(spr.getXX()-1, spr.getYY()-1, list, spr) || !map.boatisOccupied(spr.getXX()+1, spr.getYY()-1, list, spr)){
 							oldturn = RPGGame.turn;
 							carav=true;
-							//list.add(new RPGSprite(own, parent.getImages("CaravelSheet.png",3,4), spr.getXX(), spr.getYY(), 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true));
-							//playfield.add(list.get(list.size()-1));
+							
 						}
 					}
 					if(even){
 						if (!map.boatisOccupied(spr.getXX()+1, spr.getYY()+1, list, spr) || !map.boatisOccupied(spr.getXX()-1, spr.getYY()+1, list, spr) || !map.boatisOccupied(spr.getXX(), spr.getYY()-1, list, spr) || !map.boatisOccupied(spr.getXX()-1, spr.getYY(), list, spr)|| !map.boatisOccupied(spr.getXX()+1, spr.getYY(), list, spr)|| !map.boatisOccupied(spr.getXX(), spr.getYY()+1, list, spr)){
 							oldturn = RPGGame.turn;
 							carav=true;
-							//list.add(new RPGSprite(own, parent.getImages("CaravelSheet.png",3,4), spr.getXX(), spr.getYY(), 3, RPGSprite.RIGHT, 50,40, 100, 1, 3, 6, 2, "Caravel",1000, true));
-							//playfield.add(list.get(list.size()-1));	
+								
 						}
 						
 					}
@@ -532,6 +530,15 @@ public class ActionBar{
 					RPGGame.funnen=false;
 					RPGGame.gameState=0;
 					wagon=true;	
+				}
+			};
+			TButton btn21 = new TButton("Settler", 610, 5, 60, 30) {
+				public void doAction() {
+					oldturn = RPGGame.turn;
+					RPGGame.funnen=false;
+					RPGGame.gameState=0;
+					sett=true;
+					
 				}
 			};
 			line1 = ("Population: " + spr.getPOP());			
@@ -556,7 +563,7 @@ public class ActionBar{
 			actionBar.add(btn15);
 			actionBar.add(btn16);
 			actionBar.add(btn17);
-			
+			actionBar.add(btn21);
 			actionBar.add(btn19);
 			actionBar.add(btn20);
 			//actionBar.add(textField);
@@ -878,6 +885,26 @@ public class ActionBar{
 				e.printStackTrace();
 				}
 			}
+		}
+		else if(RPGGame.turn - oldturn == 3 && sett){	 		
+		     list.add(new RPGSprite(own, parent.getImages("Chara2.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 0, 2, 10, 1, 1, 1, 2, "Settler",100,true)); 		
+		     playfield.add(list.get(list.size()-1));		
+		     oldturn = 0;		
+		     sett=false; 		
+		     list.get(list.size()-1).sparad=true; 		
+		      if(RPGGame.multiplayer==true){ 		
+		        try {	 		
+		          p.madeUnit(sprC.getXX(), sprC.getYY(), RPGGame.nick,"Settler",100);
+		 		
+		       } catch (FailedException e) {
+		 		
+		          // TODO Auto-generated catch block
+		 		
+		        e.printStackTrace();
+		 		
+		       	}
+		 		
+		      }		      
 		}
 		else if(RPGGame.turn - oldturn == 4 && cata){
 			list.add(new RPGSprite(own, parent.getImages("CatapultSheet.png",3,4), sprC.getXX(), sprC.getYY(), 3, RPGSprite.RIGHT, 12,3, 100, 1, 2, 1, 2, "Catapult",1000, 50,0,0,true));
