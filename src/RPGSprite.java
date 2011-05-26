@@ -42,6 +42,7 @@ public class RPGSprite extends AdvanceSprite{
 	boolean selmov=false;
 	boolean fortified=false;
 	boolean friend;
+	boolean idle;
 	int atk;
 	double def;
 	int hp;
@@ -159,6 +160,37 @@ public class RPGSprite extends AdvanceSprite{
 		// the animation speed related with movement speed
 		getAnimationTimer().setDelay(550/moveSpeed);
 
+		speed = 0.04*moveSpeed;
+	}
+	public RPGSprite(RPGGame owner, BufferedImage[] images, int tileX, int tileY,
+			 int moveSpeed, int direction, int atk, int def, int hp, int hit, int range, int move, int sightRange, String typ, int food, boolean friend, boolean idle) {
+		super(images,(tileX*32)-8,(tileY*32)-32);
+
+		this.owner = owner;
+		this.map = owner.map;
+		this.tileX = tileX;
+		this.tileY = tileY;
+		this.hp=hp;
+		this.atk=atk;
+		this.def=def;
+		this.typ=typ;
+		this.hit=hit;
+		this.range=range;
+		this.sightRange=sightRange;
+		this.move=move;
+		this.origdef=def;
+		this.food=food;
+		this.friend=friend;
+		map.layer3[tileX][tileY] = this;	// mark sprite position
+		this.added=false;
+		this.origatk=atk;
+		this.idle=true;
+		// init status, standing facing direction
+		setAnimation(STANDING, direction);
+
+		// the animation speed related with movement speed
+		getAnimationTimer().setDelay(550/moveSpeed);
+		
 		speed = 0.04*moveSpeed;
 	}
 	

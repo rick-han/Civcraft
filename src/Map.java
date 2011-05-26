@@ -331,7 +331,7 @@ public class Map extends AbstractTileBackground2 {
 					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")
 						return false;
 			}
-			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1 || layer1[tileX][tileY] == 11){
+			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1){
 				if(layer3[tileX][tileY] != null){
 					for (int l = 0; l < lista.size(); l++){
 						if (list2.get(l).getXX()==tileX && list2.get(l).getYY()==tileY && list2.get(l).checkCapacity())	
@@ -363,7 +363,7 @@ public class Map extends AbstractTileBackground2 {
 
 		}
 		if (multiplayer==true){
-			if (((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains")){
+			if (((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean")){
 				if(layer3[tileX][tileY] != null){
 					for (int l = 0; l < lista.size(); l++){
 						if (list2.get(l).getXX()==tileX && list2.get(l).getYY()==tileY && list2.get(l).checkCapacity())	
@@ -386,8 +386,6 @@ public class Map extends AbstractTileBackground2 {
 			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea"))
 				return true;
 			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean"))
-				return true;
-			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Mountains"))
 				return true;
 		}
 		return false;
@@ -457,7 +455,6 @@ public class Map extends AbstractTileBackground2 {
 		try {
 			return (layer1[(int) tileX][(int) tileY] == 0 ||
 					layer1[(int) tileX][(int) tileY] == 1 ||
-					layer1[(int) tileX][(int) tileY] == 11 ||
 					layer3[(int) tileX][(int) tileY] != null);
 		} catch (Exception e) {
 			// out of bounds
