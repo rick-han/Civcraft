@@ -278,7 +278,7 @@ public class RPGSprite extends AdvanceSprite{
 		}
 		else
 			moveThisTurn+=1; //ska kolla efter terrainaddons som påverkar movement
-		Map.reveal(tileX,tileY, sightRange);
+		Map.reveal(tileX,tileY, move);//sightRange);
 	}
 	public int getHP(){
 		return hp;
@@ -349,10 +349,9 @@ public class RPGSprite extends AdvanceSprite{
 		if(horiz > tileX && vert > tileY){
 			
 			setDirection(1);
-			if (even){			
-				tileX+=1; 
-				tileY+=1;	
-				
+			if (even){
+				tileX+=1;
+				tileY+=1;
 				
 				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
 					if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
@@ -360,7 +359,7 @@ public class RPGSprite extends AdvanceSprite{
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}
 				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
@@ -369,19 +368,31 @@ public class RPGSprite extends AdvanceSprite{
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}
 				
-				map.layer3[tileX][tileY] = null;		 
+				map.layer3[tileX][tileY] = null;
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
-				
+				/*
+				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
+					if (map.boatisOccupied(tileX, tileY, list2, unit) == false){
+						
+						map.layer3[tileX+1][tileY+1] = unit;
+						
+						if (multiplayer==true){
+							
+						}
+						
+						return false;
+					}
+				}
+				*/
 				return true;
 				}
 		}
-	  
 		else if(horiz < tileX && vert < tileY){
 			setDirection(0);
 			if (!even){
@@ -394,7 +405,7 @@ public class RPGSprite extends AdvanceSprite{
 						tileY+=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}
 				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
@@ -403,7 +414,7 @@ public class RPGSprite extends AdvanceSprite{
 						tileY+=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}		 
 				
@@ -417,7 +428,7 @@ public class RPGSprite extends AdvanceSprite{
 		}	
 		else if(horiz < tileX && vert > tileY){
 			setDirection(0);
-			if(even){			
+			if(even){
 				tileX-=1;
 				tileY+=1;
 				
@@ -427,7 +438,7 @@ public class RPGSprite extends AdvanceSprite{
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}
 				else if (unit.getTyp() != "Galley" && unit.getTyp() != "Caravel" && unit.getTyp() != "Trireme"){
@@ -436,7 +447,7 @@ public class RPGSprite extends AdvanceSprite{
 						tileY-=1;
 						map.layer3[tileX][tileY] = unit;
 						
-						return false;				
+						return false;
 					}
 				}
 				
@@ -513,14 +524,14 @@ public class RPGSprite extends AdvanceSprite{
 				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 					tileX+=1;
 					map.layer3[tileX][tileY] = unit;
-					return false;				
+					return false;
 				}
 			}
 			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
 				if (map.isOccupied(tileX, tileY, list2, unit) == true){
 					tileX+=1;	
 					map.layer3[tileX][tileY] = unit;
-					return false;				
+					return false;
 				}
 			}
 			map.layer3[tileX][tileY] = null;
@@ -558,10 +569,10 @@ public class RPGSprite extends AdvanceSprite{
 			setDirection(2);
 			tileY-=1;
 			if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
-				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){			
+				if (map.boatisOccupied(tileX, tileY, list2, unit) == true){
 					tileY+=1;
 					map.layer3[tileX][tileY] = unit;
-					return false;				
+					return false;
 				}
 			}
 			else if (unit.getTyp() != "Galley" || unit.getTyp() != "Caravel" || unit.getTyp() != "Trireme"){
@@ -579,8 +590,8 @@ public class RPGSprite extends AdvanceSprite{
 			return true;
 		}	
 		map.layer3[tileX][tileY] = null;
-		map.layer3[tileX][tileY] = this;     		
-		setStatus(MOVING);     		
+		map.layer3[tileX][tileY] = this;
+		setStatus(MOVING);
 		setFrame(getFrame() + 1);
 		return true;
 	}

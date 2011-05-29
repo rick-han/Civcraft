@@ -37,16 +37,16 @@ public class Receiver implements Runnable
 		//	System.out.println("getResult()");
 		}
 		Result toReturn = getPacket();
-       		setPacket(null);
+			setPacket(null);
 		if(!toReturn.getOk()){
 			throw new FailedException(toReturn.getRequestFail(), toReturn.getFailMsg());
 		}
 		return toReturn;
 	}
 
-    private synchronized void setPacket(Result res){
-        packet = res;
-    }
+	private synchronized void setPacket(Result res){
+		packet = res;
+	}
 
     private synchronized Result getPacket(){
         return packet;

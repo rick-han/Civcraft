@@ -375,8 +375,17 @@ public class Map extends AbstractTileBackground2 {
 								unit.render=false;
 								boot.capacity[j]=unit;
 								RPGGame.bordat=true;
-								
+								/*
+								 * try {
+									ActionBar.p.disbandUnit(unit.getXX(), unit.getYY());
+									list2.remove(unit);
+									
+								} catch (FailedException e) {
+									// TODO Auto-generated catch block
+								e.printStackTrace();
+								}
 								return false;
+								*/
 							}
 						}
 					}
