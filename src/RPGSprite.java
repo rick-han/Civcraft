@@ -42,7 +42,7 @@ public class RPGSprite extends AdvanceSprite{
 	boolean selmov=false;
 	boolean fortified=false;
 	boolean friend;
-	boolean idle;
+	boolean idle=false;
 	int atk;
 	double def;
 	int hp;
@@ -87,7 +87,7 @@ public class RPGSprite extends AdvanceSprite{
 		this.origatk=atk;
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
-
+		this.idle=false;
 		// the animation speed related with movement speed
 		getAnimationTimer().setDelay(550/moveSpeed);
 
@@ -123,7 +123,8 @@ public class RPGSprite extends AdvanceSprite{
 		}
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
-
+		this.idle=false;
+		// the animation 
 		// the animation speed related with movement speed
 		getAnimationTimer().setDelay(550/moveSpeed);
 
@@ -156,7 +157,8 @@ public class RPGSprite extends AdvanceSprite{
 		this.origatk=atk;
 		// init status, standing facing direction
 		setAnimation(STANDING, direction);
-
+		this.idle=false;
+		// the animation 
 		// the animation speed related with movement speed
 		getAnimationTimer().setDelay(550/moveSpeed);
 
@@ -192,6 +194,10 @@ public class RPGSprite extends AdvanceSprite{
 		getAnimationTimer().setDelay(550/moveSpeed);
 		
 		speed = 0.04*moveSpeed;
+	}
+	
+	public void setIdle(){
+		idle=true;
 	}
 	
 	public void setImg(BufferedImage[] images){
@@ -242,7 +248,7 @@ public class RPGSprite extends AdvanceSprite{
 		return gunpowder;
 	}
 	public void setFort(){
-		fortified=true;
+		fortified=!fortified;
 	}
 	public boolean selm(){
 		return selmov;
@@ -269,7 +275,15 @@ public class RPGSprite extends AdvanceSprite{
 		return typ;
 	}
 	public void setMov(){
+		
 		mov=false;
+	}
+	public boolean canMove()
+	{
+		if (move <= moveThisTurn)
+			return false;
+		else
+			return true;
 	}
 	public void movement(){
 		if (move == moveThisTurn){
@@ -376,20 +390,7 @@ public class RPGSprite extends AdvanceSprite{
 				map.layer3[tileX][tileY] = this;
 				setStatus(MOVING);
 				setFrame(getFrame() + 1);
-				/*
-				if (unit.getTyp() == "Galley" || unit.getTyp() == "Caravel" || unit.getTyp() == "Trireme" || unit.getTyp() == "BarbarianB"){
-					if (map.boatisOccupied(tileX, tileY, list2, unit) == false){
-						
-						map.layer3[tileX+1][tileY+1] = unit;
-						
-						if (multiplayer==true){
-							
-						}
-						
-						return false;
-					}
-				}
-				*/
+				
 				return true;
 				}
 		}
@@ -614,13 +615,3 @@ public class RPGSprite extends AdvanceSprite{
 	}
 	
 }
-
-
-	
-
-	
-		
-	
-
-	
-

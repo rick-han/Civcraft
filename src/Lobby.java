@@ -19,6 +19,8 @@ public class Lobby extends GameObject{
 	String tmp;
 	TTextField toJoinText;
 	TTextField newCivText;
+	TTextField heightText;
+	TTextField widthText;
 	TLabel listItemsLabel;
 	TButton startButton;
 	TButton hostButton;
@@ -46,12 +48,7 @@ public class Lobby extends GameObject{
 		hostItemsLabel = new TLabel("", 315, 50, 300, 235);
 		newCivText = new TTextField("", 315, 380, 110 ,30);
 		frame.add(newCivText);
-		newCivButton =new TButton("Change Civilisation", 445, 380, 180, 30) {
-			public void doAction() {
-				changeCivilisation(newCivText.getText());
-			}
-		};
-		listButton =new TButton("List", 40, 370, 80, 30) {
+		listButton = new TButton("List", 40, 370, 80, 30) {
 			public void doAction() {
 				listGames();
 			}
@@ -66,19 +63,28 @@ public class Lobby extends GameObject{
 				hostGame();
 			}
 		};
-		startButton = new TButton("Start Game", 425, 300, 140, 30){
+		leaveButton = new TButton("Leave Game", 425, 300, 140, 30){
+			public void doAction(){
+				leaveGame();
+			}
+		};
+		heightText = new TTextField("26", 455, 340, 60,30);
+		widthText = new TTextField("26", 535, 340, 60 ,30);
+		startButton = new TButton("Start Game", 315, 340, 120, 30){
 			public void doAction() {
 				startGame();
 			}
 		};
-		leaveButton = new TButton("Leave Game", 315, 340, 160, 30){
-			public void doAction(){
-				leaveGame();
+		newCivButton = new TButton("Change Civilisation", 445, 380, 180, 30) {
+			public void doAction() {
+				changeCivilisation(newCivText.getText());
 			}
 		};
 		startButton.setEnabled(false);
 		leaveButton.setEnabled(false);
 		newCivButton.setEnabled(false);
+		frame.add(heightText);
+		frame.add(widthText);
 		frame.add(startButton);
 		frame.add(hostButton);
 		frame.add(joinButton);
@@ -135,7 +141,7 @@ public class Lobby extends GameObject{
 	}
 	public void startGame(){
 		try {
-			p.startGame(30,50);
+			p.startGame(Integer.valueOf(widthText.getText()), Integer.valueOf(heightText.getText()));
 		} catch (FailedException e) {
 			e.printStackTrace();
 		}

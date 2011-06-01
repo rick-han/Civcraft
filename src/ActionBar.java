@@ -96,8 +96,7 @@ public class ActionBar{
 					playfield.add(list.get(list.size()-1));
 					list.get(list.size()-1).setPOP(1000);	
 					map.layer3[spr.getXX()][spr.getYY()] = list.get(list.size()-1);
-					//list.add(new RPGSprite(own,parent.getImages("PhalanxSheet.png",3,4), spr.getXX(),spr.getYY()+1, 3, RPGSprite.LEFT, 2, 5, 100, 1, 1, 1, 2, "Settler",1000, true));
-					//playfield.add(list.get(list.size()-1));
+				
 					if(RPGGame.multiplayer==true){
 						try {
 							p.builtCity(spr.getXX(), spr.getYY(), "City");
@@ -185,6 +184,17 @@ public class ActionBar{
 					RPGGame.gameState=0;
 					spr.setFort();
 					spr.movement();
+					if (RPGGame.multiplayer==true){
+						 try {
+							if (spr.fortified)
+								p.fortify(spr.getXX(), spr.getYY());
+							else
+								p.unFortify(spr.getXX(), spr.getYY());
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					RPGGame.funnen=false;
 				     
 				
@@ -251,6 +261,17 @@ public class ActionBar{
 					RPGGame.gameState=0;
 					spr.setFort();
 					spr.movement();
+					if (RPGGame.multiplayer==true){
+						 try {
+							if (spr.fortified)
+								p.fortify(spr.getXX(), spr.getYY());
+							else
+								p.unFortify(spr.getXX(), spr.getYY());
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					RPGGame.funnen=false;
 				
 				}
@@ -310,10 +331,10 @@ public class ActionBar{
 					RPGGame.funnen=false;
 					RPGGame.gameState=0;
 					if (spr.idle){
-						constr = new Construction(spr,spr.getXX(),spr.getYY(), RPGGame.turn + 2 ,"Diplomat");
+						constr = new Construction(spr, spr.getXX(),spr.getYY(), RPGGame.turn + 2 ,"Diplomat");
 						RPGGame.byggList.add(constr);
 						spr.idle=false;
-					}
+					};
 				}
 			};
 			TButton btn4 = new TButton("Infantry", 70, 45, 60, 30) {
@@ -643,6 +664,17 @@ public class ActionBar{
 					RPGGame.gameState=0;
 					spr.setFort();
 					spr.movement();
+					if (RPGGame.multiplayer==true){
+						 try {
+							if (spr.fortified)
+								p.fortify(spr.getXX(), spr.getYY());
+							else
+								p.unFortify(spr.getXX(), spr.getYY());
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					RPGGame.funnen=false;
 				}
 			};
@@ -664,7 +696,6 @@ public class ActionBar{
 								try {
 									if(!((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Sea") 
 											&& !((String) (((ArrayList) Map.k.get(spr.tileX+1))).get(spr.tileY)).equalsIgnoreCase("Ocean")){
-										System.out.println("s1");
 										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX+1, spr.tileY);
 										if(ret.getOk()){
 											spr.capacity[i].tileY = spr.tileY;
@@ -677,7 +708,6 @@ public class ActionBar{
 									}
 									else if(!((String) (((ArrayList) Map.k.get(spr.tileX-1))).get(spr.tileY)).equalsIgnoreCase("Sea") 
 											&& !((String) (((ArrayList) Map.k.get(spr.tileX-1))).get(spr.tileY)).equalsIgnoreCase("Ocean")){
-										System.out.println("s2");
 										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX-1, spr.tileY);
 										if(ret.getOk()){
 											spr.capacity[i].tileY = spr.tileY;
@@ -690,7 +720,6 @@ public class ActionBar{
 									}
 									else if(!((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY+1)).equalsIgnoreCase("Sea") 
 											&& !((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY+1)).equalsIgnoreCase("Ocean")){
-										System.out.println("s3");
 										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX, spr.tileY+1);
 										if(ret.getOk()){
 											spr.capacity[i].tileX = spr.tileX;
@@ -703,7 +732,6 @@ public class ActionBar{
 									}
 									else if(!((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY-1)).equalsIgnoreCase("Sea") 
 											&& !((String) (((ArrayList) Map.k.get(spr.tileX))).get(spr.tileY-1)).equalsIgnoreCase("Ocean")){
-										System.out.println("s4");
 										ret = p.moveOutUnit(spr.capacity[i].tileX, spr.capacity[i].tileY, spr.capacity[i].getTyp() , spr.capacity[i].getHP(), spr.tileX, spr.tileY-1);
 										if(ret.getOk()){
 											spr.capacity[i].tileX = spr.tileX;
@@ -792,6 +820,17 @@ public class ActionBar{
 					RPGGame.gameState=0;
 					spr.setFort();
 					spr.movement();
+					if (RPGGame.multiplayer==true){
+						 try {
+							if (spr.fortified)
+								p.fortify(spr.getXX(), spr.getYY());
+							else
+								p.unFortify(spr.getXX(), spr.getYY());
+						} catch (FailedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					RPGGame.funnen=false;
 				     
 				

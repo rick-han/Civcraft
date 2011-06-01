@@ -24,6 +24,7 @@ public class RPGGame extends GameObject {
 	RPGSprite		hero,hero2;
 	static boolean delt=false;
 	Map map;
+	boolean ga=false;
     int xs=0, ys=0, xd=0,yd=0, xScroll=0, yScroll=0;
     static boolean multiplayer=false;
     static int turn=1;
@@ -406,7 +407,7 @@ public class RPGGame extends GameObject {
 								if(battlescore==4){
 									dialogNP[0]="This battle ended with no winner!\n";
 									dialogNP[1]="you lost brave men on the field\n";
-									dialogNP[2]=returned.getAttackerLeft()+" of your men are left";						   
+									dialogNP[2]=returned.getAttackerLeft()+" of your men are left";
 									windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 									windowHandler.setVisible(true);
 									gameState=TILEI;
@@ -427,7 +428,7 @@ public class RPGGame extends GameObject {
 						   int waves = wave1+wave2;
 					   
 						   battlescore=3;
-						   if (fiende.isFortified()){									  
+						   if (fiende.isFortified()){
 							   fiende.setDEF(fiende.getDEF()*1.5);
 						   }else fiende.setDEF(fiende.origdef);
 					   
@@ -453,18 +454,17 @@ public class RPGGame extends GameObject {
 							   int ys = list.get(h).getYY();
 							   int xs = list.get(h).getXX();
 							   if(xs == list.get(j).getXX() && ys == list.get(j).getYY() && list.get(j).getTyp()=="SiegeTower"){
-								   list.get(h).setATK(list.get(h).getATK()*2);						   
+								   list.get(h).setATK(list.get(h).getATK()*2);
 								   break;
 							   }else list.get(h).setATK(list.get(h).origatk);
 						   
 					 	  }
-					   					  
-						   while(waves > 0){	
+						  while(waves > 0){	
 						 
 							   if (list.get(h).getTyp() != "Trireme" && list.get(h).getTyp() != "Musketeer" && list.get(h).getTyp() != "Archer" && list.get(h).getTyp() != "Catapult" && list.get(h).getTyp() != "Trebuchet" && list.get(h).getTyp() != "Cannon" && list.get(h).getTyp() != "Caravel" && list.get(h).getTyp() != "Galley"){
 							   
-								   double DUDP=(fiende.getDEF()*fiende.getHP()/100);								   				   
-								   double AUDP=(list.get(h).getATK()*list.get(h).getHP())/100;								   								  
+								   double DUDP=(fiende.getDEF()*fiende.getHP()/100);
+								   double AUDP=(list.get(h).getATK()*list.get(h).getHP())/100;
 								   double ATKR1 = rand.nextDouble() * AUDP;
 								   double ATKR2 = rand2.nextDouble() * AUDP;
 								   double DEFR1 = rand3.nextDouble() * DUDP;
@@ -478,10 +478,12 @@ public class RPGGame extends GameObject {
 							   
 								   if (fiende.getHP()<=0 || DDU<=0){	
 									   battlescore=1;
-									   playfield.remove(fiende);	
 									   list.get(h).movement();
 									   list.get(h).setFood(list.get(h).getFood()+fiende.getFood());
-									   map.layer3[targetX][targetY] = null;	
+									   if (!fiende.getTyp().equalsIgnoreCase("City")){
+										   playfield.remove(fiende);
+										   map.layer3[targetX][targetY] = null;
+									   }	
 								   
 									   break;					   
 								   }
@@ -490,8 +492,8 @@ public class RPGGame extends GameObject {
 									   playfield.remove(list.get(h));
 									   soldatTyp = list.get(h).getTyp();
 									   fiende.setFood(fiende.getFood()+list.get(h).getFood());
-									   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;					   
-									   break;						   
+									   map.layer3[list.get(h).getXX()][list.get(h).getYY()] = null;
+									   break;
 								   }
 							   
 							   
@@ -519,8 +521,10 @@ public class RPGGame extends GameObject {
 								   }
 								   if (fiende.getHP()<=0){	
 									   battlescore=4;
-									   playfield.remove(fiende);									   
-									   map.layer3[targetX][targetY] = null;	
+									   if (!fiende.getTyp().equalsIgnoreCase("City")){
+										   playfield.remove(fiende);
+										   map.layer3[targetX][targetY] = null;
+									   }
 								   
 									   break;					   
 								   }
@@ -532,12 +536,12 @@ public class RPGGame extends GameObject {
 								   double DAU2= rand2.nextDouble() * AUDP;
 								   fiende.setHP((int) (fiende.getHP()-(DAU+DAU2)));
 							  	   
-								   if (fiende.getHP()<=0){	
+								   if (fiende.getHP()<=0 && !fiende.getTyp().equalsIgnoreCase("City")){	
 									   battlescore=4;
-									   playfield.remove(fiende);									   
+									   playfield.remove(fiende);
 									   map.layer3[targetX][targetY] = null;	
 									   list.remove(fiende);
-									   break;					   
+									   break;
 								   }
 						   
 						   
@@ -546,11 +550,13 @@ public class RPGGame extends GameObject {
 						   if(battlescore==1 && list.get(h).getTyp() != "Catapult" && list.get(h).getTyp() != "Trebuchet" && list.get(h).getTyp() != "Cannon"){
 							   dialogNP[0]=list.get(h).getTyp()+" won this battle\n";
 							   dialogNP[1]="but lost some soldiers\n";
-							   dialogNP[2]=list.get(h).getHP()+" soldiers are left";						   
+							   dialogNP[2]=list.get(h).getHP()+" soldiers are left";
 							   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-							   windowHandler.setVisible(true);						   				  						   
-							   list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-							   list.remove(fiende);						   
+							   windowHandler.setVisible(true);
+							   if (!fiende.getTyp().equalsIgnoreCase("City")){
+								   list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
+								   list.remove(fiende);
+							   }
 							   gameState=TILEI;
 							   break;	
 						   }
@@ -559,10 +565,11 @@ public class RPGGame extends GameObject {
 							   dialogNP[1]="";
 							   dialogNP[2]="";
 							   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-							   windowHandler.setVisible(true);						   				  							   
-							   list.remove(list.get(h));
+							   windowHandler.setVisible(true);
+							   if (!fiende.getTyp().equalsIgnoreCase("City"))
+								   list.remove(list.get(h));
 							   gameState=TILEI;
-							   break;	 						   
+							   break;
 						   }
 						   else if(battlescore==3 && list.get(h).getTyp() != "Catapult" && list.get(h).getTyp() != "Trebuchet" && list.get(h).getTyp() != "Cannon"){
 							   dialogNP[0]="The battle is over.\n";
@@ -570,20 +577,21 @@ public class RPGGame extends GameObject {
 							   dialogNP[2]="soldiers left";
 							   list.get(h).movement();
 							   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-							   windowHandler.setVisible(true);						   				  	
+							   windowHandler.setVisible(true);
 							   gameState=TILEI;
-							   break;	 						   
+							   break;
 						   }
 						   else if(battlescore==4 && list.get(h).getTyp() == "Catapult" || list.get(h).getTyp() == "Trebuchet" || list.get(h).getTyp() == "Cannon" && fiende.getHP()<=0){
 							   dialogNP[0]="Your "+list.get(h).getTyp()+"\n";
 							   dialogNP[1]="performed a bombardment\n";
 							   dialogNP[2]="on an enemy unit";
-							   list.remove(fiende);
+							   if (!fiende.getTyp().equalsIgnoreCase("City"))
+							   		list.remove(fiende);
 							   list.get(h).movement();
 							   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
-							   windowHandler.setVisible(true);						   				  	
+							   windowHandler.setVisible(true);
 							   gameState=TILEI;
-							   break;	 				 						   
+							   break;
 						   }
 						   else if(battlescore==4 && list.get(h).getTyp() == "Catapult" || list.get(h).getTyp() == "Trebuchet" || list.get(h).getTyp() == "Cannon"){
 							   dialogNP[0]="Your "+list.get(h).getTyp()+"\n";
@@ -592,8 +600,8 @@ public class RPGGame extends GameObject {
 							   list.get(h).movement();
 							   windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 							   windowHandler.setVisible(true);
-							   gameState=TILEI;							   
-							   break;	 				 						   
+							   gameState=TILEI;
+							   break;
 						   }	
 					   }
 				}
@@ -604,6 +612,8 @@ public class RPGGame extends GameObject {
 					
 					if (funnen && list.get(h).selmov){
 						
+						if (!list.get(h).canMove())
+							break;
 						funnen=false;		
 						fiende=null;
 						if (tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange() && tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() || tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() && tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() || tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() && tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange() || tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() && tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() || tileAt.y == list.get(h).tileY +1 || tileAt.y > list.get(h).tileY +1 && tileAt.y <= list.get(h).tileY+list.get(h).getRange() && tileAt.x == list.get(h).tileX +0 || tileAt.y == list.get(h).tileY -1 || tileAt.y < list.get(h).tileY -1 && tileAt.y >= list.get(h).tileY-list.get(h).getRange() && tileAt.x == list.get(h).tileX +0 || tileAt.y == list.get(h).tileY +0 && tileAt.x == list.get(h).tileX -1 || tileAt.x < list.get(h).tileX -1 && tileAt.x >= list.get(h).tileX-list.get(h).getRange() || tileAt.y == list.get(h).tileY +0 && tileAt.x == list.get(h).tileX +1 || tileAt.x > list.get(h).tileX +1 && tileAt.x <= list.get(h).tileX+list.get(h).getRange()){
@@ -611,12 +621,12 @@ public class RPGGame extends GameObject {
 							 if(multiplayer==false)
 								 fiende = (RPGSprite) map.getLayer3(targetX, targetY);
 							 else if(multiplayer==true){
-								// fiende = (RPGSprite) map.getLayer3(targetX, targetY);
-								 for(int g=0;g<list.size();g++){
-									 if(list.get(g).getXX()==targetX && list.get(g).getYY()==targetY){
-										 fiende = list.get(g);
-									 }
-								 }
+								fiende = (RPGSprite) map.getLayer3(targetX, targetY);
+								 //for(int g=0;g<list.size();g++){
+									 //if(list.get(g).getXX()==targetX && list.get(g).getYY()==targetY){
+										 //fiende = list.get(g);
+									// }
+								 //}
 							 }
 						}
 						
@@ -638,17 +648,18 @@ public class RPGGame extends GameObject {
 												
 							dialogNP[0]=list.get(h).getTyp()+" with "+list.get(h).getHP()+" MP\n";
 							dialogNP[1]="has a "+chance+"% chance\n";
-							dialogNP[2]="against "+fiende.getTyp()+" with "+fiende.getHP()+ " MP";							
+							dialogNP[2]="against "+fiende.getTyp()+" with "+fiende.getHP()+ " MP";
 							windowHandler.setLabel(dialogNP[0] + dialogNP[1] + dialogNP[2]);
 							windowHandler.setVisible(true);
 							gameState=TILEI;	
 						}
-						if (fiende != null && fiende!=list.get(h) && battle==false && fiende.friend!=list.get(h).friend) {
-							if (turn > 25){
+						if (fiende != null && fiende!=list.get(h) && battle==false && fiende.friend!=list.get(h).friend && fiende.idle==false) {
+							if (turn > 25 && list.get(h).canMove() && true){
 								battle=true;
+								list.get(h).moveThisTurn++;
 								break;
 							}
-																	
+							
 								}else 	
 									if(multiplayer==true){
 										istad=false;
@@ -671,39 +682,47 @@ public class RPGGame extends GameObject {
 													list.get(h).sparad=false;
 													test.clear();
 													
-													
 												} catch (FailedException e) {
 													// TODO Auto-generated catch block
 													e.printStackTrace();
 												}
 											}
 										}
+										
 										if(istad==false){
-											for(int o=0;o<list.size();o++){
+											int o=0;
+											boolean lolz=true;
+											for(o=0;o<list.size();o++){
+												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="City" && list.get(o).friend==true){
+														list.get(h).sparad=true;
+												}
 												
-												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="City" ){
-													
+												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="City" && list.get(o).friend==false && list.get(o).idle==true){
 													list.get(h).sparad=true;
 												}
-												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="SiegeTower" ){
-													
-													list.get(h).sparad=true;
+												
+												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="City" && list.get(o).friend==false && list.get(o).idle==false){
+													lolz=false;
+												}
+												
+												if(list.get(o).getXX() == list.get(h).getXX() && list.get(o).getYY() == list.get(h).getYY() && list.get(o).getTyp()=="SiegeTower" && list.get(o).friend==true){
+														list.get(h).sparad=true;
 												}
 											}
-											try {
-												
-												p.moveUnit(test);
-												test.clear();
-												ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
-											
-											} catch (FailedException e) {
-												// TODO Auto-generated catch block
-												e.printStackTrace();
+											if (lolz){
+												try {
+													p.moveUnit(test);	
+													test.clear();
+													ga=true;
+													ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
+												} catch (FailedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
 												
 											}
 										}
 										
-											
 										if (!bordat)
 											list.get(h).movement();	
 										
@@ -714,22 +733,27 @@ public class RPGGame extends GameObject {
 											bordat=false;
 										}
 										
-											
 										a=0;
 										break;
 										
 									}
+						
+						if(multiplayer==true && ga==true){
 							list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
-							if (!bordat)
-								list.get(h).movement();	
+							ga=false;
+						}
+						if(multiplayer==false)
+							list.get(h).test(tileAt.x,tileAt.y, list.get(h), list);
+						if (!bordat)
+							list.get(h).movement();	
 							a=0;
-							if (bordat){
-								playfield.remove(list.get(h));
+						if (bordat){
+							playfield.remove(list.get(h));
 								
-								list.remove(h);
-								bordat=false;
+							list.remove(h);
+							bordat=false;
 							}
-							}
+					}
 					if (!funnen){
 						h=0;
 						for(h = 0; h<list.size();h++){
@@ -746,7 +770,6 @@ public class RPGGame extends GameObject {
 								list.get(h).dirSet(3);
 								ActionBar.send(list.get(h), playfield, map.layer3, list, this, map);
 								actionBar.initResources();
-
 								break;
 							}
 						}
@@ -763,9 +786,9 @@ public class RPGGame extends GameObject {
 						xs = list.get(a).getXX();
 						ys = list.get(a).getYY();
 						if (tileAt.x == xs && tileAt.y == ys && list.get(a).getTyp()!="Mine"){
-							list.get(a).dirSet(3);						
+							list.get(a).dirSet(3);
 							ActionBar.send(list.get(a), playfield, map.layer3, list, this, map);
-							actionBar.initResources();						
+							actionBar.initResources();
 							break;
 						}
 						if(a>list.size()-1)
@@ -877,8 +900,7 @@ public class RPGGame extends GameObject {
 						for(int f = 0; f<list.size();f++){
 							if(list.get(f).sparad==false)
 								playfield.remove(list.get(f));
-							
-							
+								
 						}
 						delt=false;
 						
@@ -887,7 +909,7 @@ public class RPGGame extends GameObject {
 					for(int f=0;f<list.size();f++){
 						if(list.get(f).sparad==true){
 							list.get(f).mov = true;
-							list.get(f).moveThisTurn = 0;					
+							list.get(f).moveThisTurn = 0;
 							list.get(f).setMove(2);
 							listny.add(list.get(f));
 						}
@@ -1277,9 +1299,24 @@ public class RPGGame extends GameObject {
 							}
 							if(received.existCity(i)){
 								theOwner = received.getCityOwner(i);
-								
 								if(theOwner.equalsIgnoreCase(nick)){
-									list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true));														
+									list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, true, true));
+									if (!byggList.isEmpty()){
+										for (int j=0; j < byggList.size(); j++)
+										{
+											if (xe == byggList.get(j).tileX && ye == byggList.get(j).tileY && turn < byggList.get(j).turnDone){
+												list.get(list.size()-1).idle=false;
+												j=Integer.MAX_VALUE-1;
+												break;
+											}
+											else{
+												list.get(list.size()-1).idle=true;
+											}
+										}
+									}
+									else{
+										list.get(list.size()-1).idle=true;
+									}
 									playfield.add(list.get(list.size()-1));
 									ActionBar.send(list.get(list.size()-1), playfield, map.layer3, list, this, map);
 									map.setToCenter(list.get(list.size()-1));
@@ -1289,11 +1326,18 @@ public class RPGGame extends GameObject {
 									
 								}
 								if(!theOwner.equalsIgnoreCase(nick)){
-									list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false));														
+									if (received.getAmountCityUnits(i) > 0){
+										list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false, false));
+										list.get(list.size()-1).idle=false;
+									}
+									else{
+										list.add(new RPGSprite(this,getImages("citytile.png",3,4), xe,ye, 3, RPGSprite.DOWN, 1, 1, 10, 1, 1, 1, 2, "City",1000, false, true));
+									}
 									TurnBar.send(this);
 									TurnBar.initResources();
-									if(Map.fogofwar[xe][ye] < map.lwrlmt)
+									if(Map.fogofwar[xe][ye] < map.lwrlmt){
 										playfield.add(list.get(list.size()-1));
+									}
 									
 								}
 							}}}
@@ -1460,10 +1504,10 @@ public class RPGGame extends GameObject {
 	}
 	
 	public void spawnBarb(){
-		if(true){//turn>25){
+		if(turn>25){
 			int x = rand.nextInt(Map.maxX-1);
 			int y = rand.nextInt(Map.maxY-1);
-			//if (rand.nextInt(5)==0 && Map.fogofwar[x][y] < map.lwrlmt){
+			if (rand.nextInt(5)==0 && Map.fogofwar[x][y] < map.lwrlmt){
 				if(map.layer1[x][y] == 1 || map.layer1[x][y] == 0)
 					if (rand.nextInt(2) == 0)
 						list.add(new NPC(this, getImages("GalleySheet.png",3,4), x,y, 3, RPGSprite.RIGHT, 30,25, 250, 1, 2, 4, 2, "BarbarianB",logic));
@@ -1492,31 +1536,29 @@ public class RPGGame extends GameObject {
 				}
 				Map.send(playfield, list, this);
 				
-			//}
+			}
 		}
 	}
 	void spawnUnit(){
 		boolean change=false;
 		for (int i = 0; i < byggList.size(); i++){
-			if (byggList.get(i).turnDone<=turn){
-				createUnit(byggList.get(i).tileX, byggList.get(i).tileY, byggList.get(i).building);
-				byggList.get(i).sprite.idle=true;
+			if (byggList.get(i).turnDone<=turn && byggList.get(i).sprite.friend){
+				createUnit(byggList.get(i).tileX, byggList.get(i).tileY, byggList.get(i).building, byggList.get(i).sprite);
+				byggList.get(i).sprite.setIdle();
 				change=true;
 			}
 		}
 		if (change){
-			System.out.println(byggList);
 			for (int i = 0; i < byggList.size(); i++){
-				System.out.print(""+i);
-				if (byggList.get(i).turnDone<=turn){
-					byggList.get(i).sprite.idle=true;
+				if (byggList.get(i).turnDone<=turn && byggList.get(i).sprite.friend){
+					byggList.get(i).sprite.setIdle();
 					byggList.remove(i); 
 					i--;
 				}
 			}
 		}
 	}
-	void createUnit(int x,int y, String str){
+	void createUnit(int x,int y, String str, RPGSprite sprite){
 		if (str.equalsIgnoreCase("Archer")){
 			list.add(new RPGSprite(this, parent.getImages("ArcherSheet.png",3,4), x, y, 3, RPGSprite.RIGHT, 4,2, 100, 1, 2, 1, 2, "Archer",1000,true));
 			playfield.add(list.get(list.size()-1));

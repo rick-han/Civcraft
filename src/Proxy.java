@@ -9,7 +9,7 @@ public class Proxy
 	private final int	protocolVersion = 3;
 	private Receiver	receiver;
 
-	public Proxy(String host, int port, PacketListener pl)
+	public Proxy(String host, int port, PacketListener pl) throws Exception
 	{
 		try
 		{
@@ -24,11 +24,11 @@ public class Proxy
 		}
 		catch(UnknownHostException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 	}
 

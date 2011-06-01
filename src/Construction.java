@@ -10,7 +10,6 @@ public class Construction {
 		tileY=y;
 		turnDone=done;
 		building=str;
-		System.out.println(this);
 	}
 	public String toString(){
 		return "(" + tileX + ","+ tileY + ")" + building + ": " + (turnDone-RPGGame.turn)+" turns left";

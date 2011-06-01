@@ -41,8 +41,7 @@ public class Map extends AbstractTileBackground2 {
 	public Map(BaseLoader bsLoader, BaseIO bsIO, int width, int height){
 		super(0, 0, width, height);
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public Map(BaseLoader bsLoader, BaseIO bsIO, GameEngine parent, String nick){
 		super(0, 0, TILE_WIDTH, TILE_HEIGHT);
@@ -326,10 +325,11 @@ public class Map extends AbstractTileBackground2 {
 		if (multiplayer==false){
 			for(int h = 0; h<list2.size();h++){
 				int xs = list2.get(h).getXX();
-				int ys = list2.get(h).getYY();		    			
+				int ys = list2.get(h).getYY();
 				if (layer3[tileX][tileY] != null)
-					if(layer3[tileX][tileY].friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City")
+					if(list2.get(h).friend==true && xs == tileX && ys == tileY && list2.get(h).getTyp()=="City" && unit.getTyp()!="Barbarian" && unit.getTyp()!="BarbarianB"){
 						return false;
+					}
 			}
 			if (layer1[tileX][tileY] == 0 || layer1[tileX][tileY] == 1){
 				if(layer3[tileX][tileY] != null){
@@ -342,8 +342,6 @@ public class Map extends AbstractTileBackground2 {
 							if (boot.capacity[j]==null){
 								unit.render=false;
 								boot.capacity[j]=unit;
-								playfield.remove(unit);
-								list2.remove(unit);
 								RPGGame.bordat=true;
 								return false;
 							}
@@ -353,14 +351,16 @@ public class Map extends AbstractTileBackground2 {
 				return true;
 			}
 			if(layer3[tileX][tileY] != null){
+				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()=="City" && unit.getTyp()=="Barbarian" || unit.getTyp()=="BarbarianB")
+					return true;
 				if(layer3[tileX][tileY].getTyp()=="City" && layer3[tileX][tileY].friend==unit.friend)
 					return false;
 				if(layer3[tileX][tileY].getTyp()=="SiegeTower" && layer3[tileX][tileY].friend==unit.friend)
 					return false;
-				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City" || layer3[tileX][tileY].getTyp()!="SiegeTower")		
+				if(layer3[tileX][tileY].friend==true && layer3[tileX][tileY].getTyp()!="City" || layer3[tileX][tileY].getTyp()!="SiegeTower")
 					return true;
 			}
-
+			
 		}
 		if (multiplayer==true){
 			if (((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Sea") || ((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean")){
@@ -369,6 +369,7 @@ public class Map extends AbstractTileBackground2 {
 						if (list2.get(l).getXX()==tileX && list2.get(l).getYY()==tileY && list2.get(l).checkCapacity())	
 							boot = list2.get(l);
 					}
+					
 					if (layer3[tileX][tileY].friend==true && boot!=null){
 						for (int j = 0; j < boot.capacity.length; j++){
 							if (boot.capacity[j]==null){
@@ -376,16 +377,16 @@ public class Map extends AbstractTileBackground2 {
 								boot.capacity[j]=unit;
 								RPGGame.bordat=true;
 								/*
-								 * try {
-									ActionBar.p.disbandUnit(unit.getXX(), unit.getYY());
+								try {
+									ActionBar.p.insertUnit(unit.getXX(), unit.getYY(), boot.getXX(), boot.getYY());
 									list2.remove(unit);
 									
 								} catch (FailedException e) {
 									// TODO Auto-generated catch block
 								e.printStackTrace();
 								}
-								return false;
 								*/
+								return false;
 							}
 						}
 					}
@@ -396,6 +397,13 @@ public class Map extends AbstractTileBackground2 {
 				return true;
 			if(((String) (((ArrayList) k.get(tileX))).get(tileY)).equalsIgnoreCase("Ocean"))
 				return true;
+			if(layer3[tileX][tileY] != null){
+				if(layer3[tileX][tileY].getTyp().equalsIgnoreCase("City") && !layer3[tileX][tileY].idle){// && unit.mov){
+					unit.setMov();
+					return true;
+				}
+				
+			}
 		}
 		return false;
 		
@@ -435,7 +443,6 @@ public class Map extends AbstractTileBackground2 {
 		return true;
 	}
 
-
 	public RPGSprite getLayer3(int tileX, int tileY) {
 	try {
 	    return layer3[tileX][tileY];
@@ -443,7 +450,6 @@ public class Map extends AbstractTileBackground2 {
 		// out of bounds
 		return null;
 	} }
-
 
 	// chipset is only a pack of images
 	class Chipset {
@@ -469,7 +475,6 @@ public class Map extends AbstractTileBackground2 {
 			// out of bounds
 			return true;
 		} }
-
 
 void updateFogOfWar(){
 	if(multiplayer==false){

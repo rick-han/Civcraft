@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,6 +20,7 @@ public class MultiplayerMenu extends GameObject{
 	TTextField nickText;
 	Result returned;
 	Civcraft parent;
+	TLabel msgLabel;
 	public MultiplayerMenu(GameEngine parent) {
 		super(parent);
 		this.parent = (Civcraft)parent;
@@ -26,7 +29,7 @@ public class MultiplayerMenu extends GameObject{
 	public void initResources() {
 		frame = new FrameWork(bsInput, getWidth(), getHeight());
 		background = getImage("Title.png", false);
-		TLabel msgLabel = new TLabel("", 150, 20, 200, 40);
+		msgLabel = new TLabel("", 150, 20, 200, 40);
 		
 		TLabel nickLabel = new TLabel("Nickname:", 150, 50, 200, 40);
 		nickText = new TTextField("abc", 150, 80, 150, 25);
@@ -39,23 +42,35 @@ public class MultiplayerMenu extends GameObject{
 		
 		TButton connectButton = new TButton("Connect", 150, 270, 90, 30){
 			public void doAction() {
-				RPGGame.nick = nickText.getText();		
-				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss(parent)));
+				boolean hostFound = true;
+				RPGGame.nick = nickText.getText();
 				try {
-					returned = parent.getProxy().connect(nickText.getText());
-				} catch (FailedException e) {
-					e.printStackTrace();
+					parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss(parent)));
+				} catch (Exception e) {
+					if (e instanceof UnknownHostException){
+						hostFound = false;
+						msgLabel.setText("The host was not found!");
+					}else if (e instanceof IOException){
+						hostFound = false;
+						msgLabel.setText("An IOException was thrown!");
+					}
 				}
-				if (returned.getOk()){
-					parent.nextGameID = Civcraft.LOBBY;
-					finish();
-				}else{
-					
+				if (hostFound){
+					try {
+						returned = parent.getProxy().connect(nickText.getText());
+					} catch (FailedException e){
+						hostFound = false;
+						msgLabel.setText("The nickname already exists!");
+					}
+					if (hostFound && returned.getOk()){
+						parent.nextGameID = Civcraft.LOBBY;
+						finish();
+					}
 				}
 			}
 		};
 		
-		TButton hostButton = new TButton("Connect&Host&Start", 220, 270, 120, 30){
+		/*TButton hostButton = new TButton("Connect&Host&Start", 220, 270, 120, 30){
 			public void doAction() {
 				RPGGame.nick = nickText.getText();
 				parent.setProxy(new Proxy(hostText.getText(), Integer.valueOf(portText.getText()), new MyPackLyss(parent)));
@@ -85,7 +100,7 @@ public class MultiplayerMenu extends GameObject{
 					
 				}
 			}
-		};
+		};*/
 		GameFont externalFont = fontManager.getFont(new Font("Arial", Font.BOLD, 16));
 		hostLabel.UIResource().put("Text Font", externalFont);
 		hostLabel.UIResource().put("Text Color", Color.RED);
@@ -104,8 +119,9 @@ public class MultiplayerMenu extends GameObject{
 		frame.add(portText);
 		frame.add(nickLabel);
 		frame.add(nickText);
+		frame.add(msgLabel);
 		frame.add(connectButton);
-		frame.add(hostButton);
+		//frame.add(hostButton);
 		
 	}
 
